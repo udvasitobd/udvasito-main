@@ -7,11 +7,28 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@/assets/*": ["./assets/*"],
-      "@convex/*": ["./convex/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/assets/*": [
+        "./assets/*"
+      ],
+      "@convex/*": [
+        "./convex/*"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"],
-  "exclude": ["node_modules", "dist", "convex/_generated/**/*.js"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "convex/_generated/**/*.js",
+    "scripts"
+  ]
 }
