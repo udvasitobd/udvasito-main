@@ -1,10 +1,10 @@
 /** CMP-PracticeBadge — yellow "PRACTICE / অনুশীলন" pill on every practice screen (specs §1.9). */
-import { FlaskConical } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { colors } from '@/theme/tokens';
 
+import { FlaskConical } from './icons';
 import { Text } from './Text';
 
 export function PracticeBadge() {

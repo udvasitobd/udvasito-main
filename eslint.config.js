@@ -34,6 +34,20 @@ module.exports = defineConfig([
     },
   },
   {
+    // Metro does not tree-shake: the lucide barrel ships all ~1,600 icons. Icons come from src/components/icons.ts.
+    files: ['app/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
+    ignores: ['src/components/icons.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [{ name: 'lucide-react-native', message: "Import icons from '@/components/icons' (one module per icon)." }],
+          patterns: [{ group: ['lucide-react-native/icons'], message: "Import icons from '@/components/icons'." }],
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.test.ts', '**/*.test.tsx', 'scripts/**/*.ts', 'e2e/**/*.ts'],
     rules: { 'i18next/no-literal-string': 'off' },
   },

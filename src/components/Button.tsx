@@ -1,16 +1,16 @@
 /**
  * CMP-Button — specs §1.3.5. Variants primary / secondary (navy outline) / ghost / danger (primary outline +
- * warning icon). States: pressed, disabled (40 % + accessibilityState.disabled), loading (spinner; the label stays
+ * warning icon). States: pressed, disabled (40 % + aria-disabled), loading (spinner; the label stays
  * for screen readers). Touch target ≥ 48 dp; primary 52 dp tall.
  */
 import { cva, type VariantProps } from 'class-variance-authority';
-import { TriangleAlert, type LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, View, type PressableProps } from 'react-native';
 
 import { cn } from '@/lib/cn';
 import { colors } from '@/theme/tokens';
 
+import { TriangleAlert, type LucideIcon } from './icons';
 import { Text } from './Text';
 
 const button = cva('flex-row items-center justify-center gap-s2 rounded-sm px-s4 web:focus-visible:outline-none', {
@@ -75,14 +75,15 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
+      aria-disabled={isDisabled}
+      aria-busy={loading}
       disabled={isDisabled}
       hitSlop={4}
       className={cn(button({ variant: v, size, block }), isDisabled && 'opacity-40', className)}
       {...rest}
     >
       {loading ? (
-        <ActivityIndicator color={spinnerColor[v]} accessibilityElementsHidden importantForAccessibility="no" />
+        <ActivityIndicator color={spinnerColor[v]} aria-hidden />
       ) : (
         (leading ?? (Icon ? <Icon size={20} color={spinnerColor[v]} aria-hidden /> : null))
       )}

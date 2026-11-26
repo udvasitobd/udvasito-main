@@ -3,12 +3,12 @@
  * toggle and Sign out. The Home sections arrive with the features they belong to (P1+).
  */
 import { router } from 'expo-router';
-import { LogOut } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Banner, Button, LogoMark, Screen, Text } from '@/components';
+import { LogOut } from '@/components/icons';
 import { authClient } from '@/lib/convex';
 
 export default function Home() {

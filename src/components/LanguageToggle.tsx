@@ -37,8 +37,7 @@ export function LanguageToggle({ large = false, onChange }: { large?: boolean; o
           <Pressable
             key={o.value}
             accessibilityRole="radio"
-            accessibilityState={{ checked: selected }}
-            accessibilityLabel={o.long}
+            aria-checked={selected}
             aria-label={o.long}
             lang={o.value}
             onPress={() => choose(o.value)}

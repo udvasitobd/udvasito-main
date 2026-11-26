@@ -3,7 +3,6 @@
  * + CMP-OfflineBanner + scrollable content (16 px padding on phones, 24 px from 768 px, max width 720).
  */
 import { router } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +12,7 @@ import Svg, { Path } from 'react-native-svg';
 import { cn } from '@/lib/cn';
 import { breakpoints, colors } from '@/theme/tokens';
 
+import { ChevronLeft } from './icons';
 import { LanguageToggle } from './LanguageToggle';
 import { OfflineBanner } from './OfflineBanner';
 import { PracticeBadge } from './PracticeBadge';

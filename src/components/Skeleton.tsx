@@ -1,29 +1,33 @@
 /** CMP-Skeleton — grey blocks matching the final layout; gently pulses unless "reduce motion" is on (§1.7). */
-import { useEffect } from 'react';
-import { View, type ViewProps } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
+import { useEffect, useState } from 'react';
+import { Animated, Easing, View, type ViewProps } from 'react-native';
 
 import { cn } from '@/lib/cn';
+import { USE_NATIVE_DRIVER, useReduceMotion } from '@/lib/motion';
+
+import { AnimatedView } from './AnimatedView';
+
+const PULSE_MS = 900;
 
 export function Skeleton({ className, style, ...rest }: ViewProps & { className?: string }) {
-  const reduceMotion = useReducedMotion();
-  const opacity = useSharedValue(1);
+  const reduceMotion = useReduceMotion();
+  const [opacity] = useState(() => new Animated.Value(1));
   useEffect(() => {
-    if (!reduceMotion) opacity.value = withRepeat(withTiming(0.55, { duration: 900 }), -1, true);
+    if (reduceMotion) {
+      opacity.setValue(1);
+      return;
+    }
+    const step = (toValue: number) =>
+      Animated.timing(opacity, { toValue, duration: PULSE_MS, easing: Easing.inOut(Easing.quad), useNativeDriver: USE_NATIVE_DRIVER });
+    const loop = Animated.loop(Animated.sequence([step(0.55), step(1)]));
+    loop.start();
+    return () => loop.stop();
   }, [opacity, reduceMotion]);
-  const animated = useAnimatedStyle(() => ({ opacity: opacity.value }));
   return (
-    <Animated.View
-      accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants"
+    <AnimatedView
+      aria-hidden
       className={cn('rounded-sm bg-line', className)}
-      style={[animated, style]}
+      style={[{ opacity }, style]}
       {...rest}
     />
   );

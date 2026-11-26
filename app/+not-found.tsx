@@ -1,10 +1,10 @@
 /** Not found (specs §1.2) — `notFound.body` and a way back. The helpline was removed from this page (D-R3). */
 import { router } from 'expo-router';
-import { SearchX } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button, Screen, Text } from '@/components';
+import { SearchX } from '@/components/icons';
 import { colors } from '@/theme/tokens';
 
 export default function NotFound() {

@@ -2,13 +2,13 @@
  * A helpline button (D-R3): shown only when a helpline number is set; the number is fetched on tap and then shown
  * as a tap-to-call button. Used on sign-in, ErrorState ("Get help"), status screens and limit errors.
  */
-import { Phone } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useAppConfig } from '@/lib/appConfig';
 import { useHelpline } from '@/lib/helpline';
 
+import { Phone } from './icons';
 import { Banner } from './Banner';
 import { Button, type ButtonProps } from './Button';
 

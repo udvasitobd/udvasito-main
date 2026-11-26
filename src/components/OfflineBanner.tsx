@@ -1,11 +1,11 @@
 /** CMP-OfflineBanner — sticky top banner while offline; shows the pending outbox count (outbox arrives in P4). */
 import { useNetworkState } from 'expo-network';
-import { WifiOff } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { colors } from '@/theme/tokens';
 
+import { WifiOff } from './icons';
 import { Text } from './Text';
 
 export function OfflineBanner({ pending = 0 }: { pending?: number }) {

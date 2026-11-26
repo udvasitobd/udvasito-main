@@ -1,11 +1,11 @@
 /** CMP-Banner — info / warning / success / error with icon + text + optional action (never colour alone). */
-import { CircleAlert, CircleCheck, Info, TriangleAlert } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { cn } from '@/lib/cn';
 import { colors } from '@/theme/tokens';
 
+import { CircleAlert, CircleCheck, Info, TriangleAlert } from './icons';
 import { Text } from './Text';
 
 const kinds = {

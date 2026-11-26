@@ -2,7 +2,6 @@
  * CMP-ErrorState — icon + `errors.generic.title` + the message for the error code + Try again + Get help
  * (helpline through useHelpline(), D-R3). `small` is the inline variant used inside Home sections.
  */
-import { CircleAlert } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +9,7 @@ import { cn } from '@/lib/cn';
 import { errorMessage } from '@/lib/errors';
 import { colors } from '@/theme/tokens';
 
+import { CircleAlert } from './icons';
 import { Button } from './Button';
 import { HelplineButton } from './HelplineButton';
 import { Text } from './Text';

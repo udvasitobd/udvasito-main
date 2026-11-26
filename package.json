@@ -83,7 +83,8 @@
     "copy:check": "tsx scripts/extract-copy.ts --check",
     "seed:settings": "tsx scripts/seed-settings.ts",
     "build:web": "expo export --platform web",
-    "content:build": "tsx scripts/build-content.ts"
+    "content:build": "tsx scripts/build-content.ts",
+    "bundle:check": "tsx scripts/check-bundle.ts"
   },
   "private": true
 }

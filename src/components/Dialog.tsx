@@ -3,7 +3,6 @@
  * Android back closes (`onRequestClose`), the title is announced. Sheet = bottom sheet on phones, centred card on
  * wide screens; Dialog = centred card.
  */
-import { X } from 'lucide-react-native';
 import { useEffect, type ReactNode } from 'react';
 import { AccessibilityInfo, Modal, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cn } from '@/lib/cn';
 import { breakpoints, colors } from '@/theme/tokens';
 
+import { X } from './icons';
 import { Text } from './Text';
 
 type Props = {
@@ -66,7 +66,7 @@ export function Sheet({ open, onClose, ...rest }: Props) {
   return (
     <Modal visible={open} transparent animationType={asSheet ? 'slide' : 'fade'} onRequestClose={onClose} statusBarTranslucent>
       <View className={cn('flex-1 items-center bg-black/50', asSheet ? 'justify-end' : 'justify-center p-s4')}>
-        <Pressable className="absolute inset-0" onPress={onClose} accessibilityElementsHidden importantForAccessibility="no" />
+        <Pressable className="absolute inset-0" onPress={onClose} aria-hidden />
         <Frame onClose={onClose} sheet={asSheet} {...rest} />
       </View>
     </Modal>
@@ -78,7 +78,7 @@ export function Dialog({ open, onClose, ...rest }: Props) {
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <View className="flex-1 items-center justify-center bg-black/50 p-s4">
-        <Pressable className="absolute inset-0" onPress={onClose} accessibilityElementsHidden importantForAccessibility="no" />
+        <Pressable className="absolute inset-0" onPress={onClose} aria-hidden />
         <Frame onClose={onClose} sheet={false} {...rest} />
       </View>
     </Modal>

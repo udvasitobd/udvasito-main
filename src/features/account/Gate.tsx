@@ -26,7 +26,7 @@ type Group = '(app)' | '(onboarding)';
 export function LoadingScreen() {
   return (
     <SafeAreaView className="flex-1 bg-app">
-      <View accessibilityState={{ busy: true }} aria-busy className="w-full max-w-content gap-s4 self-center p-s4">
+      <View aria-busy className="w-full max-w-content gap-s4 self-center p-s4">
         <SkeletonCard />
         <SkeletonCard />
       </View>
