@@ -17,14 +17,16 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, FontsLoadedContext, ToastProvider } from '@/components';
+import { AppRoot } from '@/components/AppRoot';
 import { authClient, convex } from '@/lib/convex';
 import { i18n, initI18n } from '@/lib/i18n';
+import { initSentry, reportError } from '@/lib/sentry';
 import { colors } from '@/theme/tokens';
 
+initSentry();
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 const FONT_TIMEOUT_MS = 2000;
@@ -56,7 +58,7 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <AppRoot>
       <ConvexBetterAuthProvider client={convex} authClient={authClient}>
         <I18nextProvider i18n={i18n}>
           <FontsLoadedContext.Provider value={fontsLoaded}>
@@ -69,12 +71,13 @@ export default function RootLayout() {
           </FontsLoadedContext.Provider>
         </I18nextProvider>
       </ConvexBetterAuthProvider>
-    </GestureHandlerRootView>
+    </AppRoot>
   );
 }
 
 /** Any render error lands here: CMP-ErrorState with Try again (and the helpline when it is set). */
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => reportError(error), [error]);
   return (
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 items-center justify-center bg-app">
