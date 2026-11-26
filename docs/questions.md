@@ -43,3 +43,27 @@ Status: ✅ answered
 but a renamed channel loses the user's per-channel settings, so we fix it now).
 **Answer (2026-11-27, developer): "you decide" → A.** specs §6.8 updated to match §1.2.1 (specs change log 1.3).
 Status: ✅ answered
+
+### Q-007 · 2026-11-27 · P0 · Places dataset: which files, and permission to download them
+ADR-013 candidates checked (licence first):
+- `bangladesh-geo-data` repos on GitHub: **no licence** → cannot be used.
+- `nuhil/bangladesh-geocode` (MIT; data from BBS / UN OCHA COD-AB, CC BY-IGO): 8 divisions, 64 districts, 495 upazilas with
+  English + Bangla names, centres and BBS codes. Its published upazila list has **no Chattogram metropolitan thanas**; its
+  `pipeline/sources/bbs_admin3_points.csv` has them in English with BBS codes and centres, but no Bangla names.
+- `mdtanjilhasan/bd-geocode-with-lat-long` (MIT, 2020): has the Chattogram thanas with English **and** Bangla names and centres
+  (some rows elsewhere have no coordinates). Its spellings differ from BBS (e.g. "Potenga" / "Patenga").
+
+**Recommendation:** divisions, districts and upazilas from nuhil (BBS codes as `code`); metropolitan thanas = BBS admin-3
+codes, English names and centres, plus Bangla names from bd-geocode-with-lat-long with the "থানা" suffix removed; member 2
+checks the thana list and spellings against the CMP official list (roadmap §5.2). Attribution in `docs/data-licences.md`
+and on the About page.
+Files to download (≈ 229 KB in total, committed under `data/sources/places/` with their licences):
+nuhil/bangladesh-geocode@master — `divisions/divisions.json` (1.4 KB), `districts/districts.json` (11 KB),
+`upazilas/upazilas.json` (90 KB), `pipeline/sources/bbs_admin3_points.csv` (37 KB), `pipeline/sources/manifest.json` (1.3 KB),
+`LICENSE` (1 KB); mdtanjilhasan/bd-geocode-with-lat-long@master — `all-in-one/db_geocode.json` (86 KB), `LICENSE` (1 KB).
+
+**Decision made with it (please confirm):** `src/data/places.min.json` is keyed by place `code`, not Convex `_id` (ids
+differ between staging and production, but one app bundle serves both). In P1 the app maps code → `_id` from the places
+it fetched; that needs `code` added to the `places.list` result (additive change to specs §6). The offline file holds no
+phone numbers or addresses (`hospitals.bloodBanksNear` is member-only).
+Status: ⏳ waiting for the developer's OK to download
