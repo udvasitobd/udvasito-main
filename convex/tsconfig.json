@@ -16,6 +16,6 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["./**/*", "../src/lib/**/*"],
+  "include": ["./**/*", "../src/lib/phone.ts"],
   "exclude": ["./_generated", "./**/*.test.ts"]
 }

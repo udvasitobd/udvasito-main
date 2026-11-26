@@ -82,14 +82,14 @@ export function checkPhone(input: string, field = 'phone'): Checked<string> {
 export function checkReason(input: string, field = 'reason'): Checked<string> {
   const reason = input.trim();
   const length = [...reason].length;
-  if (length < 5 || length > 200) return fail(field, 'validation.VAL-18.range');
+  if (length < 5 || length > 200) return fail(field, 'validation.VAL-18.invalid');
   return ok(reason);
 }
 
 /** VAL-25 Delete confirmation: exactly `DELETE` or `মুছুন`. */
 export function checkDeleteWord(input: string): Checked<string> {
   const word = input.trim();
-  if (word !== 'DELETE' && word !== 'মুছুন') return fail('confirmWord', 'validation.VAL-25.mismatch');
+  if (word !== 'DELETE' && word !== 'মুছুন') return fail('confirmWord', 'validation.VAL-25.invalid');
   return ok(word);
 }
 
