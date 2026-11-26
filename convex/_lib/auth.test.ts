@@ -104,11 +104,17 @@ describe('loadCaller', () => {
 });
 
 describe('public.appConfig (public)', () => {
+  it('hides helpline buttons until a number is set', async () => {
+    const t = makeT();
+    expect((await t.query(api.public.appConfig, {})).helplineAvailable).toBe(false);
+  });
+
   it('works signed out and never contains a phone number', async () => {
     const t = makeT();
     await t.run((ctx) => ctx.db.insert('settings', { key: 'fallbackContactPhone', value: '+8801812345678' }));
     const config = await t.query(api.public.appConfig, {});
     expect(config.consentVersion).toBe('2026-11-28-pilot');
+    expect(config.helplineAvailable).toBe(true);
     expect(JSON.stringify(config)).not.toMatch(/\+?8801\d{9}|01[3-9]\d{8}/);
   });
 });

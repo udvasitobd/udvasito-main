@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { buildDictionaries, parseNotificationCell, parseSpecs, parseValidationCell, splitRow } from './copy';
+import { buildDictionaries, parseNotificationCell, parseSpecs, parseValidationCell, splitBilingual, splitRow } from './copy';
 
 describe('copy parser', () => {
   it('reads copy tables, error codes and inline copy', () => {
@@ -63,6 +63,19 @@ describe('copy parser', () => {
       'notifications.NTF-02.body=B',
       'notifications.NTF-02.body.donorCalls=C',
     ]);
+  });
+
+  it('reads the account-status table', () => {
+    const md = [
+      '| Status | Title EN / BN | Body EN / BN | Actions |',
+      '|---|---|---|---|',
+      '| `banned` | Closed / বন্ধ | Reason: {{reason}}. / কারণ: {{reason}}। | Contact us |',
+    ].join('\n');
+    expect(parseSpecs(md).entries.map((e) => [e.key, e.en, e.bn])).toEqual([
+      ['accountStatus.banned.title', 'Closed', 'বন্ধ'],
+      ['accountStatus.banned.body', 'Reason: {{reason}}.', 'কারণ: {{reason}}।'],
+    ]);
+    expect(splitBilingual('Ward / bed / ওয়ার্ড / বেড')).toEqual({ en: 'Ward / bed', bn: 'ওয়ার্ড / বেড' });
   });
 
   it('reports copy that has no key', () => {

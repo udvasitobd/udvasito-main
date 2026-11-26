@@ -25,6 +25,8 @@ export const appConfig = publicQuery({
         // The platform's own WhatsApp business number (not a person's) — shown only when WhatsApp is on.
         whatsappNumber: s.verification.whatsapp ? s.verification.whatsappNumber : '',
       },
+      // Whether helpline buttons can be shown (the number itself is fetched only on tap, D-R3; no dead controls, §1.9).
+      helplineAvailable: s.fallbackContactPhone !== '',
       features: s.features,
       aiFeatures: s['ai.features'],
     };

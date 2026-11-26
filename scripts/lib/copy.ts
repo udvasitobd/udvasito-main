@@ -5,6 +5,7 @@
  *   A. Copy tables         | Key | English | বাংলা |            → key as written
  *   B. Error-code table    | Code | English | বাংলা |           → errors.<CODE>
  *   C. Validation table    | Rule | … | Case → message … |      → validation.<rule>.<case> (no case → "invalid")
+ *   D2. Account-status table | Status | Title EN / BN | Body EN / BN | Actions | → accountStatus.<status>.title|body
  *   D. Notification table  | ID | To | Title EN / BN | Body EN / BN | Opens | → notifications.<ID>.title|body[.<label>]
  *   E. Inline copy in prose:  `some.key` "English" / "বাংলা"
  *   F. Copy without a key in specs (e.g. the practice badge): assigned a key in UNKEYED_COPY below by its exact
@@ -20,7 +21,7 @@ export type ParseResult = { entries: CopyEntry[]; issues: CopyIssue[]; unkeyed: 
  * Adding a key here is allowed; changing the English or Bangla text is not (edit docs/specs.md instead).
  */
 export const UNKEYED_COPY: Record<string, string> = {
-  PRACTICE: 'practice.badge',
+  PRACTICE: 'common.demo', // CMP-PracticeBadge — same text as common.demo in §3.0
   "This page doesn't exist.": 'notFound.body',
   'Use the web app': 'update.useWeb',
   'Contact details are paused while we review a report.': 'request.revealsFrozen',
@@ -54,13 +55,14 @@ function splitForms(cell: string): [string, string] {
 
 const unquoteKey = (cell: string) => cell.replace(/^`|`$/g, '').trim();
 
-type TableKind = 'copy' | 'errors' | 'validation' | 'notifications';
+type TableKind = 'copy' | 'errors' | 'validation' | 'notifications' | 'status';
 
 function tableKind(header: string[]): TableKind | null {
   const h = header.map((c) => c.toLowerCase());
   if (h[0] === 'key' && h[1] === 'english' && header[2] === 'বাংলা') return 'copy';
   if (h[0] === 'code' && h[1] === 'english' && header[2] === 'বাংলা') return 'errors';
   if (h[0] === 'rule' && h[1] === 'field' && (h[3] ?? '').startsWith('case')) return 'validation';
+  if (h[0] === 'status' && (h[1] ?? '').startsWith('title en')) return 'status';
   if (h[0] === 'id' && h[1] === 'to' && (h[2] ?? '').startsWith('title en')) return 'notifications';
   return null;
 }
@@ -71,6 +73,20 @@ function caseName(label: string): string {
   const l = label.trim();
   if (l === '>100') return 'tooOld';
   return l;
+}
+
+/**
+ * "English text / বাংলা টেক্সট" in one cell: split at the first " / " whose next part is Bangla, so a slash inside
+ * the English ("Ward / bed / ওয়ার্ড / বেড") stays in the English half.
+ */
+export function splitBilingual(cell: string): { en: string; bn: string } | null {
+  const parts = cell.split(' / ');
+  for (let i = 1; i < parts.length; i++) {
+    const en = parts.slice(0, i).join(' / ').trim();
+    const bn = parts.slice(i).join(' / ').trim();
+    if (!BENGALI.test(en) && BENGALI.test(parts[i] ?? '')) return { en, bn };
+  }
+  return null;
 }
 
 /** VAL cell: `empty → "EN" / "BN" · short → "EN" / "BN"` or just `"EN" / "BN"`. */
@@ -164,6 +180,19 @@ export function parseSpecs(markdown: string): ParseResult {
         const cases = parseValidationCell(messages ?? '');
         if (cases.length === 0) issues.push({ line: lineNo, message: `validation row without messages: ${rules}` });
         for (const id of ids) for (const c of cases) add(`validation.${id}.${c.name}`, c.en, c.bn, lineNo);
+        continue;
+      }
+      if (kind === 'status') {
+        const [status, title, body] = cells;
+        const name = unquoteKey(status ?? '');
+        for (const [part, cell] of [
+          ['title', title],
+          ['body', body],
+        ] as const) {
+          const pair = splitBilingual(cell ?? '');
+          if (pair) add(`accountStatus.${name}.${part}`, pair.en, pair.bn, lineNo);
+          else issues.push({ line: lineNo, message: `${name} ${part}: no "English / বাংলা" pair` });
+        }
         continue;
       }
       if (kind === 'notifications') {
