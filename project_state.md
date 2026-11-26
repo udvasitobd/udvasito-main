@@ -86,3 +86,14 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
 - Stop & ask: new dependency not in ADRs/specs, prod schema change, rule number/copy/visibility change, skipping a test,
   isolation changes, prod deploy, EAS native build (15/month).
 - Every string via t(); exact copy from specs; rule numbers from settings; rules/* pure TS + 100 % tests.
+
+## Resume here (2026-11-27, after 0df45cd)
+- Done in P0 item 9: convex/rules/places.ts + hospitals.ts (tested), admin.seed upsertPlaces/computeNeighbours (tested),
+  scripts/seed-places.ts + scripts/lib/places-file.ts (batches ≤ 20 K chars for `convex run` on Windows), scripts/lib/csv.ts.
+- Waiting: developer OK to download the places source files (docs/questions.md Q-007). Then write scripts/build-places.ts
+  (sources → data/places.json), docs/data-licences.md, run `npm run seed:places -- --file-only`.
+- Still to do: scripts/lib/hospitals-csv.ts + admin.seed upsertHospitals + scripts/import-hospitals.ts (header-only
+  data/hospitals.csv; reject bad rows, report without printing phone numbers; min.json hospitals without phone/address),
+  scripts/seed-staging.ts (refuse --prod), test:e2e, README, questions Q-005/Q-006 notes, for_me.md steps, CHANGELOG,
+  roadmap P0 → 🟦, accounts via Chrome, spikes, PR p0/foundations → staging + review (never merge before review).
+- Dev server task bt3fs0njp still holds port 8081; Chrome tab 1020493461 is mine.
