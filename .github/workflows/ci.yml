@@ -1,0 +1,59 @@
+# CI (ADR-019, build-prompts P0 item 11): every push and pull request.
+# Type check, lint (incl. the i18n no-literal-string rule), copy keys vs specs, Vitest + convex-test,
+# production dependency audit (specs §7.4), web build + bundle check (specs §7.1 budget; no phone numbers shipped).
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Copy keys match docs/specs.md
+        run: npm run copy:check
+
+      - name: Tests (rules, convex-test, scripts)
+        run: npm test
+
+      - name: Dependency audit (production, high and critical)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Web build
+        run: npm run build:web
+        env:
+          # Public deployment URLs (they ship inside the web bundle). Set them as repository *variables* to build
+          # against staging; otherwise a placeholder is used — this build is only measured, never deployed.
+          EXPO_PUBLIC_CONVEX_URL: ${{ vars.EXPO_PUBLIC_CONVEX_URL || 'https://ci-bundle-check.convex.cloud' }}
+          EXPO_PUBLIC_CONVEX_SITE_URL: ${{ vars.EXPO_PUBLIC_CONVEX_SITE_URL || 'https://ci-bundle-check.convex.site' }}
+          EXPO_PUBLIC_APP_ENV: ci
+
+      - name: Bundle check (size budget, no phone numbers)
+        run: npm run bundle:check
