@@ -86,5 +86,8 @@
     "content:build": "tsx scripts/build-content.ts",
     "bundle:check": "tsx scripts/check-bundle.ts"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "decode-uri-component": "0.5.1"
+  }
 }
