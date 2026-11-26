@@ -1,0 +1,57 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native (Continuous Native Generation — never committed)
+/ios
+/android
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.keystore
+*.mobileprovision
+*.apk
+*.aab
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# OS
+.DS_Store
+Thumbs.db
+*.pem
+
+# SECRETS — the repository is PUBLIC (CLAUDE.md rule 18)
+.env
+.env.*
+!.env.example
+google-services.json
+service-account*.json
+*credentials*.json
+
+# typescript
+*.tsbuildinfo
+
+# test output
+coverage/
+playwright-report/
+test-results/
+
+# Convex local
+.convex/
+
+# Large local-only files (brand-kit zip, promo videos) — kept on the developer's PC
+_local/
