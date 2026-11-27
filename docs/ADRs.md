@@ -19,6 +19,7 @@
 | Push notifications | **Expo Push** (Android) via the Convex push component + **Web Push** (VAPID) for browsers | ৳0 |
 | AI | **Gemini API free tier**, Flash-Lite, called only from Convex server actions | ৳0 |
 | Voice input | **expo-speech-recognition** (phone/browser built-in speech recognition) | ৳0 |
+| Copy a phone number | **expo-clipboard** (Expo SDK module, Android + web; stores nothing) — Q-022 | ৳0 |
 | Location & maps | **expo-location** + local nearest-hospital search; **MapLibre + OpenFreeMap** for the optional pin map; Google Maps link for directions | ৳0 |
 | Images | **Convex storage** for private slip photos; **Cloudinary** for public share-card images | ৳0 |
 | Web hosting | **Cloudflare Workers** (Free, static assets + a tiny Worker) → `udvasito.com`; DNS on Cloudflare (ADR-024) | ৳0 |
@@ -543,3 +544,4 @@ Pilot assumptions: ~500 donors, ~300 daily active users at peak, ~30 requests/da
 | 1.2 | 2026-11-23 | Step 7 decisions: practice sign-in rule (ADR-003), in-person verification (ADR-004 option E), pin map timing (ADR-012) |
 | 1.3 | 2026-11-27 | ADR-023: own domain `udvasito.com` replaces `udvasito.vercel.app` everywhere (developer decision, Q-002) |
 | 1.4 | 2026-11-27 | ADR-024: web hosting on Cloudflare Workers, DNS on Cloudflare (developer decision — Vercel sign-up failed); ADR-006/019/020/022/023, budget table and accounts updated |
+| 1.5 | 2026-11-28 | §0: `expo-clipboard` for the copy-number button (developer decision, Q-022) |

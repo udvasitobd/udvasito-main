@@ -2,10 +2,11 @@
  * CMP-ContactCard (specs §1.3.5): name, role chip, area / distance, phone, **Call** and **WhatsApp**, copy number.
  * Without a number (contact details paused, or the other person calls) the card shows `note` instead of buttons.
  *
- * Copy number uses the browser clipboard on web. On Android the number is selectable text (long-press → Copy): a
- * clipboard library is not in the ADRs yet (docs/questions.md Q-022), so no button is shown there.
+ * Copy number uses `expo-clipboard` on Android and web (Q-022). The number is also selectable text, so it can still be
+ * copied by hand if the browser refuses clipboard access.
  */
-import { Linking, Platform, View } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import { Linking, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { telUrl, whatsappUrl } from '@/features/alerts/links';
@@ -29,8 +30,6 @@ type Props = {
   note?: string;
 };
 
-const canCopy = Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.clipboard !== undefined;
-
 export function ContactCard({ name, role, where, phone, note }: Props) {
   const { t } = useTranslation();
   const toast = useToast();
@@ -39,8 +38,7 @@ export function ContactCard({ name, role, where, phone, note }: Props) {
   const copy = async () => {
     if (!phone) return;
     try {
-      await navigator.clipboard.writeText(displayPhone(phone));
-      toast.show(t('common.copied'));
+      if (await Clipboard.setStringAsync(displayPhone(phone))) toast.show(t('common.copied'));
     } catch {
       // The browser refused (no permission); the number stays visible to copy by hand.
     }
@@ -83,9 +81,7 @@ export function ContactCard({ name, role, where, phone, note }: Props) {
             onPress={() => void Linking.openURL(whatsappUrl(phone))}
             className="min-w-32 flex-1"
           />
-          {canCopy ? (
-            <Button label={t('common.copyNumber')} icon={Copy} variant="ghost" onPress={() => void copy()} block />
-          ) : null}
+          <Button label={t('common.copyNumber')} icon={Copy} variant="ghost" onPress={() => void copy()} block />
         </View>
       ) : null}
     </View>
