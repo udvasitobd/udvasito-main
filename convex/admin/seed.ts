@@ -7,6 +7,7 @@ import { v } from 'convex/values';
 
 import type { Doc, Id } from '../_generated/dataModel';
 import { internalMutation, type MutationCtx } from '../_generated/server';
+import { deploymentEnvironment } from '../_lib/environment';
 import { getSetting } from '../_lib/settings';
 import { hospitalSearchText } from '../rules/hospitals';
 import { insideBangladesh, neighbourCodes, placeErrors } from '../rules/places';
@@ -15,12 +16,16 @@ import { SETTING_KEYS, seedValues } from '../rules/settings';
 /** OQ-12: the pilot starts in Chattogram district. */
 const PILOT_DISTRICT_NAME_EN = 'Chattogram';
 
+/**
+ * The environment (staging or production values) comes from the deployment's SITE_URL, not from the CLI: staging is
+ * the prod deployment of the `udvasito-staging` project, so `--prod` cannot tell them apart.
+ */
 export const seedSettings = internalMutation({
   args: {
-    environment: v.union(v.literal('staging'), v.literal('production')),
     telegramBot: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const environment = deploymentEnvironment();
     const districts = await ctx.db
       .query('places')
       .withIndex('by_level_parent', (q) => q.eq('level', 'district'))
@@ -28,7 +33,7 @@ export const seedSettings = internalMutation({
     const pilot = districts.find((d) => d.nameEn === PILOT_DISTRICT_NAME_EN);
     const pilotDistrictIds = pilot ? [String(pilot._id)] : [];
 
-    const values = seedValues(args.environment, {
+    const values = seedValues(environment, {
       ...(args.telegramBot !== undefined ? { telegramBot: args.telegramBot } : {}),
       pilotDistrictIds,
     });
@@ -51,7 +56,7 @@ export const seedSettings = internalMutation({
         kept.push(key);
       }
     }
-    return { inserted: inserted.length, updated, kept: kept.length, pilotDistrictFound: pilot !== undefined };
+    return { environment, inserted: inserted.length, updated, kept: kept.length, pilotDistrictFound: pilot !== undefined };
   },
 });
 

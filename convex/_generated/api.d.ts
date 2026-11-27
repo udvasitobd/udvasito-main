@@ -10,6 +10,7 @@
 
 import type * as _lib_audit from "../_lib/audit.js";
 import type * as _lib_auth from "../_lib/auth.js";
+import type * as _lib_environment from "../_lib/environment.js";
 import type * as _lib_errors from "../_lib/errors.js";
 import type * as _lib_events from "../_lib/events.js";
 import type * as _lib_rateLimits from "../_lib/rateLimits.js";
@@ -18,10 +19,12 @@ import type * as _lib_visibility from "../_lib/visibility.js";
 import type * as admin_bootstrap from "../admin/bootstrap.js";
 import type * as admin_ops from "../admin/ops.js";
 import type * as admin_seed from "../admin/seed.js";
+import type * as admin_seedStaging from "../admin/seedStaging.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
 import type * as public_ from "../public.js";
+import type * as rules_environment from "../rules/environment.js";
 import type * as rules_hospitals from "../rules/hospitals.js";
 import type * as rules_places from "../rules/places.js";
 import type * as rules_settings from "../rules/settings.js";
@@ -38,6 +41,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   "_lib/audit": typeof _lib_audit;
   "_lib/auth": typeof _lib_auth;
+  "_lib/environment": typeof _lib_environment;
   "_lib/errors": typeof _lib_errors;
   "_lib/events": typeof _lib_events;
   "_lib/rateLimits": typeof _lib_rateLimits;
@@ -46,10 +50,12 @@ declare const fullApi: ApiFromModules<{
   "admin/bootstrap": typeof admin_bootstrap;
   "admin/ops": typeof admin_ops;
   "admin/seed": typeof admin_seed;
+  "admin/seedStaging": typeof admin_seedStaging;
   auth: typeof auth;
   http: typeof http;
   profiles: typeof profiles;
   public: typeof public_;
+  "rules/environment": typeof rules_environment;
   "rules/hospitals": typeof rules_hospitals;
   "rules/places": typeof rules_places;
   "rules/settings": typeof rules_settings;

@@ -10,13 +10,14 @@ const argv = process.argv.slice(2);
 const target = parseTarget(argv);
 const telegramBot = argValue(argv, '--telegram-bot');
 
-const result = runFunction<{ inserted: number; updated: string[]; kept: number; pilotDistrictFound: boolean }>(
+// The deployment decides staging vs production values from its SITE_URL (convex/rules/environment.ts).
+const result = runFunction<{ environment: string; inserted: number; updated: string[]; kept: number; pilotDistrictFound: boolean }>(
   'admin/seed:seedSettings',
-  { environment: target.prod ? 'production' : 'staging', ...(telegramBot ? { telegramBot } : {}) },
+  telegramBot ? { telegramBot } : {},
   target,
 );
 
-console.log(`settings: ${result.inserted} added, ${result.kept} kept as they were` +
+console.log(`settings (${result.environment} values): ${result.inserted} added, ${result.kept} kept as they were` +
   (result.updated.length ? `, filled: ${result.updated.join(', ')}` : ''));
 if (!result.pilotDistrictFound) {
   console.log('note: places are not loaded yet — run `npm run seed:places`, then this again to fill pilotDistrictIds.');

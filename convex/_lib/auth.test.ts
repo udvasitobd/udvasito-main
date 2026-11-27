@@ -1,7 +1,7 @@
 /**
  * Access tests for the auth wrappers (CLAUDE.md rule 11) and the P0 public functions.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { api, internal } from '../_generated/api';
 import { insertProfile, makeT, signIn } from '../test.setup';
@@ -195,16 +195,29 @@ describe('admin bootstrap and ops (internal)', () => {
   });
 
   it('seedSettings is idempotent and never overwrites a set value', async () => {
+    vi.stubEnv('SITE_URL', 'http://localhost:8081');
     const t = makeT();
-    const first = await t.mutation(internal.admin.seed.seedSettings, { environment: 'staging' });
+    const first = await t.mutation(internal.admin.seed.seedSettings, {});
+    expect(first.environment).toBe('staging');
     expect(first.inserted).toBe(61);
     await t.mutation(internal.admin.ops.setSetting, { key: 'waveCount', value: 2, reason: 'Pilot tuning' });
-    const second = await t.mutation(internal.admin.seed.seedSettings, { environment: 'staging' });
+    const second = await t.mutation(internal.admin.seed.seedSettings, {});
     expect(second.inserted).toBe(0);
     expect(await t.query(api.public.appConfig, {})).toMatchObject({ practiceAreaEnabled: true });
     const waveCount = await t.run((ctx) =>
       ctx.db.query('settings').withIndex('by_key', (q) => q.eq('key', 'waveCount')).unique(),
     );
     expect(waveCount?.value).toBe(2);
+    vi.unstubAllEnvs();
+  });
+
+  it('seedSettings takes production values from a production SITE_URL and refuses an unknown one', async () => {
+    vi.stubEnv('SITE_URL', 'https://udvasito.com');
+    const prod = makeT();
+    expect(await prod.mutation(internal.admin.seed.seedSettings, {})).toMatchObject({ environment: 'production' });
+    expect(await prod.query(api.public.appConfig, {})).toMatchObject({ practiceAreaEnabled: false });
+    vi.stubEnv('SITE_URL', '');
+    await expect(makeT().mutation(internal.admin.seed.seedSettings, {})).rejects.toThrow(/SITE_URL/);
+    vi.unstubAllEnvs();
   });
 });
