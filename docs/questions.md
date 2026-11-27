@@ -66,4 +66,7 @@ nuhil/bangladesh-geocode@master — `divisions/divisions.json` (1.4 KB), `distri
 differ between staging and production, but one app bundle serves both). In P1 the app maps code → `_id` from the places
 it fetched; that needs `code` added to the `places.list` result (additive change to specs §6). The offline file holds no
 phone numbers or addresses (`hospitals.bloodBanksNear` is member-only).
-Status: ⏳ waiting for the developer's OK to download
+**Answer (2026-11-27, developer): "yes"** → files downloaded at pinned commits into `data/sources/places/`, built with
+`scripts/build-places.ts`; licences in `docs/data-licences.md`. Akbar Shah thana has no centre in any source and is left out
+until member 2 adds one. The code-keyed offline file still needs the team's confirmation.
+Status: ✅ answered (offline-file design: ⏳ confirm)

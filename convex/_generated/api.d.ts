@@ -22,6 +22,8 @@ import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
 import type * as public_ from "../public.js";
+import type * as rules_hospitals from "../rules/hospitals.js";
+import type * as rules_places from "../rules/places.js";
 import type * as rules_settings from "../rules/settings.js";
 import type * as rules_validation from "../rules/validation.js";
 import type * as support from "../support.js";
@@ -48,6 +50,8 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   profiles: typeof profiles;
   public: typeof public_;
+  "rules/hospitals": typeof rules_hospitals;
+  "rules/places": typeof rules_places;
   "rules/settings": typeof rules_settings;
   "rules/validation": typeof rules_validation;
   support: typeof support;
