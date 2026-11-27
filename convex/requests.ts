@@ -110,7 +110,6 @@ async function resolvePlace(
       divisionId: hospital.divisionId,
       districtId: hospital.districtId,
       upazilaId: hospital.upazilaId,
-      ...(placeText ? { placeText } : {}),
       approxLat: point.lat,
       approxLng: point.lng,
     };

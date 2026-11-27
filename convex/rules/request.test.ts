@@ -67,6 +67,9 @@ describe('checkPlace (VAL-07)', () => {
   it('a hospital is enough', () => {
     expect(checkPlace({ hospitalId: 'h1' })).toEqual({ ok: true, value: {} });
   });
+  it('with a hospital, a typed name is dropped (never stored unchecked)', () => {
+    expect(checkPlace({ hospitalId: 'h1', placeText: 'x'.repeat(50_000) })).toEqual({ ok: true, value: {} });
+  });
   it('otherwise district + thana + a 3–80 character name', () => {
     expect(checkPlace({})).toEqual({ ok: false, error: { field: 'place', messageKey: 'validation.VAL-07.empty' } });
     expect(checkPlace({ districtId: 'd', upazilaId: null, placeText: 'Ward 5' }).ok).toBe(false);

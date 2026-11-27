@@ -66,7 +66,8 @@ export function checkUnits(units: number): Checked<number> {
 
 /**
  * VAL-07: a hospital from the list, or a district + thana + the place's name (3–80). Which of the two is checked
- * against the database by the caller; this only checks that one of them is complete.
+ * against the database by the caller; this only checks that one of them is complete. With a hospital the typed name
+ * is dropped: the hospital names the place, and the form clears the field when one is picked.
  */
 export function checkPlace(place: {
   hospitalId?: string | null;
@@ -74,8 +75,8 @@ export function checkPlace(place: {
   upazilaId?: string | null;
   placeText?: string;
 }): Checked<{ placeText?: string }> {
+  if (place.hospitalId) return ok({});
   const placeText = clean(place.placeText);
-  if (place.hospitalId) return ok(placeText ? { placeText } : {});
   if (!place.districtId || !place.upazilaId) return fail('place', 'validation.VAL-07.empty');
   if (length(placeText) < PLACE_TEXT_MIN || length(placeText) > PLACE_TEXT_MAX) {
     return fail('placeText', 'validation.VAL-07.placeText');
