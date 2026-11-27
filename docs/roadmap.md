@@ -78,7 +78,7 @@ gantt
 2. The agent first writes a **short plan** (files, functions, tests, open questions) — you approve or correct it before any code is written.
 3. Build in **vertical slices**: Convex function + tests → screen → EN/BN strings → wire-up. Commit after each slice (`P1: requests.create with idempotency + tests`).
 4. `npm run check` (type check, lint, i18n lint, Vitest, convex-test) must be green before every push.
-5. Push to `staging` → Vercel staging + Convex staging deploy automatically.
+5. Push to `staging` → Cloudflare staging (`staging.udvasito.com`) + Convex staging deploy automatically.
 6. Member 3 runs the QA checklist items for the phase (`specs.md` §7.9) on two Android phones and one browser the same evening. Bugs become GitHub issues labelled `P<n>` and `sev1` (blocks the loop) / `sev2` / `sev3`.
 7. Fix `sev1`/`sev2`, then merge `staging` → `main` → production (web + Convex). JavaScript changes reach installed apps by **EAS Update**; a new APK only when the native layer changes (§2.3).
 8. Update the status column in §3 of this file and `CHANGELOG.md`.
@@ -139,7 +139,7 @@ Rules: changing `app.config.ts` plugins, a native module, permissions, the icon/
 | Helpline / fallback phone (24/7) | Developer (super-admin) | `settings.fallbackContactPhone`; phone on loud at night |
 | Reports and freezes until the moderation queue exists (P5) | Member 4, twice a day + on any "asked for money" report | Convex dashboard (read-only) for `reports`; actions through `internal.admin.ops.setStatus` run by the developer |
 | Errors | Developer | Sentry email alerts to the team account |
-| Free-tier usage until the usage monitor exists (P5) | Developer, daily | Convex, Vercel, Expo, AI Studio, Cloudinary dashboards |
+| Free-tier usage until the usage monitor exists (P5) | Developer, daily | Convex, Cloudflare, Expo, AI Studio, Cloudinary dashboards |
 | Backups | Automatic | Daily export cron (NFR-03), checked once on Day 6 |
 | Personal-data incident | Member 4 leads | One-page breach plan (DEP-02c): contain → assess → inform affected people → record |
 
@@ -157,7 +157,7 @@ Status column (update as you go): ⬜ not started · 🟦 in progress · ✅ don
 |---|---|
 | 0 (Mon) | Accounts and services (RB-1 to RB-9, §6) — no card on any account. Public repo with MIT licence, `/docs` with all seven documents, `CLAUDE.md`, `.env.example`. Step 8 prompts. |
 | 1 (Tue) | Scaffold + design tokens + fonts + i18n with **every** copy key + full Convex schema + `_lib` wrappers + settings seed + Better Auth with Google + all native modules → **build #1** (dev client). Spikes S1–S4. |
-| 2 (Wed) | Seed scripts (places, hospitals importer, staging seed), CI, Vercel web export with security headers, Sentry with phone scrubbing, root gates G1–G7 skeleton, super-admin bootstrap. Definition of Done. |
+| 2 (Wed) | Seed scripts (places, hospitals importer, staging seed), CI, Cloudflare web export with security headers, Sentry with phone scrubbing, root gates G1–G7 skeleton, super-admin bootstrap. Definition of Done. |
 
 **In scope**
 - Folder contract (`specs.md` §1.2) and app identity/build profiles (§1.2.1): Expo SDK 57, Expo Router, TypeScript strict, React Native Web; EAS profiles `development` / `preview` / `production`; `runtimeVersion` fingerprint policy.
@@ -169,7 +169,7 @@ Status column (update as you go): ⬜ not started · 🟦 in progress · ✅ don
 - **Every native module installed and configured now:** `expo-notifications` (FCM credentials, channel `blood-requests`), `expo-speech-recognition`, `expo-location`, `expo-image-picker`, `expo-image-manipulator`, `expo-secure-store`, `expo-updates`, `@sentry/react-native`. **Not** MapLibre — the pin map is a P7 feature (D-R2).
 - Seeds: `scripts/seed-places.ts` (dataset chosen per ADR-013 and §5.2 of this file, licence recorded in `docs/data-licences.md`), `scripts/import-hospitals.ts` (reads `data/hospitals.csv`, §5.1; prints a report of bad rows; idempotent), `scripts/seed-staging.ts` (fake donors across all 8 groups and Chattogram thanas), `scripts/build-content.ts` (Markdown → JSON for `CMP-Markdown`).
 - CI (ADR-019): GitHub Actions on every push — install, type check, lint, i18n lint, Vitest + convex-test; manual workflow "Android local build".
-- Web: `expo export -p web` on Vercel, SPA rewrites, security headers (`specs.md` §7), `npx convex deploy` inside the production build; `staging` branch → staging Convex.
+- Web: `expo export -p web` on Cloudflare Workers (ADR-024), SPA fallback, security headers (`specs.md` §7), `npx convex deploy` inside the production build; `staging` branch → staging Convex.
 - Sentry on web and native with a `beforeSend` scrubber that removes anything shaped like a phone number.
 
 **Spikes** (time-boxed to 1 hour each; results written to `docs/spikes.md`, decisions follow automatically):
@@ -177,7 +177,7 @@ Status column (update as you go): ⬜ not started · 🟦 in progress · ✅ don
 |---|---|---|
 | S1 | Does Bangla (`bn-BD`) speech recognition work on the 3 test phones and in Chrome? | Voice shows "not available" on that device (already specified); the judging walkthrough uses a phone where it works |
 | S2 | Does a push reach a locked Xiaomi/Redmi phone with default battery settings? | Raises the priority of the alert guide (P4) and the in-app banner `donor.alertsOff` |
-| S3 | Can the Google sign-in callback run through `udvasito.com` (Vercel rewrite to the Convex site) so Google's screen shows our address? | Keep the Convex site address on Google's screen for the pilot (R-12) |
+| S3 | Can the Google sign-in callback run through `udvasito.com` (Cloudflare Worker pass-through to the Convex site) so Google's screen shows our address? | Keep the Convex site address on Google's screen for the pilot (R-12) |
 | S4 | Does a Gemini free-tier call from a Convex action (EU region) return JSON with the current Flash-Lite model ID? | Record the working model ID in `settings.ai.models`; if blocked, AI stays off and the rules parser carries intake (R-06) |
 
 **Out of scope:** any feature screen beyond sign-in and the empty Home.
@@ -500,13 +500,13 @@ Collected from public Facebook groups and WhatsApp forwards **with every real na
 ---
 
 ## 6. One-time setup runbooks (Day 0–2; developer unless noted)
-Never enter a card. Use the team Google account as the owner everywhere. Every secret goes into Convex/Vercel/EAS environment variables (names in `specs.md` §7 and `.env.example`) — never into the repository.
+Never enter a card. Use the team Google account as the owner everywhere. Every secret goes into Convex/Cloudflare/EAS environment variables (names in `specs.md` §7 and `.env.example`) — never into the repository.
 
 | # | Runbook | Steps |
 |---|---|---|
 | RB-1 | Team Google account + GitHub | Create the team Gmail; GitHub repo `udvasito` (public, MIT); branch protection on `main` (CI must pass); enable Actions |
-| RB-2 | Convex | Two projects `udvasito-staging` and `udvasito-prod`, region EU; deploy keys into GitHub secrets (staging) and Vercel (production) |
-| RB-3 | Vercel | Import the repo (Hobby); production branch `main` → `udvasito.com`; `staging` branch with staging env vars; build command `npx convex deploy --cmd-url-env-var-name EXPO_PUBLIC_CONVEX_URL --cmd "npx expo export --platform web"` (check the flag names against Convex's current Vercel guide) |
+| RB-2 | Convex | Two projects `udvasito-staging` and `udvasito-prod`, region EU; deploy keys into GitHub secrets (staging) and Cloudflare (production Worker build secret) |
+| RB-3 | Cloudflare (ADR-024) | Add `udvasito.com` (Free plan) and switch the Namecheap nameservers to Cloudflare; Workers & Pages → import the repo twice: `udvasito-web` (branch `main`, build `npx convex deploy --cmd-url-env-var-name EXPO_PUBLIC_CONVEX_URL --cmd "npm run build:web"`, deploy `npx wrangler deploy --env=""`, build secret `CONVEX_DEPLOY_KEY`) and `udvasito-web-staging` (branch `staging`, build `npm run build:web`, deploy `npx wrangler deploy --env staging`, preview builds on); build variables = the `EXPO_PUBLIC_*` names; Redirect Rule www → apex |
 | RB-4 | Google sign-in | Google Cloud project (no billing) → OAuth consent screen: External, basic scopes only (openid, email, profile), support email = team email, privacy/terms links to `udvasito.com`, **no logo**, publish **In production** → OAuth client (Web application) with the Better Auth callback URL for each environment (Convex site URL, or `udvasito.com` if spike S3 works) → `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` in Convex env |
 | RB-5 | Telegram | BotFather → two bots (production + staging), privacy mode on, description in EN/BN → `TELEGRAM_BOT_TOKEN` per environment → random `TELEGRAM_WEBHOOK_SECRET` → `setWebhook` to `<convex-site>/telegram/webhook` with `secret_token` and `allowed_updates=["message"]` → check with `getWebhookInfo` |
 | RB-6 | Android push | Firebase project (Spark) on the same Google Cloud project → Android app `org.udvasito.app` → `google-services.json` stored as an EAS file secret → FCM V1 service-account key uploaded with `eas credentials` |
@@ -582,7 +582,7 @@ Status: ✅ fixed in the named document · 🗺 handled by this roadmap. (No ope
 | R-10 | Venue network fails at judging | Medium / High | — | Two phone hotspots on different operators; fallback video; practice area pre-seeded | Member 5 |
 | R-11 | APK install friction: "unknown app" warnings. Google's developer-verification rule for sideloaded apps started on 30 Sep 2026 in Brazil, Indonesia, Singapore and Thailand and is planned globally for 2027 — not yet in Bangladesh | Low now / High later | Google announcements | Install guide on `/download`; web app as the zero-install path; register for verification after the competition | Developer |
 | R-12 | Google's sign-in screen shows the Convex address instead of ours — looks untrustworthy | Medium / Medium | Spike S3 | Route the callback through `udvasito.com` if S3 works; otherwise explain on the sign-in screen (`signin.why`) | Developer |
-| R-13 | Free-tier limits hit by a spike of sign-ups at a drive | Low / Medium | Convex/Vercel dashboards (later F-911) | Indexes everywhere, stats snapshots, rate limits | Developer |
+| R-13 | Free-tier limits hit by a spike of sign-ups at a drive | Low / Medium | Convex/Cloudflare dashboards (later F-911) | Indexes everywhere, stats snapshots, rate limits | Developer |
 | R-14 | Real emergencies arrive while features are still thin | Medium / High | Real requests before M2 | Helpline after 30 s from Day 5; requests not promoted until M2 | Developer |
 
 ### 7.5 Scope creep

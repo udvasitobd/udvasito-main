@@ -21,7 +21,7 @@
 | Voice input | **expo-speech-recognition** (phone/browser built-in speech recognition) | ৳0 |
 | Location & maps | **expo-location** + local nearest-hospital search; **MapLibre + OpenFreeMap** for the optional pin map; Google Maps link for directions | ৳0 |
 | Images | **Convex storage** for private slip photos; **Cloudinary** for public share-card images | ৳0 |
-| Web hosting | **Vercel Hobby** → `udvasito.com` | ৳0 |
+| Web hosting | **Cloudflare Workers** (Free, static assets + a tiny Worker) → `udvasito.com`; DNS on Cloudflare (ADR-024) | ৳0 |
 | Android builds & distribution | **EAS Build** (free quota) + local build fallback → **APK on GitHub Releases + website**; **EAS Update** for quick fixes | ৳0 |
 | Error monitoring | **Sentry** Developer plan | ৳0 |
 | Tests & CI | **Vitest + convex-test**, **Playwright** smoke tests, **GitHub Actions** | ৳0 |
@@ -61,7 +61,7 @@
 - Minimum **Android 7** (Expo SDK 57 supports Android 7+), compile/target SDK 36; iPhone via the web app (PWA). Resolves NFR-12.
 - TypeScript **strict mode**; ESLint + Prettier.
 - Native features (push, voice, Google sign-in redirect) need a **development build**, not Expo Go.
-- `web.output: "single"` (single-page app) with a rewrite to `index.html` on Vercel; shared-link previews handled by ADR-006.
+- `web.output: "single"` (single-page app) with the single-page-application fallback to `index.html` on Cloudflare (ADR-024); shared-link previews handled by ADR-006.
 
 ---
 
@@ -143,7 +143,7 @@
 ---
 
 ### ADR-006 — Web hosting, domain and share-link previews
-**Status:** ✅ Accepted (2026-11-23)
+**Status:** ✅ Accepted (2026-11-23) — **hosting superseded by ADR-024 (Cloudflare Workers, 2026-11-27)**; the share-link preview decision stands
 
 | Option | Pros | Cons | Cost | Beginner-friendly |
 |---|---|---|---|---|
@@ -154,7 +154,7 @@
 **Recommendation: A**, at **`udvasito.com`** (custom domain on Vercel Hobby — see ADR-023; originally the free subdomain `udvasito.vercel.app`, which resolved OQ-11).
 **Consequences:**
 - Production web = `main` branch; staging web = `staging` branch preview, pointed at the staging Convex project.
-- **Share-link previews:** Facebook/WhatsApp don't run JavaScript, so a shared request link needs server-rendered preview tags. One small Vercel function `/r/<id>` returns a tiny HTML page with Open Graph title/description (no personal data) and the Cloudinary share-card image, then redirects to the app route.
+- **Share-link previews:** Facebook/WhatsApp don't run JavaScript, so a shared request link needs server-rendered preview tags. One small route `/r/<id>` (originally a Vercel function; now the Cloudflare Worker, ADR-024) returns a tiny HTML page with Open Graph title/description (no personal data) and the Cloudinary share-card image, then redirects to the app route.
 
 ---
 
@@ -264,7 +264,7 @@
 |---|---|---|
 | Hospital slip photos (sensitive) | **Convex file storage** — compressed on the phone (`expo-image-manipulator`), served only through an auth-checked HTTP endpoint to volunteers/admins and the owner; deleted by the retention cron | Keeps sensitive images with the rest of our data under our access rules |
 | Share-card images (public) | **Cloudinary** free plan (25 credits per rolling 30 days, no card) — text overlays generate the bilingual card from a template; Bangla font uploaded once | Image transformations without writing an image server |
-| Logos, static images | Bundled in the app / Vercel | No need for a service |
+| Logos, static images | Bundled in the app / Cloudflare static assets | No need for a service |
 
 **Rejected:** putting slip photos on Cloudinary (public delivery by default; another processor for health data).
 
@@ -323,7 +323,7 @@ Sentry is configured to **strip phone numbers, names and request free text** fro
 | Web smoke test (post → match → accept in the practice area) | **Playwright** | before each production deploy |
 | Android smoke test (optional) | Maestro | before each APK release |
 | Type check, lint | `tsc --noEmit`, ESLint | every push |
-| Pipeline | **GitHub Actions** → Vercel deploys `main`; `npx convex deploy` runs in the Vercel production build | — |
+| Pipeline | **GitHub Actions** (checks) + **Cloudflare Workers Builds** deploys `main` and `staging` (ADR-024); `npx convex deploy` runs in the production Worker build | — |
 
 ---
 
@@ -334,8 +334,8 @@ Sentry is configured to **strip phone numbers, names and request free text** fro
 |---|---|---|
 | Repository visibility | **Public** on GitHub (transparency for judges and partners; unlimited free Actions minutes for public repos) | Private (2,000 free Actions minutes/month) |
 | Licence | **MIT** — lets other blood clubs and cities reuse it (sustainability) | AGPL-3.0 (forces derivatives to stay open) |
-| Branches | `main` → production; `staging` → staging; feature branches → Vercel previews against staging | — |
-| Secrets | Only in Convex env vars, Vercel env vars and EAS secrets; `.env.local` git-ignored; a `.env.example` with names only | — |
+| Branches | `main` → production; `staging` → staging; feature branches → Cloudflare preview URLs (staging Worker) against staging | — |
+| Secrets | Only in Convex env vars, Cloudflare build secrets and EAS secrets; `.env.local` git-ignored; a `.env.example` with names only | — |
 | Environments | Staging (`udvasito-staging` Convex + `staging` web) and Production (`udvasito-prod` + `udvasito.com`); the **practice area** (F-912) lives inside production, logically isolated | — |
 
 ---
@@ -356,7 +356,7 @@ Sentry is configured to **strip phone numbers, names and request free text** fro
 /src/lib        outbox, i18n, analytics-events, platform helpers
 /src/i18n       en.json, bn.json
 /convex         schema, functions, crons, http endpoints, ai/, rules/ (pure TS, unit-tested)
-/api            Vercel function for share-link previews (ADR-006)
+/worker         Cloudflare Worker: /api/auth pass-through, share-link previews (ADR-006, ADR-024)
 /docs           vision, stories, grilling, PRD, ADRs, specs, roadmap
 /tests          Playwright and fixtures
 ```
@@ -367,12 +367,56 @@ The full folder contract is fixed in `specs.md`.
 ### ADR-023 — Own domain udvasito.com
 **Status:** ✅ Accepted (2026-11-27, developer decision)
 **Context:** the team bought `udvasito.com` at Namecheap — the only yearly paid item in the project (the ৳0 rule covers services; the domain is a one-off team purchase). All documents used the free `udvasito.vercel.app`.
-**Decision:** `udvasito.com` is the address everywhere (app deep links, shared links, legal pages, Google sign-in consent screen, OG previews, promo material made from now on). DNS stays at Namecheap and points to Vercel (Hobby supports custom domains for free). `udvasito.vercel.app` keeps working and redirects to `udvasito.com`. Staging web uses `staging.udvasito.com` (the `staging` branch domain in Vercel).
+**Decision:** `udvasito.com` is the address everywhere (app deep links, shared links, legal pages, Google sign-in consent screen, OG previews, promo material made from now on). Staging web uses `staging.udvasito.com`. *(Hosting and DNS updated by ADR-024: DNS moved from Namecheap to Cloudflare; `udvasito.vercel.app` was never created.)*
 **Consequences:**
 - Google OAuth consent screen: authorised domain `udvasito.com` (ownership verified in Google Search Console with a DNS TXT record); privacy/terms links on `udvasito.com`.
-- Spike S3 tests the Better Auth callback through `udvasito.com` (Vercel rewrite to the Convex site).
-- The already-rendered promo videos show `udvasito.vercel.app` on the end card; that address still works (redirect), so they stay usable until re-rendered.
+- Spike S3 tests the Better Auth callback through `udvasito.com` (Cloudflare Worker pass-through to the Convex site, ADR-024).
+- The already-rendered promo videos show `udvasito.vercel.app` on the end card; that address does **not** exist (ADR-024), so the end cards must be re-rendered with `udvasito.com` before the videos are shared.
 - No extra service, no card, no personal data at a new vendor.
+
+### ADR-024 — Web hosting on Cloudflare Workers (replaces Vercel)
+**Status:** ✅ Accepted (2026-11-27, developer decision — the Vercel account could not be created: sign-in failed
+repeatedly). Supersedes the hosting part of ADR-006 and the DNS sentence of ADR-023.
+**Context:** the web app is a static Expo export (one `index.html` + hashed bundles) plus two small server pieces:
+the Google sign-in pass-through for spike S3 and, later, the share-link preview `/r/<slug>` (ADR-006). Cloudflare's
+docs (checked 2026-11-27): "Start new projects with Workers"; Pages is still supported but no longer the recommendation.
+
+| Option | Pros | Cons | Cost | Beginner-friendly |
+|---|---|---|---|---|
+| **A. Cloudflare Workers + static assets** (Workers Builds from GitHub) | Cloudflare's main platform; static requests free and unlimited; `_headers`, SPA fallback, custom domains, preview URLs; DNS + TLS + DDoS in one free place; no non-commercial clause | Apex domain needs Cloudflare nameservers; Worker code limited to 100,000 requests/day | ৳0 | ★★★★ |
+| B. Cloudflare Pages | Built-in production/preview variables | No longer recommended for new projects; same DNS requirement for a branch subdomain | ৳0 | ★★★★ |
+| C. Vercel Hobby (ADR-006) | — | Account could not be created | ৳0 | — |
+
+**Decision: A.** One `wrangler.jsonc`, two Workers:
+- **`udvasito-web`** (production): branch `main` → `udvasito.com` (+ `www.udvasito.com`, redirected to the apex).
+  Build command `npx convex deploy --cmd-url-env-var-name EXPO_PUBLIC_CONVEX_URL --cmd "npm run build:web"` with
+  `CONVEX_DEPLOY_KEY` (production) as a Cloudflare **build secret**; deploy command `npx wrangler@<pinned> deploy --env=""`.
+- **`udvasito-web-staging`** (`--env staging`): branch `staging` → `staging.udvasito.com`; every other branch gets a
+  **preview URL** (`wrangler versions upload --env staging`) built against staging. Build command `npm run build:web`
+  (staging Convex is deployed by CI, RB-2).
+- Build variables per Worker: `EXPO_PUBLIC_CONVEX_URL`, `EXPO_PUBLIC_CONVEX_SITE_URL`, `EXPO_PUBLIC_SENTRY_DSN`,
+  `EXPO_PUBLIC_APP_ENV`, `WRANGLER_SEND_METRICS=false`. Runtime variable `CONVEX_SITE_URL` (public) lives in
+  `wrangler.jsonc`. Workers Logs stay **off** (no request data stored).
+- Registration stays at Namecheap (the one paid item); **DNS moves to Cloudflare** (free). Email records found on the
+  domain (Namecheap Private Email: MX, SPF, autoconfig) are kept, DNS-only.
+
+**Trade-offs and how they are handled**
+
+| Trade-off | Handling |
+|---|---|
+| An apex domain on Workers needs Cloudflare nameservers | Nameservers at Namecheap → Cloudflare (free); registration unchanged |
+| A static `_redirects` rule cannot proxy to another host (Vercel rewrites could) | `worker/index.ts` passes `/api/auth/*` to this environment's Convex site; only `/api/*` runs the Worker (`run_worker_first`); the share preview `/r/*` is added there in its phase |
+| Worker code: 100,000 requests/day, 10 ms CPU per request (static assets: free, unlimited) | Only auth and share previews run code (hundreds a day). Above the limit those paths answer 429 until 00:00 UTC while the site keeps serving — budget table row, Workers usage page |
+| `_headers` does not apply to responses from Worker code | The Worker sets its own headers; the share-preview HTML sets its own CSP |
+| www → apex cannot be written in `_redirects` (path-only) | Zone **Redirect Rule** in the dashboard (free plan) |
+| One Worker has one set of build variables | Two Workers (production, staging) |
+| SPA fallback also answers a missing `/_expo/…` file with `index.html` (Vercel config returned 404) | Accepted — same visible failure; hashed bundle names make it rare |
+| Builds: 1 at a time, 3,000 build minutes a month, 20-minute timeout | The web export takes a few minutes; far below the limit |
+| `udvasito.vercel.app` was never created, so it does not redirect; the rendered promo videos show it | Re-render the end cards with `udvasito.com` before the videos are shared (team job, brand-kit) |
+
+**Consequences:** `vercel.json` is replaced by `wrangler.jsonc` + `public/_headers` (specs §7.4 headers, checked
+against Cloudflare's limits by a unit test); `scripts/serve-dist.ts` serves `dist/` the same way for the Playwright
+smoke test. Secrets live in Convex, Cloudflare and EAS (CLAUDE.md rule 18). Spike S3 uses the Worker pass-through.
 
 ---
 
@@ -392,7 +436,7 @@ Pilot assumptions: ~500 donors, ~300 daily active users at peak, ~30 requests/da
 | Expo Push | Free service | Hundreds/day | — (Expo rate limits are far above pilot volume) | Web push / inbox continue | Push receipts |
 | EAS Build | 15 Android builds / month | 4–8 | Building for every JS change | Use EAS Update for JS fixes; local build fallback | Expo dashboard |
 | EAS Update | 1,000 monthly active users | < 1,000 in pilot | Pilot grows past 1,000 app users | Ship a new APK instead of OTA | F-911 |
-| Vercel Hobby | Free, non-commercial | Static site + 1 small function | Very large traffic spike | Static site keeps serving | Vercel usage page |
+| Cloudflare Workers (Free) | Static assets free and unlimited; Worker code 100,000 requests/day (10 ms CPU each); Workers Builds 3,000 min/month, 1 at a time | Static site + auth pass-through (hundreds/day) | A share link goes viral (later `/r/*`) | Static site keeps serving; `/api/*` (and later `/r/*`) answer 429 until 00:00 UTC | Cloudflare Workers usage page |
 | Cloudinary | 25 credits / rolling 30 days | Share cards only | Cards re-generated per view | Cards cached; template fallback | F-911 (usage API) |
 | Sentry | 5,000 errors / month | Hundreds | Crash loop | Error sampling | Sentry |
 | Telegram Bot API | Free | Sign-ups | — | WhatsApp method / unverified flow | — |
@@ -424,7 +468,7 @@ Pilot assumptions: ~500 donors, ~300 daily active users at peak, ~30 requests/da
 | 2 | GitHub | Code, Actions, Releases (APK) | Developer |
 | 3 | Expo (EAS) | Builds, updates, push credentials | Developer |
 | 4 | Convex | Backend (staging + production projects, EU region) | Developer |
-| 5 | Vercel | Web hosting (`udvasito.com`) | Developer |
+| 5 | Cloudflare | Web hosting (Workers) + DNS for `udvasito.com` (ADR-024) | Developer |
 | 6 | Google Cloud (no billing) | OAuth client for Google sign-in. Consent screen: External, **basic scopes only** (openid, email, profile), publishing status **In production** before the pilot (in Testing, Google shows a "testing" warning to everyone); **no logo uploaded** — a logo requires Google's brand verification | Developer |
 | 7 | Firebase (FCM only, Spark plan) | Android push credentials | Developer |
 | 8 | Google AI Studio | Gemini API key | Developer |
@@ -467,7 +511,8 @@ Pilot assumptions: ~500 donors, ~300 daily active users at peak, ~30 requests/da
 - EAS free plan: https://newly.app/guides/eas-build · https://docs.expo.dev/billing/faq.md
 - expo-speech-recognition: https://github.com/jamsch/expo-speech-recognition
 - Gemini API Additional Terms (effective 23 Mar 2026): https://ai.google.dev/terms
-- Vercel Hobby non-commercial: https://vercel.com/docs/plans/hobby-plan
+- Vercel Hobby non-commercial: https://vercel.com/docs/plans/hobby-plan (replaced by ADR-024)
+- Cloudflare (checked 2026-11-27): https://developers.cloudflare.com/workers/platform/limits/ · https://developers.cloudflare.com/workers/static-assets/ · https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/ · https://developers.cloudflare.com/workers/configuration/routing/custom-domains/ · https://developers.cloudflare.com/pages/ ("Start new projects with Workers")
 - Cloudinary free plan: https://cloudinary.com/documentation/billing_and_plans.md
 - Sentry free plan: https://last9.io/blog/sentry-pricing/
 - OpenFreeMap: https://github.com/hyperknot/openfreemap
@@ -484,3 +529,4 @@ Pilot assumptions: ~500 donors, ~300 daily active users at peak, ~30 requests/da
 | 1.1 | 2026-11-23 | Step 7 issue check: Google OAuth consent-screen settings (§5 row 6); one Telegram bot per environment (§5 row 11) |
 | 1.2 | 2026-11-23 | Step 7 decisions: practice sign-in rule (ADR-003), in-person verification (ADR-004 option E), pin map timing (ADR-012) |
 | 1.3 | 2026-11-27 | ADR-023: own domain `udvasito.com` replaces `udvasito.vercel.app` everywhere (developer decision, Q-002) |
+| 1.4 | 2026-11-27 | ADR-024: web hosting on Cloudflare Workers, DNS on Cloudflare (developer decision — Vercel sign-up failed); ADR-006/019/020/022/023, budget table and accounts updated |

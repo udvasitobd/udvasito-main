@@ -65,7 +65,7 @@ convex/
   profiles.ts consents.ts phoneVerification.ts places.ts hospitals.ts requests.ts intake.ts donors.ts responses.ts contacts.ts
   volunteers.ts slips.ts reports.ts assistant.ts push.ts notifications.ts admin/*.ts matching.ts lifecycle.ts stats.ts retention.ts demo.ts public.ts support.ts
   crons.ts  http.ts  convex.config.ts (components: betterAuth, pushNotifications, rateLimiter)
-api/r/[slug].ts               Vercel function — share-link preview (ADR-006)
+worker/index.ts               Cloudflare Worker — /api/auth pass-through; share-link preview /r/<slug> (ADR-006, ADR-024)
 public/                       manifest.json, service-worker.js (web push), icons
 tests/                        Vitest (rules, convex-test), Playwright (web smoke)
 docs/                         all SpecPilot documents
@@ -80,7 +80,7 @@ docs/                         all SpecPilot documents
 | Version | Semantic `MAJOR.MINOR.PATCH` in `app.config.ts`; Android `versionCode` auto-incremented by EAS (`autoIncrement: true`) |
 | Runtime version | `runtimeVersion: { policy: "fingerprint" }` — EAS Update only reaches builds whose native layer matches, so a JS update can never crash an older APK |
 | EAS build profiles | `development` (dev client, internal), `preview` (APK, channel `preview`, points at **staging**), `production` (APK, channel `production`, points at **production**) |
-| Environment per build | `EXPO_PUBLIC_CONVEX_URL`, `EXPO_PUBLIC_CONVEX_SITE_URL`, `EXPO_PUBLIC_SENTRY_DSN` set per EAS profile; web uses the same names from Vercel env |
+| Environment per build | `EXPO_PUBLIC_CONVEX_URL`, `EXPO_PUBLIC_CONVEX_SITE_URL`, `EXPO_PUBLIC_SENTRY_DSN` set per EAS profile; web uses the same names from the Cloudflare Worker build variables (ADR-024) |
 | Android notification channel | id `blood-requests`, importance MAX, sound default, vibration on, lock-screen visibility PUBLIC — safe because alert text never contains names or numbers (P-13), and a donor should see "B+ needed · 3 km" without unlocking — created at first launch |
 | Permissions declared | `POST_NOTIFICATIONS`, `RECORD_AUDIO`, `ACCESS_COARSE_LOCATION`, `ACCESS_FINE_LOCATION`, `CAMERA` (slip photo), `INTERNET`. No background location, no contacts, no SMS, no call-log permissions |
 
@@ -177,7 +177,7 @@ Back button (when not a tab root) · screen title · `CMP-LanguageToggle` · `CM
 #### 1.4.3 Deep links
 - App scheme `udvasito://` and web `https://udvasito.com` map to the same routes.
 - Notification taps open `data.url` (e.g. `/alerts/<requestId>`, `/request/<id>`, `/confirm/<requestId>`).
-- Shared links `https://udvasito.com/r/<slug>` (Vercel preview function → `/r/<slug>` screen).
+- Shared links `https://udvasito.com/r/<slug>` (Cloudflare Worker preview route → `/r/<slug>` screen).
 
 ### 1.5 Global gates and states (root `_layout.tsx`, in this order)
 | Gate | Condition | Result |
@@ -850,7 +850,7 @@ List; editor: question EN/BN, answer EN/BN (VAL-24), tags; status Draft → Appr
 **Performance:** static HTML shell, hero renders without JS data; impact numbers load after.
 
 #### SCR-P02 · Shared request · `/r/[slug]` (if-time)
-Anonymised request (group, component, units, hospital name, area, needed-by, status) — **no names, no numbers**; language from `?lang`. If status live: **I can help** → consent → sign-in → donor setup (pre-filled group) → eligibility check → accept (server re-checks rules; if not eligible, explain and offer to share). If closed: "This request is no longer active. Thank you for caring." / "এই অনুরোধটি আর সক্রিয় নয়। আপনার আন্তরিকতার জন্য ধন্যবাদ।" Report link. Open Graph tags come from the Vercel function (ADR-006).
+Anonymised request (group, component, units, hospital name, area, needed-by, status) — **no names, no numbers**; language from `?lang`. If status live: **I can help** → consent → sign-in → donor setup (pre-filled group) → eligibility check → accept (server re-checks rules; if not eligible, explain and offer to share). If closed: "This request is no longer active. Thank you for caring." / "এই অনুরোধটি আর সক্রিয় নয়। আপনার আন্তরিকতার জন্য ধন্যবাদ।" Report link. Open Graph tags come from the Cloudflare Worker (ADR-006, ADR-024).
 
 #### SCR-P03 · Learn · `/learn`, SCR-P04 · Dengue & platelets · `/learn/dengue` (if-time)
 Content pages from Markdown files in `src/content/<lang>/*.md` (written by member 3, reviewed by the medical reviewer; a "Reviewed by {{name}} on {{date}}" line at the bottom). Every page shows `common.notMedicalAdvice`. Dengue page CTAs: "Ask for platelets" → `/request/new?dengue=1`; "Become a platelet donor" → `/donor/setup`.
@@ -859,7 +859,7 @@ Content pages from Markdown files in `src/content/<lang>/*.md` (written by membe
 Mission, team (5 members, roles — no personal phone numbers), the 7 Responsible-AI commitments (PRD §6.4) verbatim, data sources and licences (geodata, OpenFreeMap/OpenStreetMap attribution), medical reviewer credit, open-source link (GitHub), contact email.
 
 #### SCR-P06 / SCR-P07 · Privacy / Terms · `/privacy`, `/terms`
-Versioned Markdown (`src/content/legal/privacy.<lang>.md`, `terms.<lang>.md`, rendered by `CMP-Markdown`) with version + effective date at the top; the version string equals `settings.consentVersion`. Content drafted by member 4 (data-protection lead) and reviewed per NFR-08. **Must cover:** who we are (OQ-09), what we collect and why (per field), legal basis (consent), who sees what (PRD §3.3 in plain words), AI processing and voice notice, processors (Convex, Vercel, Google — sign-in, Gemini, FCM; Expo; Telegram; Cloudinary; Sentry), hosting outside Bangladesh, retention (PRD §5.9), your rights (access, correction, deletion, withdraw consent), 18+ only, contact, changes.
+Versioned Markdown (`src/content/legal/privacy.<lang>.md`, `terms.<lang>.md`, rendered by `CMP-Markdown`) with version + effective date at the top; the version string equals `settings.consentVersion`. Content drafted by member 4 (data-protection lead) and reviewed per NFR-08. **Must cover:** who we are (OQ-09), what we collect and why (per field), legal basis (consent), who sees what (PRD §3.3 in plain words), AI processing and voice notice, processors (Convex, Cloudflare, Google — sign-in, Gemini, FCM; Expo; Telegram; Cloudinary; Sentry), hosting outside Bangladesh, retention (PRD §5.9), your rights (access, correction, deletion, withdraw consent), 18+ only, contact, changes.
 
 #### SCR-P08 · Download · `/download`
 Android: big **Download APK** button (`settings.apkUrl`, version, size, date) + 4-step install guide ("Allow installs from this source") + SHA-256 checksum; "Or use the web app" link. iPhone: "Add to Home Screen" 3-step guide with illustrations + note on alerts (iOS 16.4+). Desktop: "Install" button (PWA `beforeinstallprompt`) where supported.
@@ -1320,7 +1320,7 @@ reports *─1 moderationItems            notifications *─1 profiles, *─0..1 
 ## 6. API specification
 
 ### 6.0 Conventions
-- **Transport:** Convex functions called from the app with `useQuery` / `useMutation` / `useAction` (names below = `api.<file>.<function>`), plus a few **HTTP endpoints** on the Convex site URL and one Vercel function.
+- **Transport:** Convex functions called from the app with `useQuery` / `useMutation` / `useAction` (names below = `api.<file>.<function>`), plus a few **HTTP endpoints** on the Convex site URL and one Cloudflare Worker (ADR-024).
 - **"Who"** = minimum role. Every public function starts with an auth wrapper from `convex/_lib/auth.ts` that loads the caller's profile and enforces: signed in, consent current, status allowed, role. Internal functions (`internal.*`) are never callable by clients.
 - **Errors:** `throw new ConvexError({ code, params?, field? })`. The app maps `code` → `errors.<code>` (§6.5). Validation failures use `ERR_VALIDATION` with `field` and the VAL rule's message key.
 - **Idempotency:** functions marked 🔁 take a `clientId` (uuid v4 generated on the device and stored in the outbox) and return the original result when called again.
@@ -1440,7 +1440,7 @@ reports *─1 moderationItems            notifications *─1 profiles, *─0..1 
 | `GET /public/helpline` | Convex site | none; rate limit **30 per hour per network (IP)** | — | `{phone}`; over the limit `429 {retryAfterMin}` | `Cache-Control: no-store`; called only when someone taps a helpline button (D-R3) |
 | `GET /health` | Convex site | none | — | `{ok: true, time}` | For uptime checks |
 | `/api/auth/*` | Convex site | Better Auth | — | — | Managed by the Better Auth component. Email + password: **staging** — any test account (P-10); **production** — only `*@practice.udvasito.invalid` accounts whose profile has `isDemo: true`, only while `demoAreaEnabled`, sign-up disabled, 5 wrong PINs per ID → 15-minute lock (server hook, D-R4) |
-| `GET /r/:slug` | Vercel function | none | — | HTML with Open Graph tags (title "{{group}} {{component}} needed · {{hospital}}", description, `og:image` = Cloudinary card) + `<meta http-equiv="refresh">` to the app route `/r/<slug>` | No personal data; 404 page if not found |
+| `GET /r/:slug` | Cloudflare Worker | none | — | HTML with Open Graph tags (title "{{group}} {{component}} needed · {{hospital}}", description, `og:image` = Cloudinary card) + `<meta http-equiv="refresh">` to the app route `/r/<slug>` | No personal data; 404 page if not found |
 
 ### 6.6 Scheduled and internal jobs (ADR-009)
 | Job | Trigger | Logic (all idempotent — re-check state first) |
@@ -1547,7 +1547,7 @@ AI problems are **never** thrown as errors; `intake.parse` and `assistant.ask` r
 ### 7.1 Performance budgets (checked before each production release)
 | Metric | Target | How measured |
 |---|---|---|
-| Web landing `/` on Lighthouse mobile ("Slow 4G", mid-tier device) | LCP ≤ 3.0 s · INP ≤ 200 ms · CLS ≤ 0.1 · Performance score ≥ 70 · Accessibility score ≥ 95 | Lighthouse CI on the Vercel preview |
+| Web landing `/` on Lighthouse mobile ("Slow 4G", mid-tier device) | LCP ≤ 3.0 s · INP ≤ 200 ms · CLS ≤ 0.1 · Performance score ≥ 70 · Accessibility score ≥ 95 | Lighthouse CI on the Cloudflare preview URL |
 | Web app shell JS (gzip) | ≤ 600 KB initial; map, assistant and admin code **lazy-loaded** | Bundle report in CI |
 | Android cold start → Home interactive | ≤ 3 s on a 2 GB RAM, Android 8–10 class phone | Manual timing, QA checklist |
 | APK size | ≤ 45 MB (universal APK) | Build output |
@@ -1575,9 +1575,9 @@ Must pass, with evidence in the QA checklist:
 | Screen widths | 320 px – 1920 px | Breakpoints: 768 px (tablet), 1024 px (desktop sidebar) |
 
 ### 7.4 Security
-- All traffic HTTPS. Secrets only in Convex/Vercel/EAS environment variables; `.env.example` lists names (`CONVEX_DEPLOYMENT`, `EXPO_PUBLIC_CONVEX_URL`, `EXPO_PUBLIC_CONVEX_SITE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `WHATSAPP_*`, `CLOUDINARY_*`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `SENTRY_DSN`, `EXPO_PUBLIC_SENTRY_DSN`).
+- All traffic HTTPS. Secrets only in Convex/Cloudflare/EAS environment variables; `.env.example` lists names (`CONVEX_DEPLOYMENT`, `EXPO_PUBLIC_CONVEX_URL`, `EXPO_PUBLIC_CONVEX_SITE_URL`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `WHATSAPP_*`, `CLOUDINARY_*`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `SENTRY_DSN`, `EXPO_PUBLIC_SENTRY_DSN`).
 - **Server-side authorisation on every function** (§6.0); an automated **access-control matrix test** calls every 📞 function and every admin/volunteer function as visitor, member, donor, volunteer, admin, practice account — each must match PRD §3.2/§3.3.
-- Vercel response headers: `Content-Security-Policy` (default-src 'self'; connect-src Convex, Cloudinary, OpenFreeMap, Sentry, Google OAuth; img-src self data: Cloudinary OpenFreeMap; frame-ancestors 'none'), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: geolocation=(self), microphone=(self), camera=(self)`.
+- Web response headers (`public/_headers`, served by Cloudflare — ADR-024): `Content-Security-Policy` (default-src 'self'; connect-src Convex, Cloudinary, OpenFreeMap, Sentry, Google OAuth; img-src self data: Cloudinary OpenFreeMap; frame-ancestors 'none'), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: geolocation=(self), microphone=(self), camera=(self)`.
 - Webhooks: Telegram secret-token header; WhatsApp HMAC signature; both reject replays older than 10 min (message date).
 - Sentry `beforeSend` scrubs phone patterns, names from forms and request free text; Convex `console.log` never prints phone numbers (lint rule + review).
 - CSV exports escape formula injection (§SCR-A13). Uploaded images re-encoded on device; server checks MIME and size.

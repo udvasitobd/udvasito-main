@@ -7,7 +7,7 @@ one the roadmap already names for "if it fails", so no spike changes a product r
 |---|---|---|---|
 | S1 | Bangla (`bn-BD`) speech recognition on the 3 test phones and in Chrome | test phones (DEP-14), APK build #1 | ⏳ Chrome part can run now (human); phones wait for build #1 |
 | S2 | Push reaches a locked Xiaomi/Redmi with default battery settings | Firebase FCM, APK build #1, a Xiaomi/Redmi phone | ⏳ waiting for FCM + build #1 |
-| S3 | Google sign-in callback through `udvasito.com` (Vercel rewrite to the Convex site) | Vercel account + domain, Google OAuth client | ⏳ waiting for Vercel (2026-11-28) |
+| S3 | Google sign-in callback through `udvasito.com` (Cloudflare Worker pass-through to the Convex site, ADR-024) | Cloudflare account + domain, Google OAuth client | ⏳ waiting for the Cloudflare nameservers + first deploy |
 | S4 | Gemini free-tier call from a Convex action (EU) returns JSON with the current Flash-Lite model ID | Gemini API key in the Convex env | ⏳ waiting for the key |
 
 ---
@@ -34,7 +34,7 @@ phone where it works.
 **Result:** — (not run yet)
 
 ## S3 — Google sign-in shows udvasito.com
-**Method.** On the Vercel staging project, rewrite `/api/auth/*` to the Convex site (`<deployment>.convex.site`), set
+**Method.** On the staging Worker (`staging.udvasito.com`), `worker/index.ts` passes `/api/auth/*` to the Convex site (`<deployment>.convex.site`); set
 Better Auth's base URL to the web address, add `https://staging.udvasito.com/api/auth/callback/google` as a redirect
 URI, and sign in. Check: Google's screen names our domain, the session cookie is set, Android sign-in still works.
 

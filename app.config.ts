@@ -4,7 +4,7 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
  * App identity and build profiles — specs.md §1.2.1.
  * These values are fixed before the first native build: changing the package name means a new app.
  *
- * Environment (set per EAS profile in eas.json, and in Vercel for web — names only, never values here):
+ * Environment (set per EAS profile in eas.json, and in the Cloudflare Worker build variables for web — names only, never values here):
  *   EXPO_PUBLIC_CONVEX_URL, EXPO_PUBLIC_CONVEX_SITE_URL, EXPO_PUBLIC_SENTRY_DSN, EXPO_PUBLIC_APP_ENV
  *   GOOGLE_SERVICES_JSON (EAS file secret path)
  */
@@ -59,7 +59,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
   },
   web: {
-    // One index.html SPA; Vercel rewrites every path to it (specs §7.4, roadmap RB-3).
+    // One index.html SPA; Cloudflare serves it for every unknown path (wrangler.jsonc, ADR-024).
     output: 'single',
     favicon: './public/favicon.png',
   },

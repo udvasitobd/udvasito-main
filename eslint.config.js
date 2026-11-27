@@ -13,6 +13,7 @@ module.exports = defineConfig([
       'convex/_generated/*',
       'src/content/generated/*',
       'coverage/*',
+      '.wrangler/*',
       'playwright-report/*',
       'test-results/*',
     ],

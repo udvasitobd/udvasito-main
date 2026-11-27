@@ -1,6 +1,6 @@
 # উদ্ভাসিত / UDVASITO: Brand Kit · The Ripple Drop
 
-> Note (2026-11-27, ADR-023): the web address is now **udvasito.com**. The rendered videos still show `udvasito.vercel.app`, which redirects to udvasito.com.
+> Note (2026-11-27, ADR-023, ADR-024): the web address is now **udvasito.com**. The rendered videos still show `udvasito.vercel.app`, which does **not** exist (the web app moved to Cloudflare before a Vercel project was made) — **re-render the end cards with `udvasito.com` before sharing the videos.**
 
 **The idea:** one blood request is one drop. UDVASITO sends it out in ripples: first the nearest matching donors, then a wider wave, then a wider one, until someone answers. The two ripples are the product's matching waves (10 → 25 → 50 donors, `specs.md` S-08). The glint on the drop is the light in উদ্ভাসিত, which means "lit up": the moment a donor says yes. In the wordmark, the last **O** is a ripple holding the drop.
 
@@ -115,7 +115,7 @@ The videos are silent because social feeds autoplay muted. To add music or a voi
 | `app-assets/favicon.png`, `favicon.ico` | `public/favicon.png`, `public/favicon.ico` | Web |
 | `app-assets/icon-192.png`, `icon-512.png` | `public/icon-192.png`, `public/icon-512.png` | PWA manifest (`purpose: "any maskable"`; the mark sits in the safe zone) |
 | `app-assets/apple-touch-icon.png` | `public/apple-touch-icon.png` | iPhone "Add to Home Screen" |
-| `app-assets/og-image.png` | `public/og-image.png` | Social preview for `udvasito.vercel.app` |
+| `app-assets/og-image.png` | `public/og-image.png` | Social preview for `udvasito.com` |
 | `svg/udvasito-symbol-red.svg`, `svg/udvasito-wordmark-color.svg` | `assets/logo/` | In-app header and About page (drawn with `react-native-svg`, which the `lucide-react-native` icons in `specs.md` §1.3 already need) |
 
 ## Licences

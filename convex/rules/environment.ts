@@ -1,7 +1,7 @@
 /**
  * Which deployment this is, read from the Convex env var SITE_URL (the web app it serves) — pure, no Convex imports.
  * Production serves https://udvasito.com; staging serves https://staging.udvasito.com or a local dev server. Nothing
- * else counts as staging — not even *.vercel.app, because the production Vercel project has such an address too.
+ * else counts as staging — not even *.workers.dev preview URLs, which a production Worker could also have.
  * "unknown" fails closed: staging-only tools refuse to run, seed-settings stops and auth keeps production hardening.
  *
  * Needed because staging is the *prod deployment* of the `udvasito-staging` project, so the CLI's `--prod` flag
