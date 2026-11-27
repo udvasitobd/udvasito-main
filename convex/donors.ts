@@ -7,12 +7,12 @@
  */
 import { v } from 'convex/values';
 
-import type { Doc, Id } from './_generated/dataModel';
-import type { QueryCtx } from './_generated/server';
+import type { Doc } from './_generated/dataModel';
 import { donorMutation, memberMutation, memberQuery } from './_lib/auth';
 import { donorLive, donorProfileOf, refreshDonorLive } from './_lib/donors';
 import { appError, validationError } from './_lib/errors';
 import { logEvent } from './_lib/events';
+import { checkPlaceChain } from './_lib/places';
 import { getSettings } from './_lib/settings';
 import { computeEligibility, type DonationHistory } from './rules/eligibility';
 import { dhakaDate } from './rules/time';
@@ -22,33 +22,6 @@ import { bloodGroup, callMode, component } from './schema';
 function valueOf<T>(checked: Checked<T>): T {
   if (!checked.ok) throw validationError(checked.error);
   return checked.value;
-}
-
-/** VAL-14a: a division, one of its districts and one of that district's thanas/upazilas. */
-async function checkPlaces(
-  ctx: QueryCtx,
-  ids: {
-    divisionId: Id<'places'>;
-    districtId: Id<'places'>;
-    upazilaId: Id<'places'>;
-  },
-): Promise<void> {
-  const [division, district, upazila] = await Promise.all([
-    ctx.db.get(ids.divisionId),
-    ctx.db.get(ids.districtId),
-    ctx.db.get(ids.upazilaId),
-  ]);
-  const chain =
-    division?.level === 'division' &&
-    district?.level === 'district' &&
-    district.parentId === division._id &&
-    upazila?.level === 'upazila' &&
-    upazila.parentId === district._id;
-  if (!chain)
-    throw validationError({
-      field: 'upazilaId',
-      messageKey: 'validation.VAL-14a.invalid',
-    });
 }
 
 /** What SCR-D02 needs to fill the form again, and what SCR-D01 shows. Never a phone number. */
@@ -121,7 +94,7 @@ export const upsert = memberMutation({
     const lastDonationDate = valueOf(checkLastDonation(args.neverDonated, args.lastDonationDate, dhakaDate(now)));
     const areaText = valueOf(checkShortText(args.areaText, 'areaText'));
     const institution = valueOf(checkShortText(args.institution, 'institution'));
-    await checkPlaces(ctx, args);
+    await checkPlaceChain(ctx, args, { field: 'upazilaId', messageKey: 'validation.VAL-14a.invalid' });
     // The health-data consent is part of the current legal version (X08); an old screen cannot accept an old text.
     if (args.healthConsentVersion !== settings.consentVersion) throw appError('ERR_CONSENT_REQUIRED');
 

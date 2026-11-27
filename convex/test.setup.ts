@@ -56,7 +56,11 @@ export async function signIn(t: T, email: string) {
 export type ProfileOverrides = Partial<Omit<Doc<'profiles'>, '_id' | '_creationTime' | 'authUserId'>>;
 
 /** Inserts a finished-onboarding profile for a Better Auth user (consent = current seed version). */
-export async function insertProfile(t: T, authUserId: string, overrides: ProfileOverrides = {}): Promise<Id<'profiles'>> {
+export async function insertProfile(
+  t: T,
+  authUserId: string,
+  overrides: ProfileOverrides = {},
+): Promise<Id<'profiles'>> {
   return t.run((ctx) =>
     ctx.db.insert('profiles', {
       authUserId,
@@ -74,4 +78,54 @@ export async function insertProfile(t: T, authUserId: string, overrides: Profile
       ...overrides,
     }),
   );
+}
+
+/** Chattogram division → Chattogram district → Kotwali thana, and a second district. */
+export async function insertPlaces(t: T) {
+  return t.run(async (ctx) => {
+    const base = {
+      lat: 22.35,
+      lng: 91.83,
+      isMetroThana: false,
+      neighbourIds: [],
+    };
+    const division = await ctx.db.insert('places', {
+      ...base,
+      level: 'division',
+      code: '20',
+      nameEn: 'Chattogram',
+      nameBn: 'চট্টগ্রাম',
+    });
+    const district = await ctx.db.insert('places', {
+      ...base,
+      level: 'district',
+      code: '2015',
+      nameEn: 'Chattogram',
+      nameBn: 'চট্টগ্রাম',
+      parentId: division,
+    });
+    const upazila = await ctx.db.insert('places', {
+      ...base,
+      level: 'upazila',
+      code: '201541',
+      nameEn: 'Kotwali',
+      nameBn: 'কোতোয়ালী',
+      parentId: district,
+      isMetroThana: true,
+    });
+    const otherDistrict = await ctx.db.insert('places', {
+      ...base,
+      level: 'district',
+      code: '2022',
+      nameEn: "Cox's Bazar",
+      nameBn: 'কক্সবাজার',
+      parentId: division,
+    });
+    return {
+      divisionId: division,
+      districtId: district,
+      upazilaId: upazila,
+      otherDistrict,
+    };
+  });
 }

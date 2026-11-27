@@ -4,7 +4,7 @@
  * - `ownPhone` returns the caller's own number (profiles.me) — not a reveal.
  * - `ownVerifiedPhone` returns the number Telegram/WhatsApp shared for the caller's own verification row.
  * - `verifierHint` returns the last 4 digits only — all an in-person verifier ever sees (D-R1).
- * - `phoneVerifiedElsewhere` compares numbers on the server and returns only yes/no.
+ * - `phoneVerifiedElsewhere` and `isOwnVerifiedPhone` compare numbers on the server and return only yes/no.
  * - `revealPhone` returns another person's number and, in the same transaction, writes a `contactReveals` row (once
  *   per viewer + request + subject + reason) and an audit entry. Functions marked 📞 in specs §6 must use it.
  * The number never goes into the audit `meta`, events, logs or errors.
@@ -32,6 +32,14 @@ export const REVEAL_NEEDS_REASON_TEXT: ReadonlySet<RevealReason> = new Set(['adm
 
 export function ownPhone(profile: Doc<'profiles'>): string {
   return profile.phone;
+}
+
+/**
+ * Whether a request's contact number is the caller's own verified number (`requests.contactPhoneVerified`). Compared
+ * on the server; only yes/no leaves this file.
+ */
+export function isOwnVerifiedPhone(profile: Doc<'profiles'>, phone: string): boolean {
+  return profile.phoneVerified && profile.phone === phone;
 }
 
 /** The number shared by Telegram/WhatsApp on the caller's own row (`phoneVerification.status`, SCR-O04 mismatch). */

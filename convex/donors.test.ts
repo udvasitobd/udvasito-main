@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { api } from './_generated/api';
 import type { Id } from './_generated/dataModel';
 import { readAppError } from './_lib/errors';
-import { insertProfile, makeT, signIn, type ProfileOverrides, type T } from './test.setup';
+import { insertPlaces, insertProfile, makeT, signIn, type ProfileOverrides, type T } from './test.setup';
 
 const CONSENT = '2026-11-28-pilot';
 
@@ -30,55 +30,7 @@ async function fieldOf(promise: Promise<unknown>): Promise<string | undefined> {
   }
 }
 
-/** Chattogram division → Chattogram district → Kotwali thana, and a second district. */
-async function places(t: T) {
-  return t.run(async (ctx) => {
-    const base = {
-      lat: 22.35,
-      lng: 91.83,
-      isMetroThana: false,
-      neighbourIds: [],
-    };
-    const division = await ctx.db.insert('places', {
-      ...base,
-      level: 'division',
-      code: '20',
-      nameEn: 'Chattogram',
-      nameBn: 'চট্টগ্রাম',
-    });
-    const district = await ctx.db.insert('places', {
-      ...base,
-      level: 'district',
-      code: '2015',
-      nameEn: 'Chattogram',
-      nameBn: 'চট্টগ্রাম',
-      parentId: division,
-    });
-    const upazila = await ctx.db.insert('places', {
-      ...base,
-      level: 'upazila',
-      code: '201541',
-      nameEn: 'Kotwali',
-      nameBn: 'কোতোয়ালী',
-      parentId: district,
-      isMetroThana: true,
-    });
-    const otherDistrict = await ctx.db.insert('places', {
-      ...base,
-      level: 'district',
-      code: '2022',
-      nameEn: "Cox's Bazar",
-      nameBn: 'কক্সবাজার',
-      parentId: division,
-    });
-    return {
-      divisionId: division,
-      districtId: district,
-      upazilaId: upazila,
-      otherDistrict,
-    };
-  });
-}
+const places = insertPlaces;
 
 let people = 0;
 async function member(t: T, overrides: ProfileOverrides = {}) {

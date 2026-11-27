@@ -21,7 +21,7 @@ const fail = (field: string, messageKey: string, params?: Record<string, string 
 });
 
 /** Letters (Latin or Bangla, incl. Bangla vowel signs and marks), spaces, `.` `-` `'` only (VAL-01). */
-const NAME_CHARS = /^[\p{Script=Latin}\p{Script=Bengali}\p{M} .'-]+$/u;
+export const NAME_CHARS = /^[\p{Script=Latin}\p{Script=Bengali}\p{M} .'-]+$/u;
 
 /** VAL-01 length limits (specs §4). */
 export const NAME_MIN_LENGTH = 2;
