@@ -323,3 +323,26 @@ tap, D-R3). Following the standing rule (Q-014), specs SCR-M02 now has a copy ta
 **Recommendation:** keep as built; member 3 reviews the 12 Bangla lines.
 **Applied:** as above (standing instruction "do the recommendations").
 Status: 🟦 applied, waiting for review
+
+### Q-020 · 2026-11-27 · P1 · Push alerts (matching v1): words and rules specs leaves open
+- **Android channel names:** specs §1.2.1 fixes the channel ids (`blood-requests`, `updates`) but not the names people
+  see in Android Settings. Following the standing rule (Q-014), specs §6.8 now has
+  `notifications.channel.bloodRequests` "Blood requests" / "রক্তের অনুরোধ" and `notifications.channel.updates`
+  "Updates" / "হালনাগাদ".
+- **"Fix" on the alerts banner** (SCR-D01 point 3) has no key: added `donor.alertsFix` "Fix" / "ঠিক করুন". The
+  alert guide it should open (SCR-D07) is P4, so in P1 "Fix" shows the Android permission dialog, or opens the app's
+  Android settings when the dialog may no longer be shown. When SCR-D07 is built, "Fix" opens it instead.
+- **Travel range is respected from wave 1:** a donor who chose "my thana only" is alerted only for requests in their
+  thana (PRD §5.3 filter). Neighbouring thanas count from P2, with the thana tiers.
+- **Distance in the alert** ("· 3.2 km"): from the centre of the donor's thana to the hospital (or the request's
+  thana centre), one decimal under 10 km. The app never sends the donor's own location to the server.
+- **"By {{time}}":** the time alone when it is today in Dhaka ("10:30 PM"), else date and time ("28 Nov, 9:00 AM").
+- **No Android device registered** (web-only donors, P1 has no web push): the donor still gets the `responses` row,
+  so the alert waits in the app (notification channel `inapp`) and counts toward the wave size.
+- **Quiet hours (S-21) and the daily cap (S-20)** are enforced from P2, as the P2 prompt lists them. Until then a wave
+  can reach a donor at night. With S-08 wave 1 = 10 donors per request this is bounded; flagging it so the team
+  knows.
+
+**Recommendation:** keep as built; member 3 reviews the 3 Bangla lines.
+**Applied:** as above (standing instruction "do the recommendations").
+Status: 🟦 applied, waiting for review

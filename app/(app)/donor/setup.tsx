@@ -48,6 +48,7 @@ import {
   type StepField,
 } from '@/features/donor/setupForm';
 import { useLocateArea } from '@/features/places/useLocateArea';
+import { useEnablePush } from '@/features/push/usePush';
 import { useAppConfig } from '@/lib/appConfig';
 import { todayInDhaka } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
@@ -142,6 +143,7 @@ function SetupSteps({
   const toast = useToast();
   const config = useAppConfig();
   const upsert = useMutation(api.donors.upsert);
+  const enablePush = useEnablePush();
   const locate = useLocateArea();
 
   const [step, setStep] = useState<Step>(initial.step);
@@ -248,6 +250,9 @@ function SetupSteps({
       await forgetDraft(profileId);
       toast.show(t('donor.setup.done'));
       router.replace('/donor');
+      // The first contextual moment to ask for notifications (SCR-D02 states). If refused, the Donate tab shows
+      // "Alerts may not reach you" with Fix (the alert guide, SCR-D07, arrives in P4).
+      void enablePush();
     } catch (error) {
       const message = errorMessage(error);
       const field = (error as { data?: { field?: string } }).data?.field as StepField | undefined;

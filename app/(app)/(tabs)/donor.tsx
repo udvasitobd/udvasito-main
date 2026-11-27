@@ -1,19 +1,21 @@
 /**
  * SCR-D01 · Donate tab. No donor profile → the intro and "Become a donor". With a profile → the status card
- * (Available / Not available, eligibility, why requests are not arriving yet) and a way back into donor setup.
- * Sections whose features are not built yet stay hidden (specs §1.9): Paused, Requests for you, alert health,
- * alert & privacy settings, donation history and "Hide my donor profile" join with their screens.
+ * (Available / Not available, eligibility, why requests are not arriving yet), alert health on Android ("Alerts may
+ * not reach you" + Fix) and a way back into donor setup. Sections whose features are not built yet stay hidden
+ * (specs §1.9): Paused, Requests for you, alert & privacy settings, donation history and "Hide my donor profile"
+ * join with their screens.
  */
 import { api } from '@convex/_generated/api';
 import { useMutation, useQuery } from 'convex/react';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Banner, Button, ChoiceGroup, ListGroup, ListRow, Screen, SkeletonCard, Text, useToast } from '@/components';
 import { Check, Droplet, Pencil } from '@/components/icons';
 import { EligibilityLine, NotLiveBanner } from '@/features/donor/DonorStatus';
+import { useEnablePush, usePushPermission } from '@/features/push/usePush';
 import { errorMessage } from '@/lib/errors';
 import { colors } from '@/theme/tokens';
 
@@ -41,6 +43,31 @@ function Intro() {
       </View>
       <Button label={t('donor.intro.cta')} block onPress={() => router.push('/donor/setup')} />
     </View>
+  );
+}
+
+/**
+ * SCR-D01 point 3. "Fix" shows the Android permission dialog, or opens the app's Android settings once the dialog
+ * may no longer be shown (Q-020; the alert guide SCR-D07 takes over in P4). Hidden on web, where P1 has no push.
+ */
+function AlertsHealth() {
+  const { t } = useTranslation();
+  const [permission, setPermission] = usePushPermission();
+  const enablePush = useEnablePush();
+  if (permission !== 'ask' && permission !== 'blocked') return null;
+  const fix = async () => {
+    if (permission === 'blocked') {
+      await Linking.openSettings().catch(() => undefined);
+      return;
+    }
+    setPermission(await enablePush());
+  };
+  return (
+    <Banner
+      kind="warning"
+      text={t('donor.alertsOff')}
+      action={<Button label={t('donor.alertsFix')} variant="secondary" size="sm" onPress={() => void fix()} />}
+    />
   );
 }
 
@@ -109,6 +136,7 @@ export default function DonateTab() {
         {failure ? <Banner kind="error" text={failure} /> : null}
         <EligibilityLine eligibleFrom={mine.eligibleFrom} />
       </View>
+      <AlertsHealth />
       <ListGroup>
         <ListRow label={t('donor.edit')} icon={Pencil} onPress={() => router.push('/donor/setup')} />
       </ListGroup>

@@ -639,6 +639,7 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `donor.notLive.group` | Add your blood group to start receiving requests. | অনুরোধ পেতে আপনার রক্তের গ্রুপ যোগ করুন। |
 | `donor.notLive.consent` | Please review the updated consent to keep receiving requests. | অনুরোধ পেতে থাকতে হালনাগাদ সম্মতি পর্যালোচনা করুন। |
 | `donor.alertsOff` | Alerts may not reach you. Fix it in 1 minute. | অ্যালার্ট হয়তো আপনার কাছে পৌঁছাবে না। ১ মিনিটে ঠিক করুন। |
+| `donor.alertsFix` | Fix | ঠিক করুন |
 **States:** loading skeleton; error → `CMP-ErrorState`; availability change is optimistic (outbox) with revert + toast on failure.
 **Events:** `availability_changed{state}`.
 
@@ -1591,6 +1592,12 @@ AI problems are **never** thrown as errors; `intake.parse` and `assistant.ask` r
 
 ### 6.8 Notification templates (push; language = recipient's `profile.language`)
 **Lock-screen privacy:** no phone numbers, no patient names, no requester names in any push. Android channel `blood-requests` (importance MAX, §1.2.1) for NTF-01/02/07/08/16; `updates` (default) for the rest. Payload `data: {url, notificationId}`.
+
+**Channel names** (Android Settings → Apps → UDVASITO → Notifications; set in the app language at launch, Q-020):
+| Key | English | বাংলা |
+|---|---|---|
+| `notifications.channel.bloodRequests` | Blood requests | রক্তের অনুরোধ |
+| `notifications.channel.updates` | Updates | হালনাগাদ |
 
 | ID | To | Title EN / BN | Body EN / BN | Opens |
 |---|---|---|---|---|
