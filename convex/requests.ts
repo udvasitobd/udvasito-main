@@ -6,6 +6,7 @@
  */
 import { v } from 'convex/values';
 
+import { internal } from './_generated/api';
 import type { Doc, Id } from './_generated/dataModel';
 import type { MutationCtx } from './_generated/server';
 import { assertSameArea, memberMutation } from './_lib/auth';
@@ -222,6 +223,7 @@ export const create = memberMutation({
       actorRole: caller.role,
       props: { aiAssisted: args.aiAssisted, source: args.source },
     });
+    await ctx.scheduler.runAfter(0, internal.matching.startRequest, { requestId });
     return { requestId, existing: false };
   },
 });

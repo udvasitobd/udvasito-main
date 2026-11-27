@@ -76,11 +76,26 @@ export function formatClockTime(hm: string, language: Language): string {
   return localized(format(date, 'h:mm a', { locale: language === 'bn' ? bn : enGB }), language);
 }
 
+/** A local Date showing the Dhaka wall-clock time of `timestamp` (date-fns formats local dates). */
+function dhakaWallClock(timestamp: number): Date {
+  const d = new Date(timestamp + DHAKA_OFFSET_MS);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes());
+}
+
 /** A timestamp as Dhaka wall-clock time, "27 Nov 2026, 2:05 PM", whatever the device's time zone. */
 export function formatDhakaDateTime(timestamp: number, language: Language): string {
-  const d = new Date(timestamp + DHAKA_OFFSET_MS);
-  const wall = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes());
+  const wall = dhakaWallClock(timestamp);
   return localized(format(wall, 'd MMM yyyy, h:mm a', { locale: language === 'bn' ? bn : enGB }), language);
+}
+
+/**
+ * A deadline as short as it can be read: "2:05 PM" when it falls on today's Dhaka date, else "28 Nov, 9:00 AM"
+ * (push alerts, NTF-01 "by {{time}}").
+ */
+export function formatDhakaDeadline(timestamp: number, now: number, language: Language): string {
+  const wall = dhakaWallClock(timestamp);
+  const pattern = dhakaDate(timestamp) === dhakaDate(now) ? 'h:mm a' : 'd MMM, h:mm a';
+  return localized(format(wall, pattern, { locale: language === 'bn' ? bn : enGB }), language);
 }
 
 /** A Date's local clock time as "HH:MM" (what the phone's time picker returns). */

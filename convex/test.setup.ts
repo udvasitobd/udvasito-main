@@ -1,9 +1,10 @@
 /// <reference types="vite/client" />
 /**
- * convex-test harness: our schema + functions + the components they use (Better Auth, rate limiter).
+ * convex-test harness: our schema + functions + the components they use (Better Auth, rate limiter, Expo push).
  * Helpers create a signed-in Better Auth user with a live session, like the real sign-in does.
  */
 import { register as registerBetterAuth } from '@convex-dev/better-auth/test';
+import { register as registerPush } from '@convex-dev/expo-push-notifications/test';
 import { register as registerRateLimiter } from '@convex-dev/rate-limiter/test';
 import { convexTest } from 'convex-test';
 
@@ -25,6 +26,7 @@ export function makeT() {
   const t = convexTest(schema, modules);
   registerBetterAuth(t);
   registerRateLimiter(t);
+  registerPush(t);
   return t;
 }
 

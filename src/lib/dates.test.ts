@@ -7,6 +7,7 @@ import {
   formatClockTime,
   formatDhakaDate,
   formatDhakaDateTime,
+  formatDhakaDeadline,
   hmFromDate,
   toBanglaDigits,
   todayInDhaka,
@@ -39,6 +40,10 @@ describe('dates (specs §1.6 rule 3)', () => {
     expect(formatClockTime('25:00', 'en')).toBe('');
     expect(formatDhakaDateTime(Date.UTC(2026, 10, 27, 17, 59), 'en')).toBe('27 Nov 2026, 11:59 PM');
     expect(hmFromDate(new Date(2026, 0, 1, 7, 5))).toBe('07:05');
+    const now = Date.UTC(2026, 10, 27, 4, 0); // 10:00 in Dhaka
+    expect(formatDhakaDeadline(Date.UTC(2026, 10, 27, 16, 30), now, 'en')).toBe('10:30 PM');
+    expect(formatDhakaDeadline(Date.UTC(2026, 10, 27, 18, 0), now, 'en')).toBe('28 Nov, 12:00 AM');
+    expect(formatDhakaDeadline(Date.UTC(2026, 10, 27, 6, 0), now, 'bn')).toMatch(/^১২:০০ /);
   });
 
   it('moves by whole years, keeping 29 February valid', () => {

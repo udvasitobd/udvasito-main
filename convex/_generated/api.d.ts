@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as _lib_alertText from "../_lib/alertText.js";
 import type * as _lib_audit from "../_lib/audit.js";
 import type * as _lib_auth from "../_lib/auth.js";
 import type * as _lib_copy from "../_lib/copy.js";
@@ -17,6 +18,7 @@ import type * as _lib_errors from "../_lib/errors.js";
 import type * as _lib_events from "../_lib/events.js";
 import type * as _lib_network from "../_lib/network.js";
 import type * as _lib_places from "../_lib/places.js";
+import type * as _lib_push from "../_lib/push.js";
 import type * as _lib_random from "../_lib/random.js";
 import type * as _lib_rateLimits from "../_lib/rateLimits.js";
 import type * as _lib_settings from "../_lib/settings.js";
@@ -32,10 +34,12 @@ import type * as consents from "../consents.js";
 import type * as donors from "../donors.js";
 import type * as hospitals from "../hospitals.js";
 import type * as http from "../http.js";
+import type * as matching from "../matching.js";
 import type * as phoneVerification from "../phoneVerification.js";
 import type * as places from "../places.js";
 import type * as profiles from "../profiles.js";
 import type * as public_ from "../public.js";
+import type * as push from "../push.js";
 import type * as requests from "../requests.js";
 import type * as rules_compatibility from "../rules/compatibility.js";
 import type * as rules_donor from "../rules/donor.js";
@@ -44,11 +48,13 @@ import type * as rules_environment from "../rules/environment.js";
 import type * as rules_hospitals from "../rules/hospitals.js";
 import type * as rules_limits from "../rules/limits.js";
 import type * as rules_places from "../rules/places.js";
+import type * as rules_ranking from "../rules/ranking.js";
 import type * as rules_request from "../rules/request.js";
 import type * as rules_settings from "../rules/settings.js";
 import type * as rules_time from "../rules/time.js";
 import type * as rules_validation from "../rules/validation.js";
 import type * as rules_verification from "../rules/verification.js";
+import type * as rules_waves from "../rules/waves.js";
 import type * as support from "../support.js";
 import type * as supportInternal from "../supportInternal.js";
 import type * as telegram from "../telegram.js";
@@ -60,6 +66,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "_lib/alertText": typeof _lib_alertText;
   "_lib/audit": typeof _lib_audit;
   "_lib/auth": typeof _lib_auth;
   "_lib/copy": typeof _lib_copy;
@@ -69,6 +76,7 @@ declare const fullApi: ApiFromModules<{
   "_lib/events": typeof _lib_events;
   "_lib/network": typeof _lib_network;
   "_lib/places": typeof _lib_places;
+  "_lib/push": typeof _lib_push;
   "_lib/random": typeof _lib_random;
   "_lib/rateLimits": typeof _lib_rateLimits;
   "_lib/settings": typeof _lib_settings;
@@ -84,10 +92,12 @@ declare const fullApi: ApiFromModules<{
   donors: typeof donors;
   hospitals: typeof hospitals;
   http: typeof http;
+  matching: typeof matching;
   phoneVerification: typeof phoneVerification;
   places: typeof places;
   profiles: typeof profiles;
   public: typeof public_;
+  push: typeof push;
   requests: typeof requests;
   "rules/compatibility": typeof rules_compatibility;
   "rules/donor": typeof rules_donor;
@@ -96,11 +106,13 @@ declare const fullApi: ApiFromModules<{
   "rules/hospitals": typeof rules_hospitals;
   "rules/limits": typeof rules_limits;
   "rules/places": typeof rules_places;
+  "rules/ranking": typeof rules_ranking;
   "rules/request": typeof rules_request;
   "rules/settings": typeof rules_settings;
   "rules/time": typeof rules_time;
   "rules/validation": typeof rules_validation;
   "rules/verification": typeof rules_verification;
+  "rules/waves": typeof rules_waves;
   support: typeof support;
   supportInternal: typeof supportInternal;
   telegram: typeof telegram;
