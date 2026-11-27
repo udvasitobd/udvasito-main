@@ -42,18 +42,29 @@ Just write in the chat: phone brand + model + Android version for each phone.
 
 ---
 
-### Step 3b — Give Convex the Google sign-in secret (5 minutes)
-**Why:** Claude created the Google sign-in client ("UDVASITO staging"). It has a **secret** (like a password), so
-**you** copy it from Google straight into Convex. It never goes into the chat or the code.
-Two Chrome tabs are already open for this (if not, use the links).
-1. Tab **Google Cloud** — https://console.cloud.google.com/auth/clients?project=udvasito-516006 → click
-   **UDVASITO staging (dev + staging)**. On the right, under **Client secrets**, click **+ Add secret**.
-   A new secret appears with a **copy** button (two small squares) → click it.
-2. Tab **Convex** — https://dashboard.convex.dev/d/wry-tern-774/settings/environment-variables → click **+ Add** →
+### Step 3b — Give Convex the Google sign-in secrets (10 minutes)
+**Why:** Claude created two Google sign-in "clients": **UDVASITO staging (dev + staging)** for testing and
+**UDVASITO production** for the real app. Each has a **secret** (like a password), so **you** copy it from Google
+straight into Convex. It never goes into the chat or the code.
+
+**A. The testing secret (goes into 2 places)**
+1. Open https://console.cloud.google.com/auth/clients?project=udvasito-516006 → click **UDVASITO staging (dev + staging)**.
+   On the right, under **Client secrets**, click **+ Add secret**. A new secret appears with a **copy** button
+   (two small squares) → click it.
+2. Open https://dashboard.convex.dev/d/wry-tern-774/settings/environment-variables → **+ Add** →
    Name: `GOOGLE_CLIENT_SECRET` → Value: **Ctrl + V** → **Save**.
-3. Back on Google Cloud: the **older** secret (it ends in **LH4C** — nobody has ever seen it) → click **Disable**, then
+3. Open https://dashboard.convex.dev/d/outstanding-grasshopper-711/settings/environment-variables (this is **staging**)
+   → **+ Add** → Name: `GOOGLE_CLIENT_SECRET` → Value: **Ctrl + V** (the same secret) → **Save**.
+4. Back on Google Cloud: the **older** secret (it ends in **LH4C** — nobody has ever seen it) → **Disable**, then
    **Delete**. Keep the new one.
-4. Tell Claude "step 3b done" — Claude then tests "Continue with Google" on the web app.
+
+**B. The production secret (goes into 1 place)**
+5. Google Cloud clients list → click **UDVASITO production** → **+ Add secret** → copy it.
+6. Open https://dashboard.convex.dev/d/striped-starling-176/settings/environment-variables (this is **production** —
+   the purple "Production" label) → **+ Add** → Name: `GOOGLE_CLIENT_SECRET` → Value: **Ctrl + V** → **Save**.
+7. Back on Google Cloud: the **older** production secret (it ends in **zrYy** — nobody has seen it) → **Disable**,
+   then **Delete**.
+8. Tell Claude "step 3b done". Claude then tests "Continue with Google" on the web app.
 
 > While the app is in Google's **Testing** mode only listed test accounts can sign in (now: udvasitobd@gmail.com).
 > To test with your own Gmail: Google Cloud → **Audience** → **Test users** → **+ Add users** → type it → **Save**.

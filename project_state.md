@@ -20,13 +20,13 @@ Last updated: 2026-11-27 (Fri) — branch `p0/foundations`
 | Service | State |
 |---|---|
 | GitHub repo udvasitobd/udvasito-main | public; `main` + `staging` pushed (0273b96) |
-| Convex team `udvasitobd` | project **udvasito-staging** created, EU (Ireland); dev deployment `wry-tern-774` (used by `npx convex dev`). Team default region = EU. **udvasito-prod not created yet.** Staging "prod" deployment of udvasito-staging not created yet. |
+| Convex team `udvasitobd` | All EU (Ireland, eu-west-1). **udvasito-staging**: dev `wry-tern-774` (`npx convex dev`), prod = **STAGING** `outstanding-grasshopper-711` (created 2026-11-27, never deployed). **udvasito-prod** (created 2026-11-27): prod = **PRODUCTION** `striped-starling-176` (never deployed), unused dev `silent-elk-966`. CLI reaches any of them with `--deployment <name>` (no re-linking). |
 | Convex CLI | named account `udvasito` selected for this folder only (`~/.convex/config.json` directories map); developer's personal login kept as default account `personal` — never overwrite it |
-| Convex dev env vars set | BETTER_AUTH_SECRET (random), SITE_URL=http://localhost:8081, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID. (APP_ENV removed 2026-11-27: staging/production now comes only from SITE_URL, fail closed.) Missing: GOOGLE_CLIENT_SECRET (user step 3b) |
-| Expo | account `udvasitos-team` exists; need `eas init` → EAS_PROJECT_ID |
+| Convex env vars (names only) | dev wry-tern: BETTER_AUTH_SECRET, SITE_URL=http://localhost:8081, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID (staging client). staging outstanding-grasshopper: BETTER_AUTH_SECRET (own random), SITE_URL=https://staging.udvasito.com, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID (staging client). production striped-starling: BETTER_AUTH_SECRET (own random), SITE_URL=https://udvasito.com, GOOGLE_CLIENT_ID (production client); NEVER PASSWORD_SIGNIN. All three miss GOOGLE_CLIENT_SECRET (user step 3b). APP_ENV removed 2026-11-27. |
+| Expo | account `udvasitos-team`; project **udvasito** id `3e11ddf3-c86f-4d08-8d22-433104d9a7b2` (public) hard-coded in app.config.ts (no EAS_PROJECT_ID env any more). eas-cli not installed locally; EXPO_TOKEN GitHub secret = for_me step 5. |
 | Vercel | developer creates it on 2026-11-28 (Sat) |
 | Domain udvasito.com | Namecheap (only paid item). ADR-023: used everywhere; staging = staging.udvasito.com |
-| Google Cloud | project **UDVASITO** id `udvasito-516006` (no billing, no trial; ToS accepted with user OK 2026-11-27, also OK for Firebase + AI Studio ToS). Auth Platform: External, **Testing**, test user = team Gmail. Client **"UDVASITO staging (dev + staging)"** Web, id `436072889616-ab3hftd03esdskdkbtkaq1rv4qm347qo.apps.googleusercontent.com` (public) → set as GOOGLE_CLIENT_ID on dev. Redirect URI: `https://wry-tern-774.eu-west-1.convex.site/api/auth/callback/google` (EU site URLs carry `.eu-west-1.`!). Secret: user adds a new one → Convex dashboard (for_me step 3b); first secret ****LH4C unseen → user deletes. TODO: staging redirect URI when the staging prod deployment exists; separate production client; Branding home/privacy/terms links once those pages exist; publish to production before pilot (ask user). |
+| Google Cloud | project **UDVASITO** id `udvasito-516006` (no billing, no trial; ToS accepted with user OK 2026-11-27, also OK for Firebase + AI Studio ToS). Auth Platform: External, **Testing**, test user = team Gmail. Client **"UDVASITO staging (dev + staging)"** Web, id `436072889616-ab3hftd03esdskdkbtkaq1rv4qm347qo.apps.googleusercontent.com` (public) → set as GOOGLE_CLIENT_ID on dev. Redirect URI: `https://wry-tern-774.eu-west-1.convex.site/api/auth/callback/google` (EU site URLs carry `.eu-west-1.`!). Second redirect URI (staging): `https://outstanding-grasshopper-711.eu-west-1.convex.site/api/auth/callback/google`. Secret: user adds a new one → dev + staging Convex (for_me step 3b A); first secret ****LH4C unseen → user deletes. Client **"UDVASITO production"** id `436072889616-etaru4u7pkdf2gloro855hj4241hj4bu.apps.googleusercontent.com` → GOOGLE_CLIENT_ID on striped-starling; redirect `https://striped-starling-176.eu-west-1.convex.site/api/auth/callback/google`; first secret ****zrYy unseen → user replaces (step 3b B). TODO: Branding home/privacy/terms links once those pages exist; publish to production before pilot (ask user). |
 | Firebase FCM, Telegram bots, Gemini, Cloudinary, Sentry | not yet |
 
 Convex region note: dashboard shows "30% regional surcharge" for EU; pricing page says included amounts are shared
@@ -97,6 +97,9 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   installed Chrome (no browser download); stop the old dev server before e2e (port 8081).
 - Questions open: Q-004, Q-005 (copy), Q-006, Q-007 offline-file design. Akbar Shah thana needs a centre (member 2).
 - Google OAuth client DONE (see §2) except the secret (user). docs/spikes.md written (all 4 wait on accounts/phones).
-- NEXT: after step 3b test "Continue with Google" on localhost:8081 (dev) end-to-end; Convex udvasito-prod project; eas init → EAS_PROJECT_ID repo variable; Firebase FCM; Telegram bot; Gemini key;
-  Cloudinary; Sentry), spikes S1–S4 in docs/spikes.md, then PR p0/foundations → staging + code review + fixes (NEVER merge
-  before review). User steps pending: Vercel account (Sat), EXPO_TOKEN secret (for_me.md step 5), test phones.
+- 2026-11-27 later: review fixes 205a0f1 (+ changelog 2db9b43), PR comment posted, CI green. Created Convex staging +
+  production deployments, Expo project (id in app.config.ts), Google production client; staging/prod env vars set.
+- NEXT: after step 3b test "Continue with Google" on localhost:8081 (dev) end-to-end. Then (each needs the developer):
+  first staging deploy (after PR #1 merge OK) + CONVEX_DEPLOY_KEY for CI; Firebase FCM (google-services.json = EAS file
+  secret); Telegram bot (BotFather, developer's phone); Gemini key (developer pastes into Convex); Cloudinary; Sentry;
+  Vercel (Sat); spikes S1–S4; EAS build #1 (ask first). PR #1 NOT merged — waits for the developer's OK.

@@ -3,7 +3,7 @@
 # with `eas build --local` (free for public repositories), uploads it as a workflow artifact and, for preview and
 # production, attaches it to a DRAFT release (a person reviews and publishes it).
 #
-# Needs: repository secret EXPO_TOKEN (Expo access token) and repository variable EAS_PROJECT_ID. App secrets
+# Needs: repository secret EXPO_TOKEN (Expo access token). App secrets
 # (google-services.json, keys) are not here — EAS pulls them from the profile's EAS environment.
 name: Android local build
 
@@ -55,8 +55,6 @@ jobs:
         run: npm ci
 
       - name: Build (eas build --local)
-        env:
-          EAS_PROJECT_ID: ${{ vars.EAS_PROJECT_ID }}
         run: eas build --local --non-interactive --platform android --profile "$PROFILE" --output "$APK"
 
       - name: Upload APK artifact
