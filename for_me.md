@@ -30,7 +30,28 @@ you the exact permissions on the page before you click). Write **yes** in the ch
 
 ### 👉 2. Pass on the team jobs below 👥
 Most urgent: **member 4's privacy notice + terms draft** (English + Bangla). Without it the app cannot show its
-consent screen to real people (Q-009). Then the hospital list, two more test phones, and member 1's missing texts.
+consent screen to real people (Q-009). Then the hospital list, two more test phones, and member 1's texts.
+
+### 👉 3. Make the **test** Telegram bot (about 5 minutes)
+**Why:** people verify their phone number by tapping a button that opens this bot in Telegram. The code is ready; it
+only needs its own bot. This one is for the test website (staging) — the real one comes later.
+1. On the computer open **https://web.telegram.org** → it shows a QR code. On your phone open **Telegram** →
+   **Settings** → **Devices** → **Link Desktop Device** → point the phone at the QR code.
+2. In Telegram on the computer, search **@BotFather** (the one with the blue tick ✔) → open it → click **Start**.
+3. Send this message: `/newbot`
+4. It asks for a name. Send: `UDVASITO test`
+5. It asks for a username (it must end in "bot"). Send: `udvasito_test_bot`
+   If it says the name is taken, try `udvasito_staging_bot`, then `udvasito_test1_bot`.
+6. BotFather answers **"Done! Congratulations…"**. Under **"Use this token to access the HTTP API:"** there is a long
+   line like `123456789:AAH…`. That is a **secret password for the bot** — 🔒 never paste it into the chat. Click it
+   once (Telegram copies it).
+7. Open **https://dashboard.convex.dev** → click the project **udvasito-staging** → at the top, open the deployment
+   menu and choose **Production** (its name is `outstanding-grasshopper-711` — this is our **test website's**
+   database, not the real one) → **Settings** (left) → **Environment Variables** → **+ Add**.
+   - **Name:** `TELEGRAM_BOT_TOKEN`
+   - **Value:** paste (Ctrl + V) → **Save**.
+8. Write in the chat: **"test bot done, it is @…"** with the username from step 5 (the username is not secret).
+   Claude does the rest (a second secret, connecting the bot, switching the button on).
 
 ---
 
@@ -70,8 +91,8 @@ consent screen to real people (Q-009). Then the hospital list, two more test pho
 ## ⏳ Later (Claude will tell you when)
 - ⏳ **One key for the real website:** you copy a "deploy key" from Convex and paste it into Cloudflare (Claude shows
   you exactly where). Before the real website **udvasito.com** goes live, Claude asks you first.
-- ⏳ **Telegram bots (2 of them: real + test):** needs your phone's Telegram app for ~5 minutes (talking to
-  @BotFather). Needed for phone-number checks in P1 — Claude will give you the exact taps.
+- ⏳ **The real Telegram bot** (same taps as 👉 3, name `UDVASITO`, username `udvasito_bot` or similar) — just
+  before the real website goes live; its token goes into the **udvasito-prod** project instead.
 - ⏳ **Gemini AI key:** you create it in Google AI Studio and paste it into Convex (Claude shows where).
 - ⏳ **Install the first test app (APK)** on your phones: Claude sends a link; open it on the phone → **Download** →
   **Install** (Android may ask "Allow from this source?" → allow). Claude asks before using a build (15 a month).
@@ -95,11 +116,20 @@ consent screen to real people (Q-009). Then the hospital list, two more test pho
   the middle of Akbar Shah thana → click the numbers at the top (they are copied) → paste them into the `lat,lng`
   columns of that row (first number = lat, second = lng). Then tell Claude.
 - 👥 **Member 1 — missing text:** `docs/questions.md` Q-005 lists 4 small texts that need English + Bangla wording.
+- 👥 **Member 1 — check Claude's Bangla:** where the plan had English only, Claude wrote the Bangla itself (you said
+  "use the default Bangla translation"). Please read these tables and fix any word that sounds wrong: `docs/questions.md`
+  **Q-014** (tab bar, More, Settings, download page) and **Q-017** (the 3 Telegram bot messages), plus the new line
+  `home.verifyCta` "Verify / যাচাই করুন". Send corrections to the developer; Claude updates the files.
 
 ## ❓ Questions waiting for you / the team
 See `docs/questions.md` — Claude writes each question with a recommended answer. You said "do the recommendations",
 so Claude follows them unless you say otherwise. Still waiting on people: **Q-005** (member 1's texts), **Q-009**
 (member 4's legal draft), **Q-010** (two more phones).
+- ✅ Q-011, Q-012, Q-013, Q-014 — you answered (recommended options; "default Bangla translation everywhere").
+- 🟦 **Q-015** (one verified account per phone number) and **Q-017** (what the Telegram bot says) — Claude used the
+  recommendation; just read them and say if you want something different.
+- ❓ **Q-016** — when a volunteer says "It doesn't match", should the person see a short message? Claude suggests yes
+  (option A, the text is in the file). Until you answer, the screen simply shows the button again.
 
 ---
 

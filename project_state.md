@@ -147,8 +147,19 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   account-status, update-required, profiles.updateLanguage + LanguageSync (9a6079b) · ✅ 2 sign-in was done in P0.
   ⏭ /download (SCR-P08) moved to the go-live slice: needs the APK release; settings has no size/date fields — decide
   then (GitHub release API vs new settings keys → ask). Home sections join with their features.
-  NEXT: slice 4 verification (in person now: phoneVerification.startInPerson/lookupInPerson/confirmInPerson +
-  SCR-O04 + SCR-V06; Telegram when bots exist) → 7 donor setup → 8 request form → 9–15.
+  ✅ 4a in-person verification startInPerson/lookupInPerson/confirmInPerson + SCR-O04 + SCR-V06 (37b4e6d) · ✅ 4b
+  Telegram start/webhook/handleMessage/acceptMismatch/registerWebhook + SCR-O04 Telegram + mismatch cards (b51c595).
+  All verification goes through convex/_lib/verification.ts markPhoneVerified(ctx, profile, via, {verifierId, phone})
+  — slice 7 adds the donor `live` recompute THERE. Telegram is hidden in the app until settings.verification.telegram
+  && telegramBot ≠ ''. Bot replies: convex/_lib/copy.ts bilingual(key) from en/bn.json (JSON import, bundles fine).
+  Dev deployment wry-tern-774 has the code; webhook answers 401 without the secret (checked).
+  NEXT: 7 donor setup → 8 request form → 9–15.
+- convex-test: the fake clock moves 1 ms per write → compare with returned expiresAt / loose bounds, not exact NOW.
+  Stub fetch with vi.stubGlobal('fetch', …) and set process.env in beforeEach; t.fetch('/path') hits http.ts routes.
+- Telegram bot go-live (human + me): developer makes the bot in BotFather (staging bot first) and pastes the token as
+  TELEGRAM_BOT_TOKEN in the Convex dashboard; I generate TELEGRAM_WEBHOOK_SECRET and pipe it in unprinted
+  (node crypto → `npx convex env set` via stdin); then `npx convex run telegram:registerWebhook`; then set
+  settings.verification {telegram: true, telegramBot: '<name>'} via internal.admin.ops.setSetting.
 - Legal files: NONE in the repo (DEP-02). Without them /welcome, /onboarding, /privacy, /terms are "not found" and the
   gates skip consent/onboarding (availableRoutes({legalReady})). To check those screens locally: write 4 throwaway
   files in src/content/legal/ with front matter (version 2026-11-28-pilot, effective 2026-11-28), run

@@ -3,6 +3,11 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-27 · P1 · Phone verification by Telegram: one-time bot link, `POST /telegram/webhook` (secret header, replay guard), own-contact check, "use the Telegram number" choice, bot replies in English + Bangla, one-command webhook setup (b51c595).
+- 2026-11-27 · P1 · Phone verification in person: 6-character code, volunteer/admin check screen (first name + last 4 digits only), audit log, daily limit per verifier, one verified account per number (Q-015) (37b4e6d).
+- 2026-11-27 · P1 · App shells: tab bar (sidebar on wide screens), Home, More, Settings with language sync, account-status and update-required screens (9a6079b).
+- 2026-11-27 · P1 · Onboarding: welcome, consent and About-you steps, /privacy and /terms, invite-code capture, consent version check (6ed94a0, 45f1582, 9fefdd0).
+- 2026-11-27 · P1 · Rules: eligibility, compatibility, limits and Dhaka date helpers as pure tested functions (220845d).
 - 2026-11-27 · P0 · Code-review fixes for PR #2: crawlers and link previews get the app (not a 404) for app addresses, missing files stay 404, every Worker response carries the §7.4 security headers, local server follows the same rule and survives broken URLs; www.udvasito.com → udvasito.com Redirect Rule live.
 - 2026-11-27 · P0 · Web hosting moves to Cloudflare Workers (ADR-024, replaces Vercel): `wrangler.jsonc` (production + staging Workers), `worker/index.ts` Google sign-in pass-through to Convex (tested), `public/_headers` (CSP and security headers, checked against Cloudflare limits), local server mimics Cloudflare for the smoke test; udvasito.com DNS moved to Cloudflare (email records kept); all docs updated; for_me.md is now a live checklist.
 - 2026-11-27 · P0 · Sentry (EU, server-side phone/email masking, no IP or location), Cloudinary (cloud `udvasito`, free) and Firebase (FCM only, Android app `org.udvasito.app`, no Analytics) set up; error scrubber keeps Sentry contexts and source lines in a valid shape (tested live).
