@@ -53,6 +53,7 @@ import type * as rules_limits from "../rules/limits.js";
 import type * as rules_places from "../rules/places.js";
 import type * as rules_ranking from "../rules/ranking.js";
 import type * as rules_request from "../rules/request.js";
+import type * as rules_responses from "../rules/responses.js";
 import type * as rules_settings from "../rules/settings.js";
 import type * as rules_time from "../rules/time.js";
 import type * as rules_validation from "../rules/validation.js";
@@ -114,6 +115,7 @@ declare const fullApi: ApiFromModules<{
   "rules/places": typeof rules_places;
   "rules/ranking": typeof rules_ranking;
   "rules/request": typeof rules_request;
+  "rules/responses": typeof rules_responses;
   "rules/settings": typeof rules_settings;
   "rules/time": typeof rules_time;
   "rules/validation": typeof rules_validation;

@@ -7,6 +7,10 @@
  * - `phoneVerifiedElsewhere` and `isOwnVerifiedPhone` compare numbers on the server and return only yes/no.
  * - `revealPhone` returns another person's number and, in the same transaction, writes a `contactReveals` row (once
  *   per viewer + request + subject + reason) and an audit entry. Functions marked 📞 in specs §6 must use it.
+ * - `grantReveal` writes the same row and audit entry without returning a number (`responses.accept` grants both
+ *   sides of a confirmed slot; each side reads its number later).
+ * - `requestContactFor` returns a request's contact number to a viewer holding a live `confirmed_slot` reveal of the
+ *   requester (`responses.getForDonor`); nobody else ever gets it from here.
  * The number never goes into the audit `meta`, events, logs or errors.
  */
 import type { Doc, Id } from '../_generated/dataModel';
@@ -68,18 +72,22 @@ export async function phoneVerifiedElsewhere(
   return owners.some((other) => other._id !== profile._id && other.phoneVerified && other.isDemo === profile.isDemo);
 }
 
-export async function revealPhone(
-  ctx: MutationCtx,
-  input: {
-    viewer: Doc<'profiles'>;
-    subject: Doc<'profiles'>;
-    subjectRole: RevealSubjectRole;
-    requestId: Id<'requests'>;
-    reason: RevealReason;
-    reasonText?: string;
-    expiresAt: number;
-  },
-): Promise<string> {
+export type RevealInput = {
+  viewer: Doc<'profiles'>;
+  subject: Doc<'profiles'>;
+  subjectRole: RevealSubjectRole;
+  requestId: Id<'requests'>;
+  reason: RevealReason;
+  reasonText?: string;
+  expiresAt: number;
+};
+
+export async function revealPhone(ctx: MutationCtx, input: RevealInput): Promise<string> {
+  await grantReveal(ctx, input);
+  return input.subject.phone;
+}
+
+export async function grantReveal(ctx: MutationCtx, input: RevealInput): Promise<void> {
   const { viewer, subject } = input;
   if (viewer.isDemo !== subject.isDemo) throw appError('ERR_DEMO_ISOLATION');
   // VAL-18: a trimmed reason of 5–200 characters where one is required; the trimmed text is what gets stored.
@@ -118,5 +126,36 @@ export async function revealPhone(
       meta: { requestId: input.requestId, subjectRole: input.subjectRole, revealReason: input.reason },
     });
   }
-  return subject.phone;
+}
+
+/** Whether `viewer` holds an unexpired reveal of `subject` for this request and reason. */
+export async function hasLiveReveal(
+  ctx: QueryCtx,
+  input: { viewerId: Id<'profiles'>; subjectId: Id<'profiles'>; requestId: Id<'requests'>; reason: RevealReason },
+  now: number,
+): Promise<boolean> {
+  const rows = await ctx.db
+    .query('contactReveals')
+    .withIndex('by_viewer_request', (q) => q.eq('viewerId', input.viewerId).eq('requestId', input.requestId))
+    .collect();
+  return rows.some((r) => r.subjectId === input.subjectId && r.reason === input.reason && r.expiresAt > now);
+}
+
+/**
+ * The request's contact number for a confirmed donor (PRD §3.3): only with a live `confirmed_slot` reveal of the
+ * requester, and never while contact details are paused after a report (`revealsFrozen`).
+ */
+export async function requestContactFor(
+  ctx: QueryCtx,
+  viewer: Doc<'profiles'>,
+  request: Doc<'requests'>,
+  now: number,
+): Promise<string | undefined> {
+  if (request.revealsFrozen || viewer.isDemo !== request.isDemo) return undefined;
+  const live = await hasLiveReveal(
+    ctx,
+    { viewerId: viewer._id, subjectId: request.requesterId, requestId: request._id, reason: 'confirmed_slot' },
+    now,
+  );
+  return live ? request.contactPhone : undefined;
 }

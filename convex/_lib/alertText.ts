@@ -62,3 +62,19 @@ export function donorAlertText(alert: DonorAlert, language: Language, now: numbe
     }),
   };
 }
+
+/** NTF-04 — to the requester when a donor is confirmed: their first name, and who calls whom. */
+export function donorConfirmedText(
+  donorFirstName: string,
+  callMode: 'mutual' | 'donor_calls',
+  language: Language,
+): { title: string; body: string } {
+  const name = donorFirstName;
+  return {
+    title: fill(copyText('notifications.NTF-04.title', language), { name }),
+    body:
+      callMode === 'donor_calls'
+        ? fill(copyText('notifications.NTF-04.body.donorCalls', language), { name })
+        : copyText('notifications.NTF-04.body', language),
+  };
+}
