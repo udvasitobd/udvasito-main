@@ -5,7 +5,7 @@
  */
 import { marked, type Token, type Tokens } from 'marked';
 
-import type { Block, ContentDoc, Inline } from '../../src/lib/content';
+import { LEGAL_IDS, type Block, type ContentDoc, type ContentMeta, type Inline } from '../../src/lib/content';
 
 export class ContentError extends Error {}
 
@@ -46,8 +46,42 @@ function inline(tokens: Token[] | undefined, where: string): Inline[] {
   return out;
 }
 
+const META_KEYS = ['version', 'effective', 'reviewedBy'] as const;
+type MetaKey = (typeof META_KEYS)[number];
+
+/**
+ * The optional header (roadmap §5.4):
+ *   ---
+ *   version: 2026-11-28-pilot
+ *   effective: 2026-11-28
+ *   ---
+ */
+export function splitFrontMatter(markdown: string, where: string): { meta?: ContentMeta; body: string } {
+  const text = markdown.replace(/^﻿/, '').replace(/\r\n?/g, '\n');
+  if (!text.startsWith('---\n')) return { body: text };
+  const end = text.indexOf('\n---', 3);
+  const afterEnd = end === -1 ? -1 : end + 4;
+  if (end === -1 || (afterEnd < text.length && text[afterEnd] !== '\n')) {
+    throw new ContentError(`${where}: the header that starts with "---" must end with a "---" line`);
+  }
+  const meta: ContentMeta = {};
+  for (const line of text.slice(4, end).split('\n')) {
+    if (line.trim() === '') continue;
+    const match = /^([A-Za-z]+):\s*(.*?)\s*$/.exec(line);
+    if (!match) throw new ContentError(`${where}: header line "${line}" must look like "version: 2026-11-28-pilot"`);
+    const key = match[1] as string;
+    if (!(META_KEYS as readonly string[]).includes(key)) {
+      throw new ContentError(`${where}: unknown header "${key}" (allowed: ${META_KEYS.join(', ')})`);
+    }
+    if (match[2] === '') throw new ContentError(`${where}: header "${key}" is empty`);
+    meta[key as MetaKey] = match[2];
+  }
+  return { meta, body: text.slice(afterEnd) };
+}
+
 export function markdownToDoc(markdown: string, where: string): ContentDoc {
-  const tokens = marked.lexer(markdown);
+  const { meta, body } = splitFrontMatter(markdown, where);
+  const tokens = marked.lexer(body);
   let title = '';
   const blocks: Block[] = [];
   for (const tok of tokens) {
@@ -90,5 +124,28 @@ export function markdownToDoc(markdown: string, where: string): ContentDoc {
     }
   }
   if (!title) throw new ContentError(`${where}: the file must start with a "# Title" line`);
-  return { title, blocks };
+  return meta ? { title, meta, blocks } : { title, blocks };
+}
+
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * The legal pages are all-or-nothing (Q-009): none yet → the consent flow stays hidden; some but not all → the build
+ * stops. Each carries `version` (= settings.consentVersion) and `effective` (YYYY-MM-DD), the same in all four.
+ */
+export function legalProblems(docs: Readonly<Record<string, ContentDoc>>, consentVersion: string): string[] {
+  const present = LEGAL_IDS.filter((id) => id in docs);
+  if (present.length === 0) return [];
+  const problems: string[] = [];
+  for (const id of LEGAL_IDS) if (!present.includes(id)) problems.push(`${id}.md is missing — the four legal files ship together`);
+  for (const id of present) {
+    const meta = docs[id]?.meta;
+    if (meta?.version !== consentVersion) {
+      problems.push(`${id}.md: version must be "${consentVersion}" (settings.consentVersion), found "${meta?.version ?? ''}"`);
+    }
+    if (!meta?.effective || !DATE.test(meta.effective)) problems.push(`${id}.md: effective must be a date like 2026-11-28`);
+  }
+  const effective = new Set(present.map((id) => docs[id]?.meta?.effective).filter(Boolean));
+  if (effective.size > 1) problems.push('legal files: the four effective dates must be the same');
+  return problems;
 }

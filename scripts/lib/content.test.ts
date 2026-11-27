@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { ContentError, markdownToDoc } from './content';
+import { legalReady, type ContentDoc } from '../../src/lib/content';
+import { ContentError, legalProblems, markdownToDoc, splitFrontMatter } from './content';
 
 describe('markdownToDoc', () => {
   it('converts the supported subset', () => {
@@ -60,5 +61,67 @@ describe('markdownToDoc', () => {
     ['two titles', '# A\n\n# B'],
   ])('rejects %s', (_, md) => {
     expect(() => markdownToDoc(md, 'x.md')).toThrow(ContentError);
+  });
+});
+
+describe('splitFrontMatter (roadmap §5.4 header)', () => {
+  it('reads version, effective and reviewedBy, and keeps the rest as the body', () => {
+    const md = '---\nversion: 2026-11-28-pilot\neffective: 2026-11-28\n---\n# Privacy notice\n\nText.';
+    expect(splitFrontMatter(md, 'x')).toEqual({
+      meta: { version: '2026-11-28-pilot', effective: '2026-11-28' },
+      body: '\n# Privacy notice\n\nText.',
+    });
+    expect(markdownToDoc(md, 'x')).toMatchObject({ title: 'Privacy notice', meta: { version: '2026-11-28-pilot' } });
+  });
+
+  it('accepts Windows line endings and a byte-order mark', () => {
+    const md = '﻿---\r\nversion: v1\r\n---\r\n# T\r\n';
+    expect(markdownToDoc(md, 'x')).toEqual({ title: 'T', meta: { version: 'v1' }, blocks: [] });
+  });
+
+  it('a file without a header has no meta', () => {
+    expect(markdownToDoc('# T\n\nHi', 'x')).not.toHaveProperty('meta');
+  });
+
+  it.each([
+    ['an unclosed header', '---\nversion: v1\n# T'],
+    ['an unknown key', '---\nauthor: me\n---\n# T'],
+    ['an empty value', '---\nversion:\n---\n# T'],
+    ['a line that is not key: value', '---\njust words\n---\n# T'],
+  ])('rejects %s', (_, md) => {
+    expect(() => markdownToDoc(md, 'x')).toThrow(ContentError);
+  });
+});
+
+describe('legalProblems (Q-009: all four legal files or none)', () => {
+  const doc = (meta?: ContentDoc['meta']): ContentDoc => ({ title: 'T', blocks: [], ...(meta ? { meta } : {}) });
+  const good = { version: '2026-11-28-pilot', effective: '2026-11-28' };
+  const all = (meta = good) => ({
+    'legal/privacy.en': doc(meta),
+    'legal/privacy.bn': doc(meta),
+    'legal/terms.en': doc(meta),
+    'legal/terms.bn': doc(meta),
+  });
+
+  it('none yet is fine (the consent flow stays hidden); all four with the right header is fine', () => {
+    expect(legalProblems({ 'en/learn': doc() }, '2026-11-28-pilot')).toEqual([]);
+    expect(legalProblems(all(), '2026-11-28-pilot')).toEqual([]);
+    expect(legalReady(all())).toBe(true);
+    expect(legalReady({ 'legal/privacy.en': doc(good) })).toBe(false);
+  });
+
+  it('a partial set names each missing file', () => {
+    const { 'legal/terms.bn': _missing, ...three } = all();
+    expect(legalProblems(three, '2026-11-28-pilot')).toEqual(['legal/terms.bn.md is missing — the four legal files ship together']);
+  });
+
+  it('the version must equal settings.consentVersion and the effective date must be a date', () => {
+    expect(legalProblems(all({ version: 'draft', effective: '28 Nov' }), '2026-11-28-pilot')).toHaveLength(8);
+    expect(legalProblems({ ...all(), 'legal/terms.bn': doc() }, '2026-11-28-pilot')).toHaveLength(2);
+  });
+
+  it('all four effective dates must match', () => {
+    const problems = legalProblems({ ...all(), 'legal/terms.bn': doc({ ...good, effective: '2026-12-01' }) }, '2026-11-28-pilot');
+    expect(problems).toEqual(['legal files: the four effective dates must be the same']);
   });
 });

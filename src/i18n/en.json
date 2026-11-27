@@ -199,6 +199,7 @@
   "landing.how3": "A volunteer steps in if nobody answers in 30 seconds",
   "landing.how4": "Numbers are shared only when a donor says yes",
   "landing.sub": "Free, bilingual blood-donor network for Bangladesh — starting in Chattogram. Your number is never public.",
+  "legal.version": "Version {{version}} · in effect from {{date}}",
   "myData.delete": "Delete my account",
   "myData.deleteBody": "We'll remove your name, number, date of birth, donor details and requests' personal details within 30 days. Anonymous counts (e.g. 'one B+ donation in Chattogram') stay.",
   "myData.download": "Download my data",

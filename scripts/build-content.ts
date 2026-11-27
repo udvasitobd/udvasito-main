@@ -6,7 +6,9 @@
 import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 
-import { ContentError, markdownToDoc } from './lib/content';
+import { LEGAL_IDS, type ContentDoc } from '../src/lib/content';
+import { defaultSettings } from '../convex/rules/settings';
+import { ContentError, legalProblems, markdownToDoc } from './lib/content';
 
 const contentDir = join(process.cwd(), 'src', 'content');
 const outDir = join(contentDir, 'generated');
@@ -27,6 +29,7 @@ rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
 
 const ids: string[] = [];
+const docs: Record<string, ContentDoc> = {};
 let failed = false;
 for (const file of markdownFiles(contentDir)) {
   const id = relative(contentDir, file).split(sep).join('/').replace(/\.md$/, '');
@@ -36,9 +39,22 @@ for (const file of markdownFiles(contentDir)) {
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, `${JSON.stringify(doc)}\n`);
     ids.push(id);
+    docs[id] = doc;
   } catch (error) {
     failed = true;
     console.error(error instanceof ContentError ? error.message : error);
+  }
+}
+
+// The legal version must equal the consentVersion that seed-settings writes (settings X08). A broken legal set is
+// left out of the build entirely, so the app never shows a partial notice (the consent flow stays hidden).
+const legal = legalProblems(docs, defaultSettings().consentVersion);
+for (const problem of legal) console.error(problem);
+if (legal.length > 0) {
+  failed = true;
+  for (const id of LEGAL_IDS) {
+    const at = ids.indexOf(id);
+    if (at !== -1) ids.splice(at, 1);
   }
 }
 

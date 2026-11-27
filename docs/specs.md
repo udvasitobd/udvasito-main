@@ -860,6 +860,10 @@ Mission, team (5 members, roles — no personal phone numbers), the 7 Responsibl
 
 #### SCR-P06 / SCR-P07 · Privacy / Terms · `/privacy`, `/terms`
 Versioned Markdown (`src/content/legal/privacy.<lang>.md`, `terms.<lang>.md`, rendered by `CMP-Markdown`) with version + effective date at the top; the version string equals `settings.consentVersion`. Content drafted by member 4 (data-protection lead) and reviewed per NFR-08. **Must cover:** who we are (OQ-09), what we collect and why (per field), legal basis (consent), who sees what (PRD §3.3 in plain words), AI processing and voice notice, processors (Convex, Cloudflare, Google — sign-in, Gemini, FCM; Expo; Telegram; Cloudinary; Sentry), hosting outside Bangladesh, retention (PRD §5.9), your rights (access, correction, deletion, withdraw consent), 18+ only, contact, changes.
+**Copy** (Q-012, 2026-11-27):
+| Key | English | বাংলা |
+|---|---|---|
+| `legal.version` | Version {{version}} · in effect from {{date}} | সংস্করণ {{version}} · কার্যকর {{date}} থেকে |
 
 #### SCR-P08 · Download · `/download`
 Android: big **Download APK** button (`settings.apkUrl`, version, size, date) + 4-step install guide ("Allow installs from this source") + SHA-256 checksum; "Or use the web app" link. iPhone: "Add to Home Screen" 3-step guide with illustrations + note on alerts (iOS 16.4+). Desktop: "Install" button (PWA `beforeinstallprompt`) where supported.

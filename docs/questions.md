@@ -154,3 +154,35 @@ covers the Vivo battery-settings guide (SCR-M08 "Vivo").
 **Answer (2026-11-27, developer): "do the recommendations"** → borrow two phones (team job in for_me.md).
 Status: ⏳ waiting for two more phones
 
+
+### Q-011 · 2026-11-27 · P1 · A date picker for date of birth, last donation and "pick date & time"
+SCR-O03 (date of birth), SCR-D02 (last donation) and CMP-NeededByPicker ("Pick date & time") need a date picker, but
+no picker library is named in ADRs/specs, and specs has no copy for "Day / Month / Year" boxes.
+- **A.** Add `@react-native-community/datetimepicker` (MIT, free, Expo's recommended picker). Android shows the phone's
+  own calendar (already in the phone's language); the web uses the browser's own date box. No new copy needed. Needs a
+  native build, but build #1 has not been made yet, so it costs no extra build.
+- **B.** No new library: three typed boxes (day / month / year). Needs 3 new copy strings (EN + BN) reviewed by member 1.
+
+**Recommendation: A.**
+**Answer (2026-11-27, developer):** A — the phone's own calendar (`@react-native-community/datetimepicker`, ADR-025).
+Status: ✅ answered
+
+### Q-012 · 2026-11-27 · P1 · The "version + effective date" line on the privacy and terms pages
+SCR-P06/P07 say the pages show the version and effective date at the top, but specs has no copy for that line.
+- **A.** Add `legal.version` = "Version {{version}} · in effect from {{date}}" / "সংস্করণ {{version}} · কার্যকর {{date}} থেকে"
+  (member 1 reviews the Bangla).
+- **B.** Member 4 writes the version and date as the first line of each legal text; the app adds nothing.
+
+**Recommendation: A** (the line always matches the file header, so it can never be out of date).
+**Answer (2026-11-27, developer):** A — `legal.version` added to specs SCR-P06/P07 (member 1 reviews the Bangla).
+Status: ✅ answered
+
+### Q-013 · 2026-11-27 · P1 · What is kept for someone under 18
+SCR-O03 marks an under-18 account `underage_blocked`. Specs does not say which details are kept. A child cannot give
+consent (PDPO 2025), so keeping their name and mobile number has no purpose.
+- **A.** Keep only the date of birth (the reason for the block) and the status; no name, no number, no consent row.
+- **B.** Keep the name and number like any other account.
+
+**Recommendation: A** — built this way (`profiles.completeOnboarding`); easy to change before go-live if the team prefers B.
+**Answer (2026-11-27, developer):** A — keep only the date of birth.
+Status: ✅ answered
