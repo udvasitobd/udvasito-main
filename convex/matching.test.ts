@@ -133,7 +133,7 @@ describe('wave 1', () => {
         .withIndex('by_recipient', (q) => q.eq('recipientId', en.profileId))
         .collect(),
     );
-    expect(rows.map((n) => [n.channel, n.status])).toEqual([['expo', 'queued']]);
+    expect(rows.map((n) => [n.channel, n.status])).toEqual([['expo', 'sent']]);
     expect(english.data.notificationId).toBe(rows[0]!._id);
   });
 

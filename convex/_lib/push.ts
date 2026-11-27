@@ -29,7 +29,9 @@ export type Alert = {
 
 /**
  * Records the alert and hands it to Expo when the recipient has a device registered; otherwise it waits in the app
- * (channel `inapp`). Returns the `notifications` id, which travels in the push data so the tap can mark it opened.
+ * (channel `inapp`). Either way the row is `sent` once handed over, the same moment `notification_sent` is logged
+ * (delivery receipts from Expo, which would set `failed`, are not read yet). Returns the `notifications` id, which
+ * travels in the push data so the tap can mark it opened.
  */
 export async function sendAlert(ctx: MutationCtx, alert: Alert): Promise<Id<'notifications'>> {
   const notificationId = await ctx.db.insert('notifications', {
@@ -57,7 +59,7 @@ export async function sendAlert(ctx: MutationCtx, alert: Alert): Promise<Id<'not
         })
       : null;
   const channel = pushed === null ? 'inapp' : 'expo';
-  if (channel === 'inapp') await ctx.db.patch(notificationId, { channel, status: 'sent' });
+  await ctx.db.patch(notificationId, { channel, status: 'sent' });
   await logEvent(ctx, {
     name: 'notification_sent',
     isDemo: alert.isDemo,
