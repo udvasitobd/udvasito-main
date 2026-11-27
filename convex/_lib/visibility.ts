@@ -8,6 +8,7 @@
  */
 import type { Doc, Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
+import { checkReason } from '../rules/validation';
 import { writeAudit, type AuditAction } from './audit';
 import { appError } from './errors';
 
@@ -44,8 +45,12 @@ export async function revealPhone(
 ): Promise<string> {
   const { viewer, subject } = input;
   if (viewer.isDemo !== subject.isDemo) throw appError('ERR_DEMO_ISOLATION');
-  if (REVEAL_NEEDS_REASON_TEXT.has(input.reason) && !input.reasonText) {
-    throw appError('ERR_VALIDATION', undefined, 'reason', 'validation.VAL-18');
+  // VAL-18: a trimmed reason of 5–200 characters where one is required; the trimmed text is what gets stored.
+  let reasonText = input.reasonText?.trim() || undefined;
+  if (REVEAL_NEEDS_REASON_TEXT.has(input.reason)) {
+    const checked = checkReason(input.reasonText ?? '');
+    if (!checked.ok) throw appError('ERR_VALIDATION', undefined, checked.error.field, checked.error.messageKey);
+    reasonText = checked.value;
   }
 
   const existing = await ctx.db
@@ -63,7 +68,7 @@ export async function revealPhone(
       subjectId: subject._id,
       subjectRole: input.subjectRole,
       reason: input.reason,
-      ...(input.reasonText !== undefined ? { reasonText: input.reasonText } : {}),
+      ...(reasonText !== undefined ? { reasonText } : {}),
       expiresAt: input.expiresAt,
       isDemo: viewer.isDemo,
     });
@@ -72,7 +77,7 @@ export async function revealPhone(
       action: REVEAL_AUDIT_ACTION[input.reason],
       targetType: 'profile',
       targetId: subject._id,
-      ...(input.reasonText !== undefined ? { reason: input.reasonText } : {}),
+      ...(reasonText !== undefined ? { reason: reasonText } : {}),
       meta: { requestId: input.requestId, subjectRole: input.subjectRole, revealReason: input.reason },
     });
   }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { compareVersions } from './version';
-import { requiredRole, resolveGate, routeKind, safeNext, type GateInput } from './gates';
+import { readMe, requiredRole, resolveGate, routeKind, safeNext, type GateInput } from './gates';
 
 const ALL = new Set(['/sign-in', '/home', '/welcome', '/onboarding', '/update-required', '/account-status']);
 
@@ -135,4 +135,22 @@ describe('safeNext', () => {
     ['/sign-in?next=%2Fhome', '/home'],
     ['', '/home'],
   ])('%s → %s', (input, out) => expect(safeNext(input as string | string[] | undefined)).toBe(out));
+});
+
+describe('readMe', () => {
+  const convexError = (code: string) => Object.assign(new Error(code), { data: { code } });
+
+  it('passes a loaded or loading value through', () => {
+    expect(readMe({ id: 1 })).toEqual({ me: { id: 1 }, sessionEnded: false });
+    expect(readMe(undefined)).toEqual({ me: undefined, sessionEnded: false });
+  });
+
+  it('treats a session that ended on the server as signed out', () => {
+    expect(readMe(convexError('ERR_UNAUTHENTICATED'))).toEqual({ me: undefined, sessionEnded: true });
+  });
+
+  it('rethrows every other error', () => {
+    expect(() => readMe(convexError('ERR_INTERNAL'))).toThrow('ERR_INTERNAL');
+    expect(() => readMe(new Error('network'))).toThrow('network');
+  });
 });

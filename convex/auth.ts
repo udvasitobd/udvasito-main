@@ -5,7 +5,8 @@
  *
  * Convex env: BETTER_AUTH_SECRET, SITE_URL (https://udvasito.com | https://staging.udvasito.com |
  * http://localhost:8081 for a developer's dev deployment), GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
- * APP_ENV ("production" | "staging"), PASSWORD_SIGNIN ("true" on staging only).
+ * PASSWORD_SIGNIN ("true" on staging only). Staging vs production comes from SITE_URL (rules/environment.ts), the same
+ * source the seeds use; anything not clearly staging keeps the production hardening.
  */
 import { expo } from '@better-auth/expo';
 import { createClient, type GenericCtx } from '@convex-dev/better-auth';
@@ -15,6 +16,7 @@ import { betterAuth, type BetterAuthOptions } from 'better-auth/minimal';
 import { components } from './_generated/api';
 import type { DataModel } from './_generated/dataModel';
 import authConfig from './auth.config';
+import { environmentFromSiteUrl } from './rules/environment';
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
@@ -26,20 +28,21 @@ function nonEmpty(value: string | undefined): string | undefined {
   return value === undefined || value === '' ? undefined : value;
 }
 
-export const isProduction = () => nonEmpty(process.env.APP_ENV) === 'production';
+/** Staging relaxations (dev origins, password sign-in) apply only when SITE_URL is clearly staging — fails closed. */
+export const isStaging = () => environmentFromSiteUrl(process.env.SITE_URL) === 'staging';
 
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const siteUrl = nonEmpty(process.env.SITE_URL) ?? 'https://udvasito.com';
-  const production = isProduction();
-  // Expo Go / dev-client origins are trusted only outside production (Better Auth Expo guide, step 6).
-  const devOrigins = production ? [] : ['exp://', 'exp://**', 'http://localhost:8081'];
+  const staging = isStaging();
+  // Expo Go / dev-client origins are trusted only on staging (Better Auth Expo guide, step 6).
+  const devOrigins = staging ? ['exp://', 'exp://**', 'http://localhost:8081'] : [];
   return {
     appName: 'UDVASITO',
     trustedOrigins: [siteUrl, APP_SCHEME_ORIGIN, ...devOrigins],
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       // P-10: staging-only password sign-in for automated tests. Never on in production (practice sign-in comes in P5).
-      enabled: !production && nonEmpty(process.env.PASSWORD_SIGNIN) === 'true',
+      enabled: staging && nonEmpty(process.env.PASSWORD_SIGNIN) === 'true',
       requireEmailVerification: false,
       minPasswordLength: 10,
     },

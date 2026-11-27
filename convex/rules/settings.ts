@@ -244,6 +244,8 @@ export function checkSetting<K extends SettingKey>(key: K, value: unknown): Sett
 export function crossCheck(settings: Settings): string[] {
   const problems: string[] = [];
   if (settings.waveSizes.length < settings.waveCount) problems.push('waveSizes');
+  // S-30: the warning level must come before the critical level.
+  if (settings.usageWarnPct >= settings.usageCriticalPct) problems.push('usageCriticalPct');
   return problems;
 }
 

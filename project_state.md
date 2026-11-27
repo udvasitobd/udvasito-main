@@ -22,7 +22,7 @@ Last updated: 2026-11-27 (Fri) — branch `p0/foundations`
 | GitHub repo udvasitobd/udvasito-main | public; `main` + `staging` pushed (0273b96) |
 | Convex team `udvasitobd` | project **udvasito-staging** created, EU (Ireland); dev deployment `wry-tern-774` (used by `npx convex dev`). Team default region = EU. **udvasito-prod not created yet.** Staging "prod" deployment of udvasito-staging not created yet. |
 | Convex CLI | named account `udvasito` selected for this folder only (`~/.convex/config.json` directories map); developer's personal login kept as default account `personal` — never overwrite it |
-| Convex dev env vars set | BETTER_AUTH_SECRET (random), SITE_URL=http://localhost:8081, APP_ENV=staging, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID. Missing: GOOGLE_CLIENT_SECRET (user step 3b) |
+| Convex dev env vars set | BETTER_AUTH_SECRET (random), SITE_URL=http://localhost:8081, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID. (APP_ENV removed 2026-11-27: staging/production now comes only from SITE_URL, fail closed.) Missing: GOOGLE_CLIENT_SECRET (user step 3b) |
 | Expo | account `udvasitos-team` exists; need `eas init` → EAS_PROJECT_ID |
 | Vercel | developer creates it on 2026-11-28 (Sat) |
 | Domain udvasito.com | Namecheap (only paid item). ADR-023: used everywhere; staging = staging.udvasito.com |
@@ -56,30 +56,29 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   `ops.closeRequest` comes with requests in P1.
 - Auth wrappers: no profile → ERR_CONSENT_REQUIRED; queries allow `frozen` (read-only), mutations only `active`;
   role rank member<volunteer<admin<superadmin; `support.helpline` = any signed-in person (under-18/status screens too).
-- `/public/helpline` rate-limit key = SHA-256 of IP (IP never stored). Returns `{phone: null}` until the number is set.
+- `/public/helpline` rate-limit key = SHA-256 of IP (IP never stored), via `convex/_lib/network.ts`: cf-connecting-ip,
+  else LAST x-forwarded-for entry; never x-real-ip. Probed 2026-11-27: Cloudflare refuses a client-sent cf-connecting-ip
+  (error 1000) and replaces x-forwarded-for. Returns `{phone: null}` until the number is set.
+- Auth hardening (trustedOrigins, password sign-in) follows `environmentFromSiteUrl(SITE_URL)`: only an exact staging
+  host (staging.udvasito.com, localhost) relaxes it; `*.vercel.app` is NOT staging. TODO when Vercel exists: add the
+  staging preview origin(s) to trustedOrigins + CORS deliberately.
+- Sentry scrubber is default-deny (every top-level field except STRUCTURAL_FIELDS is scrubbed).
+- `ops.setSetting` runs `crossCheck` (waveSizes ≥ waveCount; usageWarnPct < usageCriticalPct). Last-admin guard counts
+  OTHER active real admins. `revealPhone` checks VAL-18 with `checkReason` and stores the trimmed reason.
 - i18n keys for validation messages: `validation.VAL-xx.<case>` (cases: empty/short/long/chars/invalid/tooOld/range/...).
 - Test harness: `convex/test.setup.ts` (`makeT`, `signIn`, `insertProfile`); glob uses array + negations (extglob fails).
 
 ## 5. Phase status
-- P0 🟦 started 2026-11-27 (user: "no need to tension about the dates").
-- Build order (build-prompts P0): 1 scaffold ✅ ▶ 2 app.config ✅ ▶ 3 native modules ✅ ▶ 4 design system ◻ ▶
-  5 i18n+extract-copy ◻ ▶ 6 Convex schema/_lib/settings ✅ (rules stubs for eligibility etc. come with P1) ▶
-  7 Better Auth (server ✅, client + Google ◻) ▶ 8 appConfig ✅ + gates ◻ ▶ 9 seeds (settings ✅, places/hospitals/staging ◻)
-  ▶ 10 Home ◻ ▶ 11 CI ◻ ▶ 12 Vercel ◻ ▶ 13 Sentry scrubber ◻ ▶ 14 scripts+README (partial). Spikes S1–S4 ◻.
-
-### Done (commits on p0/foundations unless noted)
-- 0273b96 (main+staging) repo set-up, docs, brand assets, app.config, eas.json, tokens, tailwind.
-- 4da5609 Convex backend core: schema, Better Auth server, wrappers, errors, settings, audit, events, visibility,
-  rate limits, profiles.me, public.appConfig, support.helpline, /health, /public/helpline, admin bootstrap/ops/seed,
-  validation (VAL-01/02/03/18/25/26) + phone.ts, 103 tests, ESLint (i18next rule), npm scripts. Dev deployment seeded.
-
-### Next
-1. i18n: `scripts/extract-copy.ts` → `src/i18n/en.json`/`bn.json` + i18next set-up (F-104) + test.
-2. Design system components + fonts + root `_layout` providers (Convex + Better Auth client) + gates G1–G7.
-3. Google OAuth client (Cloud Console, team Gmail) → set GOOGLE_CLIENT_ID/SECRET on Convex.
-4. seed-places (ADR-013), import-hospitals, seed-staging, content:build; Home; CI; vercel.json; Sentry scrubber.
-5. Create udvasito-prod project (EU) + staging prod deployment; `eas init`.
-6. Q-004 in docs/questions.md (profiles row created at onboarding P1, not at P0 sign-in).
+- P0 🟦 started 2026-11-27 (user: "no need to tension about the dates"). **PR #1** `p0/foundations` → `staging`
+  opened 2026-11-27 (part 1: everything not waiting on accounts/phones). Code review (high) found 10 problems → all
+  fixed in the "P0: review fixes" commit (see Resume here). PR NOT merged; waits for the developer's OK.
+- P0 build-prompt items: 1–11, 13, 14 ✅ (Home = empty Home; CI ✅). 12 Vercel ⏳ (account 2026-11-28).
+- P0 DoD: Google sign-in ⏳ (client made; secret = user step 3b; then test web + Android dev build; staging + prod);
+  language switch ✅ (e2e) / 2 GB phone render ⏳ phones; seed-places + count test ✅; locked-screen push ⏳ (FCM +
+  build #1); Lighthouse ≤ 3 s ⏳ (Vercel); spikes ⏳ (docs/spikes.md).
+- Commits: 0273b96 setup · 4da5609 Convex core · 1002f0f i18n · c9f1258 design system/sign-in/Home · c0d79fc Sentry ·
+  3ce1db5 web shell/vercel.json · 2d967ce decode-uri patch · f2abb20 CI · 0df45cd/7c44473 places · 8ee3eef hospitals ·
+  45908e7 seed-staging + SITE_URL env · 2c1a786 e2e · 7fb8767 docs · a38a7fa Google OAuth notes + spikes.
 
 ## 6. Rules I must not forget (short)
 - PR workflow: feature branch → PR into `staging`. **Never merge a PR before the code-review + fix phase** (user order).

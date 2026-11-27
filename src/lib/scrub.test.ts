@@ -126,3 +126,54 @@ describe('scrubBreadcrumb', () => {
     ).toEqual({ category: 'fetch', message: `GET ${PHONE_MASK}`, data: { url: 'https://x.convex.site/public/helpline', status_code: 200 } });
   });
 });
+
+describe('scrubEvent covers every field by default', () => {
+  const phone = '+8801712345678';
+
+  it('scrubs logentry, transaction, fingerprint and fields it does not know', () => {
+    const out = scrubEvent({
+      logentry: { message: 'Lookup failed for %s', params: [phone] },
+      transaction: `/donor/${phone}`,
+      fingerprint: ['lookup', phone],
+      someFutureField: { note: 'x', detail: `call ${phone}` },
+    });
+    expect(JSON.stringify(out)).not.toContain('1712345678');
+    expect(out.logentry).toEqual({ message: 'Lookup failed for %s', params: [PHONE_MASK] });
+  });
+
+  it('scrubs mechanism data and frame source lines, keeps function and file names', () => {
+    const out = scrubEvent({
+      exception: {
+        values: [
+          {
+            type: 'Error',
+            value: `bad ${phone}`,
+            mechanism: { type: 'onerror', handled: false, data: { input: `${phone}` } },
+            stacktrace: {
+              frames: [
+                {
+                  filename: 'app/home.tsx',
+                  function: 'onPress',
+                  context_line: `const p = '${phone}';`,
+                  pre_context: [`// ${phone}`],
+                  vars: { phone },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+    expect(JSON.stringify(out)).not.toContain('1712345678');
+    const frame = (out.exception as { values: { stacktrace: { frames: Record<string, unknown>[] } }[] }).values[0]!.stacktrace
+      .frames[0]!;
+    expect(frame).toMatchObject({ filename: 'app/home.tsx', function: 'onPress' });
+    expect(frame).not.toHaveProperty('vars');
+  });
+
+  it('passes Sentry structure through unchanged', () => {
+    const sdk = { name: 'sentry.javascript.react-native', version: '7.0.0', packages: [{ name: 'npm:x', version: '1' }] };
+    const out = scrubEvent({ event_id: 'abc', level: 'error', release: 'org.udvasito.app@0.1.0', sdk });
+    expect(out).toEqual({ event_id: 'abc', level: 'error', release: 'org.udvasito.app@0.1.0', sdk });
+  });
+});

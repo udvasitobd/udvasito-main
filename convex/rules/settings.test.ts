@@ -116,6 +116,12 @@ describe('settings definitions (specs §5.2)', () => {
     s.waveCount = 4;
     expect(crossCheck(s)).toEqual(['waveSizes']);
   });
+
+  it('flags a usage warning level at or above the critical level (S-30)', () => {
+    const s = defaultSettings();
+    s.usageWarnPct = 90;
+    expect(crossCheck(s)).toEqual(['usageCriticalPct']);
+  });
 });
 
 describe('resolveSettings', () => {

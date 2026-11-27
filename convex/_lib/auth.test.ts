@@ -177,6 +177,33 @@ describe('admin bootstrap and ops (internal)', () => {
     ).rejects.toThrow(/ERR_LAST_ADMIN/);
   });
 
+  it('setRole and setStatus allow changing an inactive admin while another active admin remains', async () => {
+    const t = makeT();
+    const { userId: a } = await signIn(t, 'admin-a@example.com');
+    const { userId: b } = await signIn(t, 'admin-b@example.com');
+    await insertProfile(t, a, { role: 'admin' });
+    const frozen = await insertProfile(t, b, { role: 'admin', status: 'frozen' });
+    await t.mutation(internal.admin.ops.setStatus, { profileId: frozen, status: 'banned', reason: 'Left the team' });
+    await t.mutation(internal.admin.ops.setRole, { profileId: frozen, role: 'member', reason: 'Left the team' });
+    expect((await t.run((ctx) => ctx.db.get(frozen)))?.role).toBe('member');
+  });
+
+  it('setStatus refuses to take the last active admin out', async () => {
+    const t = makeT();
+    const { userId } = await signIn(t, 'last@example.com');
+    const id = await insertProfile(t, userId, { role: 'superadmin' });
+    await expect(
+      t.mutation(internal.admin.ops.setStatus, { profileId: id, status: 'frozen', reason: 'Holiday break' }),
+    ).rejects.toThrow(/ERR_LAST_ADMIN/);
+  });
+
+  it('setSetting refuses a value that does not fit the other settings', async () => {
+    const t = makeT();
+    await expect(
+      t.mutation(internal.admin.ops.setSetting, { key: 'waveCount', value: 5, reason: 'Pilot tuning' }),
+    ).rejects.toThrow(/waveSizes/);
+  });
+
   it('setSetting validates the range and audits without copying the value', async () => {
     const t = makeT();
     await expect(

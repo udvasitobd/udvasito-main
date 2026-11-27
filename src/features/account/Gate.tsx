@@ -5,10 +5,11 @@
  * forbidden state. While a gate waits for data a skeleton is shown — never a blank screen (specs §1.5).
  */
 import { api } from '@convex/_generated/api';
-import { useConvexAuth, useQuery } from 'convex/react';
+import { useConvexAuth, useQueries, type RequestForQueries } from 'convex/react';
+import type { FunctionReturnType } from 'convex/server';
 import Constants from 'expo-constants';
 import { Redirect, router, Stack, usePathname, useSegments, type Href } from 'expo-router';
-import type { ReactElement } from 'react';
+import { useMemo, type ReactElement } from 'react';
 import { Platform, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ErrorState, SkeletonCard } from '@/components';
 import { useAppConfig } from '@/lib/appConfig';
 import { useLocalConsentVersion } from '@/lib/consent';
-import { resolveGate } from '@/lib/gates';
+import { readMe, resolveGate } from '@/lib/gates';
 import { colors } from '@/theme/tokens';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
@@ -34,13 +35,26 @@ export function LoadingScreen() {
   );
 }
 
+type Me = FunctionReturnType<typeof api.profiles.me>;
+
+/** `profiles.me` without throwing during render: a session that ended on the server reads as signed out. */
+function useMe(isAuthenticated: boolean) {
+  const queries = useMemo(() => {
+    const request: RequestForQueries = {};
+    if (isAuthenticated) request.me = { query: api.profiles.me, args: {} };
+    return request;
+  }, [isAuthenticated]);
+  const results = useQueries(queries);
+  return readMe(results.me as Me | Error | undefined);
+}
+
 function GateScreen({ group, focused, children }: { group: Group; focused: boolean; children: ReactElement }) {
   const { t } = useTranslation();
   const path = usePathname();
   const segments = useSegments();
   const { isLoading, isAuthenticated } = useConvexAuth();
   const config = useAppConfig();
-  const me = useQuery(api.profiles.me, isAuthenticated ? {} : 'skip');
+  const { me, sessionEnded } = useMe(isAuthenticated);
   const localConsentVersion = useLocalConsentVersion();
 
   // Only the focused screen of the active group decides; screens below it in the stack (or a group that is being
@@ -52,7 +66,7 @@ function GateScreen({ group, focused, children }: { group: Group; focused: boole
     appVersion: APP_VERSION,
     config,
     localConsentVersion,
-    auth: isLoading ? 'loading' : isAuthenticated ? 'signedIn' : 'signedOut',
+    auth: isLoading ? 'loading' : isAuthenticated && !sessionEnded ? 'signedIn' : 'signedOut',
     me: me
       ? {
           needsOnboarding: me.flags.needsOnboarding,

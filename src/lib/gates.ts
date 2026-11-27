@@ -5,6 +5,7 @@
  * A gate whose target screen is not built yet stays off (its route is not in AVAILABLE_ROUTES), so a redirect can
  * never land on a missing page (specs §1.9). Each phase adds its screens here.
  */
+import { errorMessage } from './errors';
 import { compareVersions } from './version';
 
 export type ProfileStatus = 'active' | 'frozen' | 'suspended' | 'banned' | 'deletion_pending' | 'underage_blocked';
@@ -125,4 +126,15 @@ export function safeNext(next: string | string[] | undefined, fallback = '/home'
   }
   if (routeKind(value.split('?')[0] ?? value) === 'onboarding') return fallback;
   return value;
+}
+
+/**
+ * `profiles.me` read as a value (Convex `useQueries` returns errors instead of throwing). ERR_UNAUTHENTICATED means
+ * the session already ended on the server — signed out on this device, or revoked from another — while the client
+ * still holds its token: that is "signed out", not a crash. Any other error is rethrown for the error boundary.
+ */
+export function readMe<T>(result: T | Error | undefined): { me: T | undefined; sessionEnded: boolean } {
+  if (!(result instanceof Error)) return { me: result, sessionEnded: false };
+  if (errorMessage(result).code === 'ERR_UNAUTHENTICATED') return { me: undefined, sessionEnded: true };
+  throw result;
 }

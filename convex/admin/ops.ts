@@ -14,7 +14,8 @@ import { v } from 'convex/values';
 import type { Doc } from '../_generated/dataModel';
 import { internalMutation, type MutationCtx } from '../_generated/server';
 import { writeAudit } from '../_lib/audit';
-import { isSettingKey, checkSetting } from '../rules/settings';
+import { getSettings } from '../_lib/settings';
+import { checkSetting, crossCheck, isSettingKey } from '../rules/settings';
 import { checkReason } from '../rules/validation';
 import { role as roleValidator } from '../schema';
 
@@ -32,15 +33,19 @@ async function loadProfile(ctx: MutationCtx, profileId: Doc<'profiles'>['_id']) 
 
 const ADMIN_ROLES: readonly Doc<'profiles'>['role'][] = ['admin', 'superadmin'];
 
-/** ERR_LAST_ADMIN: there must always be at least one admin (admin or super-admin) among real accounts. */
-async function countRealAdmins(ctx: MutationCtx): Promise<number> {
+/**
+ * ERR_LAST_ADMIN: there must always be at least one active admin (admin or super-admin) among real accounts.
+ * Counts the active real admins *other than* the target, so changing an admin who is already frozen or suspended is
+ * allowed while another active admin remains.
+ */
+async function otherActiveAdmins(ctx: MutationCtx, targetId: Doc<'profiles'>['_id']): Promise<number> {
   let count = 0;
   for (const role of ADMIN_ROLES) {
     const rows = await ctx.db
       .query('profiles')
       .withIndex('by_role', (q) => q.eq('role', role))
       .collect();
-    count += rows.filter((p) => !p.isDemo && p.status === 'active').length;
+    count += rows.filter((p) => p._id !== targetId && !p.isDemo && p.status === 'active').length;
   }
   return count;
 }
@@ -55,7 +60,7 @@ export const setRole = internalMutation({
       throw new Error('Practice accounts get their roles from the practice area (admin.demo), not here.');
     }
     const losingAdmin = ADMIN_ROLES.includes(profile.role) && !ADMIN_ROLES.includes(args.role);
-    if (losingAdmin && !profile.isDemo && (await countRealAdmins(ctx)) <= 1) {
+    if (losingAdmin && !profile.isDemo && (await otherActiveAdmins(ctx, profile._id)) === 0) {
       throw new Error('ERR_LAST_ADMIN: there must always be at least one admin.');
     }
     await ctx.db.patch(profile._id, { role: args.role });
@@ -84,7 +89,8 @@ export const setStatus = internalMutation({
     if (args.status === 'suspended' && (args.until === undefined || args.until <= Date.now())) {
       throw new Error('A suspension needs an end time in the future (`until`, ms since epoch).');
     }
-    if (args.status !== 'active' && ADMIN_ROLES.includes(profile.role) && !profile.isDemo && (await countRealAdmins(ctx)) <= 1) {
+    const losingActiveAdmin = args.status !== 'active' && ADMIN_ROLES.includes(profile.role) && !profile.isDemo;
+    if (losingActiveAdmin && (await otherActiveAdmins(ctx, profile._id)) === 0) {
       throw new Error('ERR_LAST_ADMIN: there must always be at least one admin.');
     }
     await ctx.db.patch(profile._id, {
@@ -153,7 +159,10 @@ export const setDemo = internalMutation({
   },
 });
 
-/** Sets one settings row after checking its range (VAL-19). The value is not copied into the audit entry. */
+/**
+ * Sets one settings row after checking its range (VAL-19) and that it still fits the other settings (`crossCheck`,
+ * e.g. waveCount ≤ waveSizes). The value is not copied into the audit entry.
+ */
 export const setSetting = internalMutation({
   args: { key: v.string(), value: v.any(), reason: v.string() },
   handler: async (ctx, args) => {
@@ -166,6 +175,10 @@ export const setSetting = internalMutation({
           ? `Value must be between ${check.range.min} and ${check.range.max} (VAL-19).`
           : 'Value has the wrong format for this setting (VAL-19).',
       );
+    }
+    const problems = crossCheck({ ...(await getSettings(ctx)), [args.key]: check.value });
+    if (problems.length > 0) {
+      throw new Error(`This value does not fit together with: ${problems.join(', ')} (VAL-19).`);
     }
     const row = await ctx.db
       .query('settings')

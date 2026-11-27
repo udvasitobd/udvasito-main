@@ -68,9 +68,13 @@ These strings are needed but specs has no exact English + Bangla text. Until the
    "Cancel deletion" — need Bangla (P1).
 6. **`common.offline`** says "({{count}} waiting)" even when nothing is waiting — needs a variant without the count, e.g.
    EN "You're offline. We'll send your changes when you're back online." + BN text.
+7. **Language names in the toggle** — specs §1.3.5 shows the toggle as "বাংলা / EN" but gives no key, and the welcome
+   screen's large buttons need the full name "English". They are written once in `LanguageToggle.tsx` (each name in
+   its own script, identical in both languages), not in en.json / bn.json. OK, or should specs give them keys
+   (e.g. `language.bn`, `language.en`, `language.enShort`)?
 
 **Recommendation:** member 1 (content) writes 1, 3, 5 and the no-count variant of 6 in both languages; 2 and 4 stay as
-they are. Then `npm run copy:extract` picks them up from specs.
+they are; 7 stays as it is unless the team wants keys. Then `npm run copy:extract` picks them up from specs.
 Status: ⏳ waiting for copy
 
 ### Q-006 · 2026-11-27 · P0 · Small additions made to the specs contracts (please confirm)

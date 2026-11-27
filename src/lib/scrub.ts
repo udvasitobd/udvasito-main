@@ -5,7 +5,8 @@
  * - Bangladeshi mobile numbers in Latin or Bangla digits, in the `+880…`, `880…` and `01…` forms, with or without
  *   spaces, dashes, dots or brackets → `[phone]`.
  * - Values under keys that hold names, phone numbers or free text (form fields, request text) → `[removed]`.
- * - Request bodies, query strings and cookies are dropped; `user` keeps only its id.
+ * - Request bodies, query strings, cookies and headers are dropped; `user` keeps only its id.
+ * - Default-deny: every event field except a short list of Sentry structure (STRUCTURAL_FIELDS) is scrubbed.
  */
 
 const DIGIT = '[0-9০-৯]';
@@ -70,25 +71,56 @@ type Scrubbable = {
   user?: { id?: string | number } & Record<string, unknown>;
 } & Record<string, unknown>;
 
+/**
+ * Top-level fields that are Sentry structure, never user data, and pass through unchanged. Every other field —
+ * `message`, `logentry`, `transaction`, `fingerprint`, `extra`, `tags`, `breadcrumbs`, and anything a future SDK adds —
+ * is scrubbed by default.
+ */
+const STRUCTURAL_FIELDS: ReadonlySet<string> = new Set([
+  'event_id',
+  'timestamp',
+  'start_timestamp',
+  'platform',
+  'level',
+  'release',
+  'dist',
+  'environment',
+  'type',
+  'sdk',
+  'debug_meta',
+  'modules',
+]);
+
 /** Scrubs a whole Sentry event (structural type, so this file needs no Sentry import). */
 export function scrubEvent<T extends Scrubbable>(event: T): T {
-  const out: Scrubbable = { ...event };
-  if (out.message !== undefined) out.message = scrubValue(out.message, 0);
-  if (out.exception !== undefined) out.exception = scrubException(out.exception);
-  if (out.breadcrumbs !== undefined) out.breadcrumbs = scrubValue(out.breadcrumbs, 0);
-  if (out.extra !== undefined) out.extra = scrubValue(out.extra, 0);
-  if (out.contexts !== undefined) {
-    const contexts = scrubValue(out.contexts, 0, CONTEXT_SAFE_KEYS) as Record<string, Record<string, unknown> | undefined>;
-    if (contexts.device && 'name' in contexts.device) contexts.device = { ...contexts.device, name: REMOVED };
-    out.contexts = contexts;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(event)) {
+    if (value === undefined || STRUCTURAL_FIELDS.has(key)) out[key] = value;
+    else if (key === 'exception') out[key] = scrubException(value);
+    else if (key === 'contexts') out[key] = scrubContexts(value);
+    else if (key === 'request') out[key] = scrubRequest(value as NonNullable<Scrubbable['request']>);
+    else if (key === 'user') out[key] = scrubUser(value as NonNullable<Scrubbable['user']>);
+    else out[key] = scrubValue(value, 0);
   }
-  if (out.tags !== undefined) out.tags = scrubValue(out.tags, 0);
-  if (out.request) {
-    const { data: _data, query_string: _query, cookies: _cookies, headers: _headers, ...rest } = out.request;
-    out.request = { ...rest, url: rest.url ? stripQuery(rest.url) : rest.url };
-  }
-  if (out.user) out.user = out.user.id !== undefined ? { id: out.user.id } : {};
   return out as T;
+}
+
+function scrubContexts(value: unknown): unknown {
+  const contexts = scrubValue(value, 0, CONTEXT_SAFE_KEYS) as Record<string, Record<string, unknown> | undefined>;
+  if (contexts.device && 'name' in contexts.device) contexts.device = { ...contexts.device, name: REMOVED };
+  return contexts;
+}
+
+/** Request bodies, query strings, cookies and headers never leave the device. */
+function scrubRequest(request: NonNullable<Scrubbable['request']>): unknown {
+  const { data: _data, query_string: _query, cookies: _cookies, headers: _headers, ...rest } = request;
+  const scrubbed = scrubValue(rest, 0) as Record<string, unknown>;
+  return { ...scrubbed, url: typeof rest.url === 'string' ? stripQuery(rest.url) : rest.url };
+}
+
+/** `user` keeps only its id. */
+function scrubUser(user: NonNullable<Scrubbable['user']>): unknown {
+  return user.id !== undefined ? { id: user.id } : {};
 }
 
 /** Breadcrumbs (console lines, navigation, fetch) go through the same rules. */
@@ -98,24 +130,25 @@ export function scrubBreadcrumb<T extends Record<string, unknown>>(crumb: T): T 
   return out;
 }
 
-/** Exception values and stack frames: keep the structure (function and file names), scrub the text. */
+/**
+ * Exception values and stack frames: local variables are dropped; everything else (the value, `mechanism.data`,
+ * frame source lines) goes through the same scrubbing, while function and file names are kept (SAFE_KEYS).
+ */
 function scrubException(exception: unknown): unknown {
   if (!exception || typeof exception !== 'object') return scrubValue(exception, 0);
-  const ex = exception as { values?: { value?: unknown; stacktrace?: { frames?: Record<string, unknown>[] } }[] };
+  const ex = exception as { values?: { stacktrace?: { frames?: Record<string, unknown>[] } }[] };
   if (!Array.isArray(ex.values)) return scrubValue(exception, 0);
-  return {
-    ...ex,
-    values: ex.values.map((v) => ({
-      ...v,
-      value: typeof v.value === 'string' ? scrubText(v.value) : v.value,
-      stacktrace: v.stacktrace
-        ? {
-            ...v.stacktrace,
-            frames: v.stacktrace.frames?.map(({ vars: _vars, ...frame }) => frame),
-          }
-        : v.stacktrace,
-    })),
-  };
+  return scrubValue(
+    {
+      ...ex,
+      values: ex.values.map((v) =>
+        v.stacktrace
+          ? { ...v, stacktrace: { ...v.stacktrace, frames: v.stacktrace.frames?.map(({ vars: _vars, ...frame }) => frame) } }
+          : v,
+      ),
+    },
+    0,
+  );
 }
 
 /** Query strings can carry search text or tokens (`?ott=`), so they never leave the device. */

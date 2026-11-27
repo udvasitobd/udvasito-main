@@ -8,7 +8,9 @@ describe('environmentFromSiteUrl', () => {
     ['https://www.udvasito.com/', 'production'],
     ['https://UDVASITO.com', 'production'],
     ['https://staging.udvasito.com', 'staging'],
-    ['https://udvasito-git-p0-foundations-team.vercel.app', 'staging'],
+    // A *.vercel.app address may belong to the production project — never treated as staging.
+    ['https://udvasito-git-p0-foundations-team.vercel.app', 'unknown'],
+    ['https://udvasito.vercel.app', 'unknown'],
     ['http://localhost:8081', 'staging'],
     ['http://127.0.0.1:8081', 'staging'],
     ['http://app.localhost:3000', 'staging'],
