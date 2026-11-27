@@ -175,7 +175,16 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   place, Bangla digits/date/time, search cmch → no matches (no hospitals until DEP-01), Post reaches the server (925b2db).
   AFTER POST: goes to /home with Sent until SCR-M03 (/request/[id], slice 13) exists — change it then.
   convex-test creation times only move forward → fake-time tests must start at the earliest time.
-  NEXT: 9 matching v1 + Expo push (schedule internal.matching.startRequest from requests.create) → 10–15.
+  ✅ 9 matching v1 + NTF-01 (3dfcf84) · ✅ push on Android (c24453e) · ✅ 10 inbox/markOpened (c1e3a40) · ✅ 11+12
+  accept/decline, slots, contact reveals, SCR-D03/D04 (b55f0b7, 9bdf011) · ✅ 13 getForOwner/listMine/close + SCR-M03/
+  M04 + Home cards + useLiveQuery 15 s fallback (406203b, fdea762, 6f32aea) · ✅ 14 volunteerHotline at S-13 →
+  fallbackShown + "no donors yet" with _lib/bloodBanks (4743b1c, b0d12c5) · ✅ 15 S-25 sign-up limit (f14ed09).
+  ALL 15 SLICES BUILT 2026-11-28 (769 tests). S-22 was already in requests.create; S-23/S-24/S-37 are P2.
+  S-25 key = Better Auth session.ipAddress (auth.ts advanced.ipAddress reads cf-connecting-ip first), hashed via
+  _lib/network.addressKey; session without an address → not limited. Q-022…Q-025 wait for the developer.
+  SCR-M03 body lives in src/features/requests/MyRequestView.tsx (pure, takes `view` + `now`) so previews can render it.
+  NEXT: PR p1/walking-skeleton → staging, code review + fixes, merge only after that; then the team doc's Bangla tab
+  (Q-020, Q-021, Q-023 lines); human steps: helpline number (setSetting fallbackContactPhone), Telegram bot, phones.
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
   b498ce34-9880-4845-8fc5-54431dd450cb; tab "To-do" 1e0a4b77-629a (body 8e30bb71-e1ec), tab "Bangla to check"
   fc1b86ea-accf (body 054015cc-eff6, 66 rows: Screen | English | Claude's Bangla | Your fix | Key). Edit it ONLY via the
@@ -202,6 +211,9 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
 - Unit tests (vitest "unit" project) resolve @/ and @convex/ aliases (vitest.config.mts).
 - House style = prettier --single-quote --print-width 120 (no config file); run it on new files before the check.
 - Chrome screenshots can time out when the window is hidden: use read_page / javascript_tool to check the DOM.
+- Previews: app/zz* and src/content/legal/ are in .git/info/exclude (can never be committed). The Chrome window is
+  maximised, so resize_window does nothing: replace the page body with 360 px iframes via javascript_tool instead.
+  Run the dev server WITHOUT CI=1 when adding files (CI mode has no file watching → "Unable to resolve").
 - Typed routes: after adding a route file run `CI=1 npx expo start --web --port 8099` ~25 s to regenerate
   .expo/types/router.d.ts, otherwise tsc rejects the new href.
 - Copy rule (developer, Q-014): specs English-only → write the plain Bangla translation; don't ask.
