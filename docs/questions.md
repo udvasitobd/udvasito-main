@@ -439,3 +439,14 @@ network per hour, then `ERR_RATE_LIMITED {minutes}`, with the helpline button un
    posting is bounded by S-22 (1 / 2 open requests, 5 a month), already enforced in `requests.create`.
 
 **Recommendation:** A. Status: 🟦 applied, waiting for review
+
+### Q-026 · 2026-11-28 · P1 · Code review of PR #3: practice accounts and the hospital list (please confirm)
+The review found that a practice account (made with `internal.admin.ops.setDemo`, as in the go-live smoke test)
+could never post at a listed hospital: the list showed real hospitals, and a practice request may only name a
+practice one (`ERR_DEMO_ISOLATION`). Fixed: `hospitals.search` now shows a signed-in practice account the practice
+hospitals only (specs SCR-A09: "UDVASITO Practice Hospital", a `hospitals` row with `isDemo: true`), and
+everyone else the real ones — the same rule as the "no donors yet" blood-bank list. Isolation is stricter, not
+looser: real and practice rows still never meet. Until a practice hospital exists, a practice account uses "My place
+isn't in the list".
+
+**Recommendation:** keep. Status: 🟦 applied, waiting for review
