@@ -144,6 +144,9 @@ The consent screen (SCR-O01, gate G3) links to `/privacy` and `/terms`, rendered
 
 **Recommendation: A**; member 4's draft (EN + BN) is the most urgent team job.
 **Answer (2026-11-27, developer): "do the recommendations"** → A.
+**How it is built:** with **no** legal files the build works but `/welcome`, `/onboarding`, `/privacy` and `/terms`
+do not exist (gates never send anyone there, the addresses show "not found"); with **some but not all four**, or a
+wrong `version`/`effective` header, `npm run content:build` stops and leaves the legal pages out.
 Status: ✅ answered (waiting for DEP-02)
 
 ### Q-010 · 2026-11-27 · P1 · Test phones: one named so far

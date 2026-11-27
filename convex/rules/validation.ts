@@ -23,12 +23,16 @@ const fail = (field: string, messageKey: string, params?: Record<string, string 
 /** Letters (Latin or Bangla, incl. Bangla vowel signs and marks), spaces, `.` `-` `'` only (VAL-01). */
 const NAME_CHARS = /^[\p{Script=Latin}\p{Script=Bengali}\p{M} .'-]+$/u;
 
+/** VAL-01 length limits (specs §4). */
+export const NAME_MIN_LENGTH = 2;
+export const NAME_MAX_LENGTH = 60;
+
 /** VAL-01 Full name. */
 export function checkName(input: string, field = 'name'): Checked<string> {
   const name = input.trim().replace(/\s+/g, ' ');
   if (name === '') return fail(field, 'validation.VAL-01.empty');
-  if ([...name].length < 2) return fail(field, 'validation.VAL-01.short');
-  if ([...name].length > 60) return fail(field, 'validation.VAL-01.long');
+  if ([...name].length < NAME_MIN_LENGTH) return fail(field, 'validation.VAL-01.short');
+  if ([...name].length > NAME_MAX_LENGTH) return fail(field, 'validation.VAL-01.long');
   if (!NAME_CHARS.test(name) || /[0-9০-৯]/.test(name)) return fail(field, 'validation.VAL-01.chars');
   return ok(name);
 }

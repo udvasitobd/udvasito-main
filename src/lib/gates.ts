@@ -14,6 +14,16 @@ export type Role = 'member' | 'volunteer' | 'admin' | 'superadmin';
 /** Redirect targets that exist in this build. */
 export const AVAILABLE_ROUTES = new Set<string>(['/sign-in', '/home']);
 
+/**
+ * Built, but reachable only once member 4's privacy notice and terms are in the build (DEP-02): the consent screen,
+ * and onboarding, which stores that consent (Q-009). Without them nobody can give valid consent, so neither exists.
+ */
+export const CONSENT_ROUTES = ['/welcome', '/onboarding'] as const;
+
+export function availableRoutes(options: { legalReady: boolean }): ReadonlySet<string> {
+  return new Set([...AVAILABLE_ROUTES, ...(options.legalReady ? CONSENT_ROUTES : [])]);
+}
+
 export type GateInput = {
   native: boolean;
   appVersion: string;

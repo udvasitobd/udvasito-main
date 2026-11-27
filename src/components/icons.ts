@@ -16,3 +16,7 @@ export { default as SearchX } from 'lucide-react-native/icons/search-x';
 export { default as TriangleAlert } from 'lucide-react-native/icons/triangle-alert';
 export { default as WifiOff } from 'lucide-react-native/icons/wifi-off';
 export { default as X } from 'lucide-react-native/icons/x';
+export { default as CalendarDays } from 'lucide-react-native/icons/calendar-days';
+export { default as Check } from 'lucide-react-native/icons/check';
+export { default as ChevronDown } from 'lucide-react-native/icons/chevron-down';
+export { default as ChevronRight } from 'lucide-react-native/icons/chevron-right';

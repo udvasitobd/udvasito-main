@@ -21,6 +21,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, FontsLoadedContext, ToastProvider } from '@/components';
 import { AppRoot } from '@/components/AppRoot';
+import { useCampaignCapture } from '@/lib/campaign';
 import { authClient, convex } from '@/lib/convex';
 import { i18n, initI18n } from '@/lib/i18n';
 import { initSentry, reportError } from '@/lib/sentry';
@@ -41,6 +42,7 @@ export default function RootLayout() {
     NotoSansBengali_700Bold,
   });
   const [i18nReady, setI18nReady] = useState(false);
+  useCampaignCapture();
   const [fontWaitOver, setFontWaitOver] = useState(false);
 
   useEffect(() => {
