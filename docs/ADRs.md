@@ -371,7 +371,7 @@ The full folder contract is fixed in `specs.md`.
 **Consequences:**
 - Google OAuth consent screen: authorised domain `udvasito.com` (ownership verified in Google Search Console with a DNS TXT record); privacy/terms links on `udvasito.com`.
 - Spike S3 tests the Better Auth callback through `udvasito.com` (Cloudflare Worker pass-through to the Convex site, ADR-024).
-- The already-rendered promo videos show `udvasito.vercel.app` on the end card; that address does **not** exist (ADR-024), so the end cards must be re-rendered with `udvasito.com` before the videos are shared.
+- The rendered promo videos show `www.udvasito.com` on the end card (checked 2026-11-27); `www` must keep redirecting to `udvasito.com` (ADR-024 Redirect Rule).
 - No extra service, no card, no personal data at a new vendor.
 
 ### ADR-024 — Web hosting on Cloudflare Workers (replaces Vercel)
@@ -412,7 +412,7 @@ docs (checked 2026-11-27): "Start new projects with Workers"; Pages is still sup
 | One Worker has one set of build variables | Two Workers (production, staging) |
 | SPA fallback also answers a missing `/_expo/…` file with `index.html` (Vercel config returned 404) | Accepted — same visible failure; hashed bundle names make it rare |
 | Builds: 1 at a time, 3,000 build minutes a month, 20-minute timeout | The web export takes a few minutes; far below the limit |
-| `udvasito.vercel.app` was never created, so it does not redirect; the rendered promo videos show it | Re-render the end cards with `udvasito.com` before the videos are shared (team job, brand-kit) |
+| The rendered promo videos show `www.udvasito.com` | `www.udvasito.com` is a Custom Domain of the production Worker and a Redirect Rule sends it to `udvasito.com` (301) — checked with curl after the first deploy |
 
 **Consequences:** `vercel.json` is replaced by `wrangler.jsonc` + `public/_headers` (specs §7.4 headers, checked
 against Cloudflare's limits by a unit test); `scripts/serve-dist.ts` serves `dist/` the same way for the Playwright

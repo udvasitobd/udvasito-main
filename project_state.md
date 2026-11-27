@@ -119,12 +119,13 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   (CSP etc., parser + limits test in scripts/lib/headers-file.ts), serve-dist reads dist/_headers + SPA fallback.
   `wrangler deploy --dry-run` OK for both envs. Wrangler NOT a devDependency: pinned `npx wrangler@4.161.0`.
   All docs switched (CLAUDE.md, ADRs 1.4, roadmap RB-3, specs, PRD, README, spikes S3, brand-kit). Promo videos show
-  udvasito.vercel.app (never existed) → team must re-render end cards (told developer).
+  **www.udvasito.com** (developer checked 2026-11-27 — brand-kit was wrong) → www MUST redirect to udvasito.com.
+- 2026-11-27: step 5 ✅ (Expo robot user `github-actions`, role Developer, on org udvasitos-team; its token is the
+  GitHub repo secret EXPO_TOKEN — name checked). Namecheap contact verification ✅ (developer). Cloudflare zone
+  udvasito.com **ACTIVE** 2026-11-27 ("Your domain is now protected by Cloudflare").
 - for_me.md is a LIVE CHECKLIST (developer's wish): top = "👉 Do now", then "✅ Done" (move items there the moment
   the developer says done / I verify), then "⏳ Later". Keep it current in every commit.
-- NEXT: (1) developer clicks Namecheap "Sign in" → I set Custom DNS jen/marvin, check DNSSEC off, Cloudflare "Check
-  nameservers"; (2) step 5 EXPO_TOKEN (I pre-fill Expo token name + GitHub secret name; developer clicks Create/Copy/
-  paste/Add secret; never screenshot a visible token); (3) open PR p0/part-2 → staging, code review, fix, developer OK,
-  merge; (4) Workers Builds (ask before installing the Cloudflare GitHub app) + staging Worker + staging.udvasito.com;
+- NEXT: (1)+(2) DONE (nameservers switched by me after the developer's sign-in, DNSSEC off; step 5 done).
+  (3) open PR p0/part-2 → staging, code review, fix, developer OK, merge; (4) Workers Builds (ask before installing the Cloudflare GitHub app) + staging Worker + staging.udvasito.com;
   spike S3 (Better Auth baseURL, Google redirect URIs on udvasito.com); (5) Telegram bot, Gemini key, CONVEX_DEPLOY_KEY
   (staging) for CI; spikes S1, S2, S4; EAS build #1 (ask first). Never merge a PR before review + fixes.

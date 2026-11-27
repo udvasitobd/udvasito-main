@@ -23,40 +23,7 @@ _Last updated: Fri 27 Nov 2026._
 
 ## 👉 Do now
 
-### 👉 1. Step 5 — Let GitHub build the Android app (3 minutes)
-**Why:** the "Android local build" button on GitHub builds the app file (APK) for free on GitHub's computers. GitHub
-needs a key from Expo to do that. A key is like a password, so **you** click the buttons that create and paste it
-(Claude never sees it). Claude has already opened the two pages and typed the names for you.
-
-**In the Chrome tab "Access tokens — @udvasitos-team — Expo":**
-1. A box **Create Robot** is open. The name `github-actions` and the role **Developer** are already filled in.
-   Click the black **Create robot** button.
-   _(A "robot" is a separate login only for GitHub. It can build the app but cannot change the team, members or
-   settings — safer than using your own key.)_
-2. The robot **github-actions** now appears in the list. Click **Create token** next to it (it may be behind the
-   **⋯** button). If it asks for a name, type `github`; leave everything else as it is → **Create** / **Generate**.
-3. A long line of letters (the token) appears **only once**. Click its **Copy** button.
-   ⚠️ Don't take a screenshot of it and don't paste it anywhere else.
-
-**In the Chrome tab "Add Actions secret · udvasitobd/udvasito-main" (GitHub):**
-4. **Name** already says `EXPO_TOKEN`. Click inside the big **Secret** box → press **Ctrl + V** → click the green
-   **Add secret** button.
-5. Go back to the Expo tab and close the token window (**Done** / **×**).
-6. Tell Claude **"step 5 done"**. Claude checks that GitHub shows the name `EXPO_TOKEN` (it never sees the value).
-
-_Stuck on a button name? Tell Claude what you see — Claude looks at the page only when no token is on screen._
-
-### 👉 2. Check the Namecheap "ALERT" (2 minutes)
-On the Namecheap page of **udvasito.com** a yellow **ALERT** sign is next to "Status & Validity". It usually means one
-of two things:
-- **Namecheap sent an email "Verify your contact information"** to the email of your Namecheap account. Open that inbox and click the link in the email. ⚠️ If it is not verified within **15 days** the
-  domain stops working — so please check today.
-- **Auto-renew is OFF.** The domain is paid until **26 Nov 2027**. Turning auto-renew on is your choice (it uses the
-  card saved at Namecheap — this is the one yearly payment of the project). Claude will remind you in October 2027.
-
-Tell Claude what you found (for example "verified" or "no email").
-
-### 👉 3. Tell Claude your test phones
+### 👉 1. Tell Claude your test phones
 **Why:** we test Bangla voice input and lock-screen alerts on real phones (one cheap 2 GB phone, ideally also one
 Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version** for each phone.
 
@@ -81,6 +48,13 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 | ✅ | Decided: **Cloudflare instead of Vercel** for the website (written down as ADR-024) | 27 Nov |
 | ✅ | **Signed in to Namecheap** → Claude switched udvasito.com to Cloudflare (nameservers `jen` + `marvin`; the internet already sees it; email records kept) | 27 Nov |
 | ✅ | ~~Step 4 — Vercel account~~ → not needed any more (replaced by Cloudflare) | 27 Nov |
+| ✅ | **Step 5** — Expo robot `github-actions` + its key saved on GitHub as `EXPO_TOKEN` (Claude checked the name) | 27 Nov |
+| ✅ | **Namecheap contact email verified** (the domain can't be suspended for that any more) | 27 Nov |
+| ✅ | **Checked the promo videos:** they show **www.udvasito.com** — fine, it will open udvasito.com (Claude sets that up) | 27 Nov |
+| ✅ | Cloudflare confirmed: **"Your domain is now protected by Cloudflare"** (udvasito.com is active there) | 27 Nov |
+
+> 💡 Namecheap **auto-renew is off** — the domain is paid until **26 Nov 2027**. Turning it on is your choice (it uses
+> the card saved at Namecheap — the project's one yearly payment). Claude will remind you in October 2027.
 
 ---
 
@@ -100,9 +74,6 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 ---
 
 ## 👥 Jobs for the team (pass these on)
-- 👥 **NEW — whoever made the promo videos:** the last picture of the videos shows **udvasito.vercel.app**. That address
-  does **not** exist (we moved to Cloudflare). Change it to **udvasito.com** and render the videos again **before
-  sharing them**.
 - 👥 **Member 2 — hospital list (DEP-01):** fill `data/hospitals.csv` (the first line already has the column names; the
   rules are in `docs/roadmap.md` §5.1). Blood-bank numbers: **only the hospital's public number, never a person's.**
   Then run `npm run import:hospitals -- --check-only` — it lists every row that needs fixing, by line number.
