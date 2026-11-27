@@ -388,7 +388,7 @@ docs (checked 2026-11-27): "Start new projects with Workers"; Pages is still sup
 | C. Vercel Hobby (ADR-006) | — | Account could not be created | ৳0 | — |
 
 **Decision: A.** One `wrangler.jsonc`, two Workers:
-- **`udvasito-web`** (production): branch `main` → `udvasito.com` (+ `www.udvasito.com`, redirected to the apex).
+- **`udvasito-web`** (production): branch `main` → `udvasito.com`. `www.udvasito.com` never reaches the Worker: a proxied placeholder record (A `192.0.2.1`) + the zone Redirect Rule answer 301 → `https://udvasito.com/<path>?<query>`.
   Build command `npx convex deploy --cmd-url-env-var-name EXPO_PUBLIC_CONVEX_URL --cmd "npm run build:web"` with
   `CONVEX_DEPLOY_KEY` (production) as a Cloudflare **build secret**; deploy command `npx wrangler@<pinned> deploy --env=""`.
 - **`udvasito-web-staging`** (`--env staging`): branch `staging` → `staging.udvasito.com`; every other branch gets a
@@ -405,14 +405,14 @@ docs (checked 2026-11-27): "Start new projects with Workers"; Pages is still sup
 | Trade-off | Handling |
 |---|---|
 | An apex domain on Workers needs Cloudflare nameservers | Nameservers at Namecheap → Cloudflare (free); registration unchanged |
-| A static `_redirects` rule cannot proxy to another host (Vercel rewrites could) | `worker/index.ts` passes `/api/auth/*` to this environment's Convex site; only `/api/*` runs the Worker (`run_worker_first`); the share preview `/r/*` is added there in its phase |
-| Worker code: 100,000 requests/day, 10 ms CPU per request (static assets: free, unlimited) | Only auth and share previews run code (hundreds a day). Above the limit those paths answer 429 until 00:00 UTC while the site keeps serving — budget table row, Workers usage page |
-| `_headers` does not apply to responses from Worker code | The Worker sets its own headers; the share-preview HTML sets its own CSP |
-| www → apex cannot be written in `_redirects` (path-only) | Zone **Redirect Rule** in the dashboard (free plan) |
+| A static `_redirects` rule cannot proxy to another host (Vercel rewrites could) | `worker/index.ts` passes `/api/auth/*` to this environment's Convex site; `/api/*` always runs the Worker (`run_worker_first`); the share preview `/r/*` is added there in its phase |
+| Worker code: 100,000 requests/day, 10 ms CPU per request (static assets: free, unlimited) | Only auth, share previews and non-navigation requests for addresses with no file (crawlers, link previews) run code (hundreds a day). Above the limit those paths answer 429 until 00:00 UTC while the site keeps serving — budget table row, Workers usage page |
+| `_headers` does not apply to responses from Worker code | `worker/security-headers.ts` adds the §7.4 headers to every Worker response (a test keeps them equal to `public/_headers`); the auth pass-through skips only the app CSP; the share-preview HTML sets its own CSP |
+| www → apex cannot be written in `_redirects` (path-only) | Zone **Redirect Rule** "www to udvasito.com" (free plan, 1 of 10) + "Always Use HTTPS" — set up and checked with curl 2026-11-27 |
 | One Worker has one set of build variables | Two Workers (production, staging) |
-| SPA fallback also answers a missing `/_expo/…` file with `index.html` (Vercel config returned 404) | Accepted — same visible failure; hashed bundle names make it rare |
+| Cloudflare's SPA fallback answers only browser navigations (`Sec-Fetch-Mode: navigate`); crawlers, link-preview bots and older browsers reach the Worker for any address with no file | `routeFor` in `worker/index.ts`: app addresses (no dot, not `/_expo/`, `/assets/`, `/.well-known/`) get `index.html` through the `ASSETS` binding; missing files get 404 (found in the PR #2 review; `scripts/serve-dist.ts` uses the same rule) |
 | Builds: 1 at a time, 3,000 build minutes a month, 20-minute timeout | The web export takes a few minutes; far below the limit |
-| The rendered promo videos show `www.udvasito.com` | `www.udvasito.com` is a Custom Domain of the production Worker and a Redirect Rule sends it to `udvasito.com` (301) — checked with curl after the first deploy |
+| The rendered promo videos show `www.udvasito.com` | The Redirect Rule above keeps it working (path and query kept); never delete the `www` placeholder record |
 
 **Consequences:** `vercel.json` is replaced by `wrangler.jsonc` + `public/_headers` (specs §7.4 headers, checked
 against Cloudflare's limits by a unit test); `scripts/serve-dist.ts` serves `dist/` the same way for the Playwright

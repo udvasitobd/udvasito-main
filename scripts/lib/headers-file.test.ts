@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { SECURITY_HEADERS } from '../../worker/security-headers';
 import { checkHeadersFile, headersFor, parseHeadersFile } from './headers-file';
 
 describe('parseHeadersFile / headersFor', () => {
@@ -38,6 +39,10 @@ describe('public/_headers (what Cloudflare serves)', () => {
     expect(h.get('x-frame-options')).toBe('DENY');
     expect(h.get('strict-transport-security')).toMatch(/max-age=\d+/);
     expect(h.get('referrer-policy')).toBe('strict-origin-when-cross-origin');
+  });
+
+  it('equals SECURITY_HEADERS in worker/security-headers.ts, so Worker responses carry the same headers', () => {
+    expect(Object.fromEntries(headersFor(rules, '/'))).toEqual(SECURITY_HEADERS);
   });
 
   it('caches hashed bundles for a year but never sets a cache header on pages', () => {

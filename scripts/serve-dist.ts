@@ -1,15 +1,18 @@
 /**
  * npx tsx scripts/serve-dist.ts [--port 8081]
  *
- * Serves the web export `dist/` the way Cloudflare does with wrangler.jsonc (ADR-024): real files first, then the
- * single-page-application fallback to index.html, the same `_headers` (CSP included), and 404 for `/api/*` (handled
- * by worker/index.ts in production) — so the Playwright smoke test sees what production browsers see.
+ * Serves the web export `dist/` the way Cloudflare does with wrangler.jsonc (ADR-024): real files first, with the
+ * same `_headers` (CSP included); every other request is answered by the Worker's own rule (`routeFor` in
+ * worker/index.ts): an app address gets index.html, a missing file or `/api/*` gets a 404 (no Convex locally), each
+ * with the Worker's security headers — so the Playwright smoke test sees what production browsers and crawlers see.
  * Local testing only; no dependencies.
  */
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import path from 'node:path';
 
+import { routeFor } from '../worker/index';
+import { SECURITY_HEADERS } from '../worker/security-headers';
 import { argValue } from './lib/convex-cli';
 import { headersFor, parseHeadersFile } from './lib/headers-file';
 
@@ -31,8 +34,15 @@ const TYPES: Record<string, string> = {
 };
 
 function fileFor(urlPath: string): string | null {
-  const resolved = path.normalize(path.join(dist, decodeURIComponent(urlPath)));
-  if (!resolved.startsWith(dist)) return null;
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(urlPath);
+  } catch {
+    return null; // a broken escape such as /%E0%A4 is no file — never a crash
+  }
+  const resolved = path.normalize(path.join(dist, decoded));
+  // `dist + sep`, so a sibling folder such as dist-old/ can never match.
+  if (!resolved.startsWith(dist + path.sep)) return null;
   return existsSync(resolved) && statSync(resolved).isFile() ? resolved : null;
 }
 
@@ -48,19 +58,21 @@ if (!existsSync(headersFile)) {
 const rules = parseHeadersFile(readFileSync(headersFile, 'utf8'));
 
 createServer((req, res) => {
-  const urlPath = new URL(req.url ?? '/', 'http://localhost').pathname;
-  if (urlPath.startsWith('/api/')) {
-    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not found');
-    return;
-  }
-  // `_headers` itself is configuration: Cloudflare never serves it.
-  const file = (urlPath === '/_headers' ? null : fileFor(urlPath === '/' ? '/index.html' : urlPath)) ?? fileFor('/index.html');
-  for (const [name, value] of headersFor(rules, urlPath)) {
+  const url = new URL(req.url ?? '/', 'http://localhost');
+  // Static files first — except `/api/*` (run_worker_first) and `_headers` (configuration Cloudflare never serves).
+  const asset =
+    url.pathname.startsWith('/api/') || url.pathname === '/_headers'
+      ? null
+      : fileFor(url.pathname === '/' ? '/index.html' : url.pathname);
+  // No file: the Worker's rule, with the Worker's headers (Cloudflare does not apply `_headers` to Worker responses).
+  const file = asset ?? (routeFor(req.method ?? 'GET', url.href, undefined).kind === 'app' ? fileFor('/index.html') : null);
+  const headers = asset ? headersFor(rules, url.pathname) : new Map(Object.entries(SECURITY_HEADERS));
+  for (const [name, value] of headers) {
     // Plain-http localhost: browsers would upgrade every request to https and fail; production is https anyway.
     res.setHeader(name, name === 'content-security-policy' ? value.replace(/;\s*upgrade-insecure-requests/, '') : value);
   }
   if (!file) {
-    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not Found');
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not found');
     return;
   }
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] ?? 'application/octet-stream' });

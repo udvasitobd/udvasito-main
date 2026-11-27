@@ -23,7 +23,11 @@ _Last updated: Fri 27 Nov 2026._
 
 ## 👉 Do now
 
-### 👉 1. Tell Claude your test phones
+### 👉 1. Say "merge" for pull request #2
+**Why:** it holds today's work (Cloudflare website setup + fixes). The automatic code review found 5 problems; Claude
+fixed all of them and every test passes. Just write **merge** in the chat (or ask Claude anything about it first).
+
+### 👉 2. Tell Claude your test phones
 **Why:** we test Bangla voice input and lock-screen alerts on real phones (one cheap 2 GB phone, ideally also one
 Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version** for each phone.
 
@@ -50,7 +54,7 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 | ✅ | ~~Step 4 — Vercel account~~ → not needed any more (replaced by Cloudflare) | 27 Nov |
 | ✅ | **Step 5** — Expo robot `github-actions` + its key saved on GitHub as `EXPO_TOKEN` (Claude checked the name) | 27 Nov |
 | ✅ | **Namecheap contact email verified** (the domain can't be suspended for that any more) | 27 Nov |
-| ✅ | **Checked the promo videos:** they show **www.udvasito.com** — fine, it will open udvasito.com (Claude sets that up) | 27 Nov |
+| ✅ | **Checked the promo videos:** they show **www.udvasito.com** — fine: Claude set Cloudflare to forward www.udvasito.com to udvasito.com and tested it | 27 Nov |
 | ✅ | Cloudflare confirmed: **"Your domain is now protected by Cloudflare"** (udvasito.com is active there) | 27 Nov |
 
 > 💡 Namecheap **auto-renew is off** — the domain is paid until **26 Nov 2027**. Turning it on is your choice (it uses
@@ -59,8 +63,6 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 ---
 
 ## ⏳ Later (Claude will tell you when)
-- ⏳ **Read the code review and say "merge"** for the next pull request (Cloudflare + today's work). Claude never merges
-  before the review and fixes are done.
 - ⏳ **Connect Cloudflare to GitHub (1 click):** Claude opens the page; you click **Install & Authorize** so Cloudflare
   can build the website from the repository. Then the test website appears at **staging.udvasito.com**.
 - ⏳ **One key for the real website:** you copy a "deploy key" from Convex and paste it into Cloudflare (Claude shows

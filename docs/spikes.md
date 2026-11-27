@@ -37,6 +37,9 @@ phone where it works.
 **Method.** On the staging Worker (`staging.udvasito.com`), `worker/index.ts` passes `/api/auth/*` to the Convex site (`<deployment>.convex.site`); set
 Better Auth's base URL to the web address, add `https://staging.udvasito.com/api/auth/callback/google` as a redirect
 URI, and sign in. Check: Google's screen names our domain, the session cookie is set, Android sign-in still works.
+Also: Better Auth's own IP rate limiter is **off** on Convex (it needs NODE_ENV "production"; staging 2026-11-27: 5 quick
+sign-in attempts → 401 ×5, no 429) and the Worker does not forward the visitor IP. If the limiter is ever turned on,
+forward the IP in the Worker and set `advanced.ipAddress` first, or every visitor shares one bucket (PR #2 review).
 
 **If it fails:** keep the Convex site address on Google's screen for the pilot (R-12).
 

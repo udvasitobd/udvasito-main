@@ -3,6 +3,7 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-27 · P0 · Code-review fixes for PR #2: crawlers and link previews get the app (not a 404) for app addresses, missing files stay 404, every Worker response carries the §7.4 security headers, local server follows the same rule and survives broken URLs; www.udvasito.com → udvasito.com Redirect Rule live.
 - 2026-11-27 · P0 · Web hosting moves to Cloudflare Workers (ADR-024, replaces Vercel): `wrangler.jsonc` (production + staging Workers), `worker/index.ts` Google sign-in pass-through to Convex (tested), `public/_headers` (CSP and security headers, checked against Cloudflare limits), local server mimics Cloudflare for the smoke test; udvasito.com DNS moved to Cloudflare (email records kept); all docs updated; for_me.md is now a live checklist.
 - 2026-11-27 · P0 · Sentry (EU, server-side phone/email masking, no IP or location), Cloudinary (cloud `udvasito`, free) and Firebase (FCM only, Android app `org.udvasito.app`, no Analytics) set up; error scrubber keeps Sentry contexts and source lines in a valid shape (tested live).
 - 2026-11-27 · P0 · Staging live on Convex (EU): PR #1 merged (aa6dac5), functions deployed, settings + places + practice donors loaded; Google sign-in tested end to end on the dev deployment.
