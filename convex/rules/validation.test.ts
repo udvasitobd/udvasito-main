@@ -14,7 +14,6 @@ import {
   checkTicked,
   checkVerificationCode,
   firstNameOf,
-  zPhone,
 } from './validation';
 
 describe('VAL-01 name', () => {
@@ -72,9 +71,9 @@ describe('VAL-03 phone', () => {
     expect(checkPhone('')).toMatchObject({ ok: false, error: { messageKey: 'validation.VAL-03.empty' } });
     expect(checkPhone('123')).toMatchObject({ ok: false, error: { messageKey: 'validation.VAL-03.invalid' } });
   });
-  it('zod helper uses the same rule', () => {
-    expect(zPhone.parse('০১৮১২৩৪৫৬৭৮')).toBe('+8801812345678');
-    expect(zPhone.safeParse('99').success).toBe(false);
+  it('Bangla digits are read too', () => {
+    expect(checkPhone('০১৮১২৩৪৫৬৭৮')).toEqual({ ok: true, value: '+8801812345678' });
+    expect(checkPhone('99')).toMatchObject({ ok: false });
   });
 });
 

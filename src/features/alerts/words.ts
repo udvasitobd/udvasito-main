@@ -2,7 +2,7 @@
  * Words for a request as a donor sees it (SCR-D03, SCR-D04): group and component as on the chips, distance, the
  * deadline and the time left (specs §1.6 rule 3: "in 2 h" from date-fns, Bangla digits in Bangla).
  */
-import { formatDistanceStrict } from 'date-fns';
+import { formatDistanceStrict } from 'date-fns/formatDistanceStrict';
 import { bn } from 'date-fns/locale/bn';
 import { enGB } from 'date-fns/locale/en-GB';
 

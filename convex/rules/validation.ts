@@ -1,12 +1,11 @@
 /**
  * Validation rules — specs §4. Single source of truth: the app imports these for instant field errors and every
- * Convex mutation re-runs them (the server never trusts client validation). Pure TypeScript + zod.
+ * Convex mutation re-runs them (the server never trusts client validation). Pure TypeScript with no libraries: the
+ * web app bundles this file, and zod alone would add about 100 KB gzip to the first load (specs §7.1).
  *
  * Each failure carries the i18n key `validation.<rule>.<case>` (e.g. `validation.VAL-03.invalid`).
  * Rules are added here phase by phase, as their forms are built.
  */
-import { z } from 'zod';
-
 import { normalisePhone } from '../../src/lib/phone';
 
 export { normalisePhone, phoneLast4, toLatinDigits } from '../../src/lib/phone';
@@ -157,25 +156,3 @@ export function checkShortText(input: string | undefined, field: 'institution' |
   }
   return ok(value);
 }
-
-/** Zod helpers for forms (react-hook-form resolvers) built on the same checks. */
-export const zPhone = z.string().transform((value, ctx) => {
-  const r = checkPhone(value);
-  if (r.ok) return r.value;
-  ctx.addIssue({ code: 'custom', message: r.error.messageKey });
-  return z.NEVER;
-});
-
-export const zName = z.string().transform((value, ctx) => {
-  const r = checkName(value);
-  if (r.ok) return r.value;
-  ctx.addIssue({ code: 'custom', message: r.error.messageKey });
-  return z.NEVER;
-});
-
-export const zReason = z.string().transform((value, ctx) => {
-  const r = checkReason(value);
-  if (r.ok) return r.value;
-  ctx.addIssue({ code: 'custom', message: r.error.messageKey });
-  return z.NEVER;
-});

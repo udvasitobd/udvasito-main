@@ -2,7 +2,7 @@
  * Dates shown to people (specs §1.6 rule 3): `d MMM yyyy` with the date-fns `bn` / `enGB` locale, Bangla digits in
  * Bangla, Asia/Dhaka time. Calendar dates travel as "YYYY-MM-DD" strings (VAL-02, VAL-14b).
  */
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { bn } from 'date-fns/locale/bn';
 import { enGB } from 'date-fns/locale/en-GB';
 
