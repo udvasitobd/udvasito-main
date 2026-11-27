@@ -28,9 +28,10 @@ _Last updated: Fri 27 Nov 2026._
 you only click **Install & Authorize** (it lets Cloudflare read the code and show build results on GitHub; Claude shows
 you the exact permissions on the page before you click). Write **yes** in the chat.
 
-### 👉 2. Pass on the team jobs below 👥
-Most urgent: **member 4's privacy notice + terms draft** (English + Bangla). Without it the app cannot show its
-consent screen to real people (Q-009). Then the hospital list, two more test phones, and member 1's texts.
+### 👉 2. Share the team to-do doc with members 2–5
+Open **https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v** → **Share** → add the four members (or copy the link and send it in your team group). The most
+urgent jobs in it: **member 4's privacy notice + terms**, **the hospital list** (members 2 + 4) and **two more test
+phones** (anyone). Nobody else can open the link until you share it.
 
 ### 👉 3. Make the **test** Telegram bot (about 5 minutes)
 **Why:** people verify their phone number by tapping a button that opens this bot in Telegram. The code is ready; it
@@ -101,31 +102,20 @@ only needs its own bot. This one is for the test website (staging) — the real 
 ---
 
 ## 👥 Jobs for the team (pass these on)
-- 👥 **Member 4 — privacy notice + terms draft (DEP-02), MOST URGENT:** English + Bangla, four files:
-  `src/content/legal/privacy.en.md`, `privacy.bn.md`, `terms.en.md`, `terms.bn.md`. Each starts with
-  `version: 2026-11-28-pilot` and `effective: 2026-11-28` (format in `docs/roadmap.md` §5.4). A law teacher reads it
-  for 30 minutes before real people use the app. Send the text to the developer if editing files is hard.
-- 👥 **Anyone — two more Android test phones (DEP-14):** the first real test needs 3 phones (one asks for blood, two
-  answer). Best: one cheap phone with 2 GB memory and one Xiaomi/Redmi. Tell Claude brand + model.
-- 👥 **Member 5 — final app icon (DEP-11)** before the first app for real people.
-- 👥 **Member 2 — hospital list (DEP-01):** fill `data/hospitals.csv` (the first line already has the column names; the
-  rules are in `docs/roadmap.md` §5.1). Blood-bank numbers: **only the hospital's public number, never a person's.**
-  Then run `npm run import:hospitals -- --check-only` — it lists every row that needs fixing, by line number.
-- 👥 **Member 2 — city thanas:** open `data/sources/places/chattogram-metro-thanas.csv` and check the 15 thana names
-  against the Chattogram Metropolitan Police list. **Akbar Shah** is missing its location: in Google Maps right-click
-  the middle of Akbar Shah thana → click the numbers at the top (they are copied) → paste them into the `lat,lng`
-  columns of that row (first number = lat, second = lng). Then tell Claude.
-- 👥 **Member 1 — missing text:** `docs/questions.md` Q-005 lists 4 small texts that need English + Bangla wording.
-- 👥 **Member 1 — check Claude's Bangla:** where the plan had English only, Claude wrote the Bangla itself (you said
-  "use the default Bangla translation"). Please read these tables and fix any word that sounds wrong: `docs/questions.md`
-  **Q-014** (tab bar, More, Settings, download page), **Q-017** (the 3 Telegram bot messages) and **Q-018** (18 words
-  in the "Become a donor" form: gender, division/district/thana, "I don't know my group"…), **Q-019** (13 words in
-  the "Request blood" form: "Increase bags", "Hospital, clinic or area name", "Needed by …"…), plus the new line
-  `home.verifyCta` "Verify / যাচাই করুন". Send corrections to the developer; Claude updates the files.
+Every job for members 2–5 is now in one shared doc: **UDVASITO team to-do** → https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v
+- It has a table of the **11 jobs that must be finished before the first campus drive** (with a Status column the
+  team changes themselves), then one checklist per member with plain step-by-step instructions, and a second tab
+  **Bangla to check** where member 3 types fixes next to each Bangla line Claude wrote.
+- 🔒 Only you can open the link until you share it: open it → **Share** (top right) → add the members, or copy the link.
+- When someone sends you their work (the hospital sheet, the legal text, Bangla fixes…), give it to Claude in the chat;
+  Claude puts it into the app and ticks the job in the doc.
+- Team numbers: **member 1 = you (developer)**, member 2 = recruitment, member 3 = Bangla, FAQ and testing,
+  member 4 = operations and data protection, member 5 = presentation. (Claude wrote "member 1" for the Bangla
+  review by mistake earlier; it is member 3.)
 
 ## ❓ Questions waiting for you / the team
 See `docs/questions.md` — Claude writes each question with a recommended answer. You said "do the recommendations",
-so Claude follows them unless you say otherwise. Still waiting on people: **Q-005** (member 1's texts), **Q-009**
+so Claude follows them unless you say otherwise. Still waiting on people: **Q-005** (member 3's texts), **Q-009**
 (member 4's legal draft), **Q-010** (two more phones).
 - ✅ Q-011, Q-012, Q-013, Q-014 — you answered (recommended options; "default Bangla translation everywhere").
 - 🟦 **Q-015** (one verified account per phone number), **Q-017** (what the Telegram bot says), **Q-018** (donor

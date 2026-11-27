@@ -519,7 +519,7 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `request.duplicate.body` | A {{group}} request at {{hospital}} was posted {{time}}. Is it the same patient? | {{hospital}}-এ {{group}} গ্রুপের একটি অনুরোধ {{time}} পোস্ট হয়েছে। এটি কি একই রোগী? |
 | `request.duplicate.join` | Yes, open that request | হ্যাঁ, সেই অনুরোধটি খুলুন |
 | `request.duplicate.postAnyway` | No, post mine | না, আমারটি পাঠান |
-**Copy — labels the layout names in English only, or not at all** (Q-019, 2026-11-27; member 1 reviews the Bangla):
+**Copy — labels the layout names in English only, or not at all** (Q-019, 2026-11-27; member 3 reviews the Bangla):
 | Key | English | বাংলা |
 |---|---|---|
 | `request.unitsIncrease` | Increase bags | ব্যাগ বাড়ান |
@@ -676,7 +676,7 @@ Four steps with a progress indicator "Step x of 4"; Back keeps entries; data sav
 | `donor.setup.consentHealth` | I agree that UDVASITO stores my blood group, donation dates and area to match me with requests, and shares my number only as described above. | আমি সম্মত যে উদ্ভাসিত আমার রক্তের গ্রুপ, রক্তদানের তারিখ ও এলাকা সংরক্ষণ করবে অনুরোধের সঙ্গে মেলাতে, এবং উপরে বর্ণিতভাবে শুধু আমার নম্বর শেয়ার করবে। |
 | `donor.setup.finish` | Start receiving requests | অনুরোধ পাওয়া শুরু করুন |
 | `donor.setup.done` | You're a donor now. Thank you! We'll alert you only when you can help. | আপনি এখন একজন রক্তদাতা। ধন্যবাদ! শুধু যখন সাহায্য করতে পারবেন, তখনই জানাব। |
-**Copy — labels the layout names in English only** (Q-018, 2026-11-27; member 1 reviews the Bangla):
+**Copy — labels the layout names in English only** (Q-018, 2026-11-27; member 3 reviews the Bangla):
 | Key | English | বাংলা |
 |---|---|---|
 | `donor.setup.dontKnowGroup` | I don't know my group | আমি আমার গ্রুপ জানি না |

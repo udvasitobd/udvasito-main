@@ -74,10 +74,10 @@ These strings are needed but specs has no exact English + Bangla text. Until the
    its own script, identical in both languages), not in en.json / bn.json. OK, or should specs give them keys
    (e.g. `language.bn`, `language.en`, `language.enShort`)?
 
-**Recommendation:** member 1 (content) writes 1, 3, 5 and the no-count variant of 6 in both languages; 2 and 4 stay as
+**Recommendation:** member 3 (Bangla content) writes 1, 3, 5 and the no-count variant of 6 in both languages; 2 and 4 stay as
 they are; 7 stays as it is unless the team wants keys. Then `npm run copy:extract` picks them up from specs.
-**Answer (2026-11-27, developer): "do the recommendations"** → 2, 4 and 7 stay as they are; member 1 writes 1, 3, 5 and the no-count variant of 6 (team job in for_me.md).
-Status: ⏳ waiting for member 1's copy (1, 3, 5, 6)
+**Answer (2026-11-27, developer): "do the recommendations"** → 2, 4 and 7 stay as they are; member 3 writes 1, 3, 5 and the no-count variant of 6 (team job in for_me.md).
+Status: ⏳ waiting for member 3's copy (1, 3, 5, 6)
 
 ### Q-006 · 2026-11-27 · P0 · Small additions made to the specs contracts (please confirm)
 1. `public.appConfig` (specs §6.1) also returns **`helplineAvailable: boolean`** (true when `fallbackContactPhone` is
@@ -164,7 +164,7 @@ no picker library is named in ADRs/specs, and specs has no copy for "Day / Month
 - **A.** Add `@react-native-community/datetimepicker` (MIT, free, Expo's recommended picker). Android shows the phone's
   own calendar (already in the phone's language); the web uses the browser's own date box. No new copy needed. Needs a
   native build, but build #1 has not been made yet, so it costs no extra build.
-- **B.** No new library: three typed boxes (day / month / year). Needs 3 new copy strings (EN + BN) reviewed by member 1.
+- **B.** No new library: three typed boxes (day / month / year). Needs 3 new copy strings (EN + BN) reviewed by member 3.
 
 **Recommendation: A.**
 **Answer (2026-11-27, developer):** A — the phone's own calendar (`@react-native-community/datetimepicker`, ADR-025).
@@ -173,11 +173,11 @@ Status: ✅ answered
 ### Q-012 · 2026-11-27 · P1 · The "version + effective date" line on the privacy and terms pages
 SCR-P06/P07 say the pages show the version and effective date at the top, but specs has no copy for that line.
 - **A.** Add `legal.version` = "Version {{version}} · in effect from {{date}}" / "সংস্করণ {{version}} · কার্যকর {{date}} থেকে"
-  (member 1 reviews the Bangla).
+  (member 3 reviews the Bangla).
 - **B.** Member 4 writes the version and date as the first line of each legal text; the app adds nothing.
 
 **Recommendation: A** (the line always matches the file header, so it can never be out of date).
-**Answer (2026-11-27, developer):** A — `legal.version` added to specs SCR-P06/P07 (member 1 reviews the Bangla).
+**Answer (2026-11-27, developer):** A — `legal.version` added to specs SCR-P06/P07 (member 3 reviews the Bangla).
 Status: ✅ answered
 
 ### Q-013 · 2026-11-27 · P1 · What is kept for someone under 18
@@ -192,7 +192,7 @@ Status: ✅ answered
 
 ### Q-014 · 2026-11-27 · P1 · Missing words for the tab bar, More, Settings, account-status buttons and /download
 specs §1.4.1, SCR-M10, SCR-M06, SCR-O06 and SCR-P08 name these labels in English only (or not at all); there is no
-Bangla and no copy key. Draft (keys follow the specs' style; member 1 reviews the Bangla like all other copy):
+Bangla and no copy key. Draft (keys follow the specs' style; member 3 reviews the Bangla like all other copy):
 
 | Key | English | বাংলা |
 |---|---|---|
@@ -232,13 +232,13 @@ Existing keys are reused where they already say the same thing: Settings → `se
 `settings.signOut`, Terms → `welcome.terms`, Call helpline → `request.fallbackTitle`, "Or use the web app" →
 `update.useWeb`, the iPhone alerts note → `alertGuide.ios`. The iPhone guide uses icons instead of the illustrations
 specs mentions (none exist yet). Rows and tabs for features not built yet stay hidden (specs §1.9).
-- **A.** Use this draft now; member 1 reviews the Bangla before the first campus drive.
-- **B.** Wait for member 1 to write the copy first (the shells wait too).
+- **A.** Use this draft now; member 3 reviews the Bangla before the first campus drive.
+- **B.** Wait for member 3 to write the copy first (the shells wait too).
 
 **Recommendation: A.**
 **Answer (2026-11-27, developer):** "use the default Bangla translation of English everywhere" → A, and a standing rule:
 where specs gives English only, the Bangla is the plain standard translation of that English (no question needed).
-Member 1 may still polish it in review.
+Member 3 may still polish it in review.
 Status: ✅ answered
 
 ### Q-015 · 2026-11-27 · P1 · Phone verification: one verified account per number, and what the daily limit counts
@@ -281,8 +281,8 @@ happens when the shared contact is odd. The Telegram flow is built as follows (s
   `verify.mismatch` with `verify.useVerified` / Cancel (specs SCR-O04).
 
 **Recommendation:** keep as built — every case is safe (nothing is verified unless it is the person's own Bangladeshi
-number, not used elsewhere), and the new English lines are short enough for member 1 to review with the Bangla.
-**Applied:** as above (standing instruction "do the recommendations"); member 1 to review the three new bot lines.
+number, not used elsewhere), and the new English lines are short enough for member 3 to review with the Bangla.
+**Applied:** as above (standing instruction "do the recommendations"); member 3 to review the three new bot lines.
 Status: 🟦 applied, waiting for review
 
 ### Q-018 · 2026-11-27 · P1 · Words for donor setup and the Donate tab that specs names in English only
@@ -295,7 +295,7 @@ Also decided while building (no copy involved):
   donor not live until they accept it again (`donor.notLive.consent`), like the main consent (X08).
 - "Paused until" is hidden in P1 (roadmap: availability pause is out of scope); Available / Not available work.
 
-**Recommendation:** keep as built; member 1 reviews the 18 Bangla lines.
+**Recommendation:** keep as built; member 3 reviews the 18 Bangla lines.
 **Applied:** as above (standing instruction "do the recommendations").
 Status: 🟦 applied, waiting for review
 
@@ -320,6 +320,6 @@ tap, D-R3). Following the standing rule (Q-014), specs SCR-M02 now has a copy ta
 - **Not in this slice:** the money-word flag (the automatic-flags step; specs has no word list, and none is invented)
   and a per-minute rate limit on posting (slice 15).
 
-**Recommendation:** keep as built; member 1 reviews the 13 Bangla lines.
+**Recommendation:** keep as built; member 3 reviews the 12 Bangla lines.
 **Applied:** as above (standing instruction "do the recommendations").
 Status: 🟦 applied, waiting for review

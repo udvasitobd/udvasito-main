@@ -127,7 +127,7 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   the developer says done / I verify), then "⏳ Later". Keep it current in every commit.
 - 2026-11-27: PR #2 MERGED (squash 3b95976) after review + fixes + CI green (developer: "merge it once the checks pass").
   Test phone: iQOO Z10 Turbo Pro (Vivo family). Developer: "do the recommendations" for open questions → Q-004 A,
-  Q-006 keep all, Q-007 offline file confirmed, Q-005 2/4/7 stay (member 1 writes 1/3/5/6); new Q-008 (P1 on staging
+  Q-006 keep all, Q-007 offline file confirmed, Q-005 2/4/7 stay (member 3 writes 1/3/5/6); new Q-008 (P1 on staging
   alongside P0 leftovers), Q-009 (no legal drafts → content:build refuses without them; consent tested by tests only),
   Q-010 (need 2 more phones). Developer: "start working on next phase" → **P1 started, branch `p1/walking-skeleton`**.
 - P1 PLAN (build-prompts §2 order, vertical slices, commit `P1: …`, PRs into staging, review + fix before merge):
@@ -176,6 +176,16 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   AFTER POST: goes to /home with Sent until SCR-M03 (/request/[id], slice 13) exists — change it then.
   convex-test creation times only move forward → fake-time tests must start at the earliest time.
   NEXT: 9 matching v1 + Expo push (schedule internal.matching.startRequest from requests.create) → 10–15.
+- TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
+  b498ce34-9880-4845-8fc5-54431dd450cb; tab "To-do" 1e0a4b77-629a (body 8e30bb71-e1ec), tab "Bangla to check"
+  fc1b86ea-accf (body 054015cc-eff6, 66 rows: Screen | English | Claude's Bangla | Your fix | Key). Edit it ONLY via the
+  Claude Docs connector (load the docs skill, then read with sinceRev before writing — the team edits it). When a job is
+  handed over, tick it there + Status dropdown in the "Before the first campus drive" table. Read "Your fix" cells
+  and copy fixes into specs/en/bn (then copy:extract). TEAM NUMBERS: member 1 = developer; 2 recruitment; 3 Bangla/FAQ/QA
+  (reviews ALL Bangla); 4 operations/data protection (admin, legal); 5 presentation. (Earlier notes said "member 1"
+  for Bangla review — fixed to member 3 everywhere.)
+  TODO for me from the doc: internal.admin.ops op to create/activate campaigns (none exists; member 2 sends codes);
+  export the 15 city thanas for member 2.
 - convex-test: the fake clock moves 1 ms per write → compare with returned expiresAt / loose bounds, not exact NOW.
   Stub fetch with vi.stubGlobal('fetch', …) and set process.env in beforeEach; t.fetch('/path') hits http.ts routes.
 - Telegram bot go-live (human + me): developer makes the bot in BotFather (staging bot first) and pastes the token as
