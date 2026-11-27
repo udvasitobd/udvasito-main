@@ -3,6 +3,7 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-27 · P0 · Code-review fixes: last-admin guard, settings cross-check, VAL-18 on phone reveals, default-deny Sentry scrubber, auth hardening from SITE_URL only, spoof-proof helpline rate-limit key, signed-out race on Home, www → udvasito.com redirect (205a0f1).
 - 2026-11-27 · P0 · Test: `npm run test:e2e` web smoke (sign-in, language switch, sign-in guard, axe, no inline scripts) against `dist/` with production headers; dataset count test (2c1a786).
 - 2026-11-27 · P0 · `seed:staging` fake donors (8 groups × 29 Chattogram places, unallocated +88010 numbers); deployments tell staging from production by `SITE_URL` (45908e7).
 - 2026-11-27 · P0 · `import:hospitals` with a line-by-line report, idempotent upsert, header-only `data/hospitals.csv` (8ee3eef).
