@@ -13,6 +13,7 @@ import { internal } from './_generated/api';
 import type { Doc } from './_generated/dataModel';
 import { internalMutation, type MutationCtx } from './_generated/server';
 import { donorAlertText } from './_lib/alertText';
+import { isLiveNow } from './_lib/donors';
 import { logEvent } from './_lib/events';
 import { sendAlert } from './_lib/push';
 import { requestPlaceNames } from './_lib/requestPlace';
@@ -25,7 +26,13 @@ import { nextWaveSize } from './rules/waves';
 type Point = { lat: number; lng: number };
 
 /** Every live donor of the alert groups in the request's district, joined with their profile (by_match index). */
-async function loadCandidates(ctx: MutationCtx, request: Doc<'requests'>, settings: Settings, finalWave: boolean) {
+async function loadCandidates(
+  ctx: MutationCtx,
+  request: Doc<'requests'>,
+  settings: Settings,
+  finalWave: boolean,
+  now: number,
+) {
   const { exact, compatible } = groupsFor(request.bloodGroup, request.component, finalWave, settings);
   const candidates: Candidate[] = [];
   const rows = new Map<string, { donor: Doc<'donorProfiles'>; profile: Doc<'profiles'> }>();
@@ -58,8 +65,9 @@ async function loadCandidates(ctx: MutationCtx, request: Doc<'requests'>, settin
         travelRange: donor.travelRange,
         availability: donor.availability,
         plateletOptIn: donor.plateletOptIn,
-        // `live` is kept true to its rule on every change; status and phone are re-checked here as a second guard.
-        live: donor.live && profile.status === 'active' && profile.phoneVerified,
+        // The stored flag can lag behind the rule (a new consent version changes no donor row), so the whole live
+        // rule runs again for every candidate.
+        live: isLiveNow(profile, donor, now, settings),
         isDemo: donor.isDemo,
         dateOfBirth: profile.dateOfBirth,
         lastActiveAt: profile.lastActiveAt,
@@ -87,7 +95,7 @@ async function runWave(
     .withIndex('by_request_donor', (q) => q.eq('requestId', request._id))
     .collect();
   const openedUnanswered = earlier.filter((r) => r.state === 'opened').length;
-  const { candidates, rows, places } = await loadCandidates(ctx, request, settings, false);
+  const { candidates, rows, places } = await loadCandidates(ctx, request, settings, false, now);
   const ranked = rankCandidates(
     candidates,
     {

@@ -239,6 +239,22 @@ describe('responses.accept', () => {
     await t.run((ctx) => ctx.db.patch(requestId, { status: 'closed', closedAt: Date.now() }));
     expect(await codeOf(me.as.mutation(api.responses.accept, acceptArgs(requestId)))).toBe('ERR_REQUEST_CLOSED');
   });
+
+  it('a new consent version: terms accepted again but not the health-data consent → not live, no contact', async () => {
+    const { t, where } = await setupMatching();
+    const me = await signedInDonor(t, where);
+    const { requestId } = await alerted(t, where);
+    const NEW = '2027-01-01-pilot';
+    await t.run(async (ctx) => {
+      await ctx.db.insert('settings', { key: 'consentVersion', value: NEW });
+      await ctx.db.patch(me.profileId, { consentVersion: NEW });
+    });
+    expect(await failure(me.as.mutation(api.responses.accept, acceptArgs(requestId)))).toEqual({
+      code: 'ERR_NOT_ELIGIBLE',
+      params: { reason: 'notLive' },
+    });
+    expect(await revealsOf(t, requestId)).toEqual([]);
+  });
 });
 
 describe('responses.decline', () => {

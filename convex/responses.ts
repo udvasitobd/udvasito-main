@@ -13,7 +13,7 @@ import type { Doc, Id } from './_generated/dataModel';
 import type { QueryCtx } from './_generated/server';
 import { donorConfirmedText, roundKm } from './_lib/alertText';
 import { donorMutation, donorQuery, memberQuery } from './_lib/auth';
-import { donorProfileOf } from './_lib/donors';
+import { donorProfileOf, isLiveNow } from './_lib/donors';
 import { appError, validationError } from './_lib/errors';
 import { logEvent } from './_lib/events';
 import { sendAlert } from './_lib/push';
@@ -281,7 +281,7 @@ export const accept = donorMutation({
     const why = whyNotEligible(
       {
         ...historyOf(donor),
-        live: donor.live,
+        live: isLiveNow(profile, donor, now, settings),
         bloodGroup: donor.bloodGroup,
         plateletOptIn: donor.plateletOptIn,
         dateOfBirth: profile.dateOfBirth,

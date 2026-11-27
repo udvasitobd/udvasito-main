@@ -5,7 +5,7 @@
  */
 import type { Doc, Id } from '../_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '../_generated/server';
-import { notLiveReasons, type NotLiveReason } from '../rules/donor';
+import { notLiveReasons, type LiveRules, type NotLiveReason } from '../rules/donor';
 import { logEvent } from './events';
 import { getSettings } from './settings';
 
@@ -18,13 +18,14 @@ export async function donorProfileOf(ctx: QueryCtx, profileId: Id<'profiles'>): 
     .unique();
 }
 
-export async function donorLive(
-  ctx: QueryCtx,
+/** The live rule applied to these rows now (no database read, so matching can call it per candidate). */
+export function liveReasonsNow(
   profile: Doc<'profiles'>,
   donor: Doc<'donorProfiles'>,
-  now = Date.now(),
-): Promise<DonorLive> {
-  const reasons = notLiveReasons(
+  now: number,
+  settings: LiveRules,
+): NotLiveReason[] {
+  return notLiveReasons(
     {
       phoneVerified: profile.phoneVerified,
       profileStatus: profile.status,
@@ -34,8 +35,30 @@ export async function donorLive(
       healthConsentVersion: donor.healthConsentVersion,
     },
     now,
-    await getSettings(ctx),
+    settings,
   );
+}
+
+/**
+ * Whether this donor may be alerted or confirmed now. The stored flag can lag behind the rule (a new consent version
+ * or a birthday changes nothing in the row), so both must hold.
+ */
+export function isLiveNow(
+  profile: Doc<'profiles'>,
+  donor: Doc<'donorProfiles'>,
+  now: number,
+  settings: LiveRules,
+): boolean {
+  return donor.live && liveReasonsNow(profile, donor, now, settings).length === 0;
+}
+
+export async function donorLive(
+  ctx: QueryCtx,
+  profile: Doc<'profiles'>,
+  donor: Doc<'donorProfiles'>,
+  now = Date.now(),
+): Promise<DonorLive> {
+  const reasons = liveReasonsNow(profile, donor, now, await getSettings(ctx));
   return { live: reasons.length === 0, notLiveReasons: reasons };
 }
 

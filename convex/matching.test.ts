@@ -182,6 +182,19 @@ describe('wave 1', () => {
     expect(practiceResponses.every((r) => r.isDemo)).toBe(true);
   });
 
+  it('re-runs the whole live rule: a donor whose health consent is out of date is not alerted', async () => {
+    const { t, where } = await setup();
+    const NEW = '2027-01-01-pilot';
+    await t.run((ctx) => ctx.db.insert('settings', { key: 'consentVersion', value: NEW }));
+    // Both rows still say live: nothing recomputes the flag when the version changes.
+    await donor(t, where);
+    const current = await donor(t, where, { profile: { consentVersion: NEW } });
+    await t.run((ctx) => ctx.db.patch(current.donorProfileId, { healthConsentVersion: NEW }));
+    const { requestId } = await postRequest(t, where, {}, { consentVersion: NEW });
+    await start(t, requestId);
+    expect(await notified(t, requestId)).toEqual([current.donorProfileId]);
+  });
+
   it('no matching donor → zeroEligibleAtPublish; "Not sure" alerts nobody', async () => {
     const { t, where } = await setup();
     await donor(t, where, { bloodGroup: 'O+' });
