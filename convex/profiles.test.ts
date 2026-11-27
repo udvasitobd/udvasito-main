@@ -240,3 +240,27 @@ describe('consents.accept', () => {
     expect(await codeOf(as.mutation(api.consents.accept, { kind: 'terms_privacy', version: CONSENT, lang: 'en' }))).toBe('ERR_FROZEN');
   });
 });
+
+describe('profiles.updateLanguage', () => {
+  it('needs a session and a profile', async () => {
+    const t = makeT();
+    expect(await codeOf(t.mutation(api.profiles.updateLanguage, { language: 'bn' }))).toBe('ERR_UNAUTHENTICATED');
+    const { as } = await signIn(t, 'no-profile@example.com');
+    expect(await codeOf(as.mutation(api.profiles.updateLanguage, { language: 'bn' }))).toBe('ERR_CONSENT_REQUIRED');
+  });
+
+  it('stores the chosen language, also for a paused account or an older consent', async () => {
+    const t = makeT();
+    const { as, userId } = await signIn(t, 'lang@example.com');
+    await insertProfile(t, userId, { status: 'frozen', consentVersion: 'older-version' });
+    await as.mutation(api.profiles.updateLanguage, { language: 'bn' });
+    expect((await profileOf(t, userId))?.language).toBe('bn');
+  });
+
+  it('refuses an under-18 block', async () => {
+    const t = makeT();
+    const { as, userId } = await signIn(t, 'young@example.com');
+    await insertProfile(t, userId, { status: 'underage_blocked' });
+    expect(await codeOf(as.mutation(api.profiles.updateLanguage, { language: 'bn' }))).toBe('ERR_UNDERAGE');
+  });
+});

@@ -88,4 +88,21 @@ export async function setLanguage(language: Language): Promise<void> {
   }
 }
 
+type PickListener = (language: Language) => void;
+const pickListeners = new Set<PickListener>();
+
+/** Listen for a language the person chose (not the device default) — saved to the profile by `profiles.updateLanguage`. */
+export function onLanguagePicked(listener: PickListener): () => void {
+  pickListeners.add(listener);
+  return () => {
+    pickListeners.delete(listener);
+  };
+}
+
+/** The language toggle: switch now and tell the listeners. */
+export async function chooseLanguage(language: Language): Promise<void> {
+  await setLanguage(language);
+  pickListeners.forEach((listener) => listener(language));
+}
+
 export { i18n };

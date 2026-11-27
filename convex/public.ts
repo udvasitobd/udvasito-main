@@ -15,6 +15,8 @@ export const appConfig = publicQuery({
       apkUrl: s.apkUrl,
       apkSha256: s.apkSha256,
       consentVersion: s.consentVersion,
+      // The team inbox (public on the About page): "Contact us" for a closed account (SCR-O06).
+      contactEmail: s.contactEmail,
       emailSignInEnabled: s.emailSignInEnabled,
       practiceAreaEnabled: s.demoAreaEnabled,
       verification: {

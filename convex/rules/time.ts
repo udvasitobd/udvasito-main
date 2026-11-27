@@ -7,7 +7,7 @@
 
 /** Asia/Dhaka is UTC+6 all year. A time-zone fact, not a product rule. */
 const DHAKA_OFFSET_MS = 6 * 60 * 60 * 1000;
-const DAY_MS = 24 * 60 * 60 * 1000;
+export const DAY_MS = 24 * 60 * 60 * 1000;
 
 function parts(date: string): [number, number, number] {
   return date.split('-').map(Number) as [number, number, number];

@@ -20,3 +20,12 @@ export { default as CalendarDays } from 'lucide-react-native/icons/calendar-days
 export { default as Check } from 'lucide-react-native/icons/check';
 export { default as ChevronDown } from 'lucide-react-native/icons/chevron-down';
 export { default as ChevronRight } from 'lucide-react-native/icons/chevron-right';
+export { default as Download } from 'lucide-react-native/icons/download';
+export { default as FileText } from 'lucide-react-native/icons/file-text';
+export { default as House } from 'lucide-react-native/icons/house';
+export { default as Languages } from 'lucide-react-native/icons/languages';
+export { default as Mail } from 'lucide-react-native/icons/mail';
+export { default as Menu } from 'lucide-react-native/icons/menu';
+export { default as Settings } from 'lucide-react-native/icons/settings';
+export { default as ShieldCheck } from 'lucide-react-native/icons/shield-check';
+export { default as Smartphone } from 'lucide-react-native/icons/smartphone';

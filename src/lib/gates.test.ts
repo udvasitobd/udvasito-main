@@ -112,7 +112,7 @@ describe('resolveGate', () => {
   it('consent and onboarding exist only once the legal files are in the build (Q-009)', () => {
     const without = availableRoutes({ legalReady: false });
     const withLegal = availableRoutes({ legalReady: true });
-    expect([...without]).toEqual(['/sign-in', '/home']);
+    expect([...without]).toEqual(['/sign-in', '/home', '/update-required', '/account-status']);
     expect(withLegal.has('/welcome') && withLegal.has('/onboarding')).toBe(true);
 
     const newcomer = { localConsentVersion: null, me: { needsOnboarding: true, serverConsentCurrent: false, status: null, role: null } };

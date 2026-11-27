@@ -8,19 +8,17 @@ import { api } from '@convex/_generated/api';
 import { useConvexAuth, useMutation } from 'convex/react';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Checkbox, LanguageToggle, LogoMark, Screen, Sheet, Text, useLanguage } from '@/components';
+import { Button, Checkbox, LanguageToggle, ListGroup, ListRow, LogoMark, Screen, Sheet, Text, useLanguage } from '@/components';
 import { NotFound } from '@/components/NotFound';
-import { ChevronDown, ChevronRight, type LucideIcon } from '@/components/icons';
 import { content } from '@/content/generated';
 import { LEGAL_READY, LegalDoc, useLegalDoc } from '@/features/legal/LegalDoc';
 import { useAppConfig } from '@/lib/appConfig';
 import { writeLocalConsent } from '@/lib/consent';
 import { legalVersion, type LegalPage } from '@/lib/content';
 import { safeNext } from '@/lib/gates';
-import { colors } from '@/theme/tokens';
 
 /** The words before the first colon of a notice ("How AI is used: …") name its row; the row opens the full text. */
 function leadOf(text: string): string {
@@ -33,37 +31,6 @@ function afterConsent(next: string | string[] | undefined): string {
   const value = Array.isArray(next) ? next[0] : next;
   if (value === '/onboarding' || value === '/verify-phone') return value;
   return safeNext(value, '/sign-in');
-}
-
-function Row({
-  label,
-  icon: Icon,
-  expanded,
-  onPress,
-}: {
-  label: string;
-  icon: LucideIcon;
-  expanded?: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      aria-expanded={expanded}
-      onPress={onPress}
-      className="min-h-touch flex-row items-center gap-s3 px-s4 py-s3 active:bg-surface web:hover:bg-surface"
-    >
-      <Text variant="bodyStrong" className="flex-1">
-        {label}
-      </Text>
-      <Icon
-        size={22}
-        color={colors.text.muted}
-        aria-hidden
-        style={expanded ? { transform: [{ rotate: '180deg' }] } : undefined}
-      />
-    </Pressable>
-  );
 }
 
 function Notice({ texts }: { texts: string[] }) {
@@ -124,25 +91,23 @@ export default function Welcome() {
         <LanguageToggle large />
       </View>
 
-      <View className="overflow-hidden rounded-md border border-line bg-app">
-        <Text variant="heading" accessibilityRole="header" className="border-b border-line bg-surface px-s4 py-s3">
-          {t('welcome.beforeStart')}
-        </Text>
-        <Row label={t('welcome.terms')} icon={ChevronRight} onPress={() => setSheet('terms')} />
-        <View className="h-px bg-line" />
-        <Row label={t('welcome.privacy')} icon={ChevronRight} onPress={() => setSheet('privacy')} />
-        <View className="h-px bg-line" />
-        <Row label={leadOf(t('welcome.ai'))} icon={ChevronDown} expanded={open === 'ai'} onPress={() => toggle('ai')} />
-        {open === 'ai' ? <Notice texts={[t('welcome.ai'), t('welcome.voice')]} /> : null}
-        <View className="h-px bg-line" />
-        <Row
-          label={leadOf(t('welcome.permissions'))}
-          icon={ChevronDown}
-          expanded={open === 'permissions'}
-          onPress={() => toggle('permissions')}
-        />
-        {open === 'permissions' ? <Notice texts={[t('welcome.permissions')]} /> : null}
-      </View>
+      <ListGroup title={t('welcome.beforeStart')}>
+        <ListRow label={t('welcome.terms')} onPress={() => setSheet('terms')} />
+        <ListRow label={t('welcome.privacy')} onPress={() => setSheet('privacy')} />
+        <View>
+          <ListRow label={leadOf(t('welcome.ai'))} kind="expand" expanded={open === 'ai'} onPress={() => toggle('ai')} />
+          {open === 'ai' ? <Notice texts={[t('welcome.ai'), t('welcome.voice')]} /> : null}
+        </View>
+        <View>
+          <ListRow
+            label={leadOf(t('welcome.permissions'))}
+            kind="expand"
+            expanded={open === 'permissions'}
+            onPress={() => toggle('permissions')}
+          />
+          {open === 'permissions' ? <Notice texts={[t('welcome.permissions')]} /> : null}
+        </View>
+      </ListGroup>
 
       <Checkbox label={t('welcome.consent')} checked={agreed} onChange={setAgreed} />
       <Button label={t('common.continue')} block disabled={!agreed || version === ''} onPress={accept} />

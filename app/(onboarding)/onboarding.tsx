@@ -11,11 +11,10 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Banner, Button, DateField, HelplineButton, Input, Screen, Text, useLanguage } from '@/components';
+import { Banner, Button, DateField, Input, Screen, Text, useLanguage } from '@/components';
 import { NotFound } from '@/components/NotFound';
-import { LogOut } from '@/components/icons';
 import { LoadingScreen } from '@/features/account/Gate';
-import { useSignOut } from '@/features/account/useSignOut';
+import { Underage } from '@/features/account/Underage';
 import { LEGAL_READY } from '@/features/legal/LegalDoc';
 import { forgetCampaign, readCampaign } from '@/lib/campaign';
 import { readLocalConsent } from '@/lib/consent';
@@ -30,24 +29,6 @@ const PHONE_PREFIX = '+88';
 /** Where the calendar opens (a typical adult's birth year) — a convenience, not an age rule. */
 const CALENDAR_OPENS_YEARS_BACK = 25;
 const WELCOME_THEN_ONBOARDING = `/welcome?next=${encodeURIComponent('/onboarding')}`;
-
-function Underage() {
-  const { t } = useTranslation();
-  const { signOut, busy, failed } = useSignOut();
-  return (
-    <Screen root>
-      <View className="gap-s4 py-s6">
-        <Text variant="title" accessibilityRole="header">
-          {t('onboarding.underage.title')}
-        </Text>
-        <Text>{t('onboarding.underage.body')}</Text>
-      </View>
-      <HelplineButton labelKey="request.fallbackTitle" variant="primary" />
-      {failed ? <Banner kind="error" text={t('errors.ERR_INTERNAL')} /> : null}
-      <Button label={t('settings.signOut')} variant="secondary" icon={LogOut} block loading={busy} onPress={() => void signOut()} />
-    </Screen>
-  );
-}
 
 export default function Onboarding() {
   const { t } = useTranslation();

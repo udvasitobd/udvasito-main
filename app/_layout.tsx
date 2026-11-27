@@ -21,6 +21,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, FontsLoadedContext, ToastProvider } from '@/components';
 import { AppRoot } from '@/components/AppRoot';
+import { LanguageSync } from '@/features/account/LanguageSync';
 import { useCampaignCapture } from '@/lib/campaign';
 import { authClient, convex } from '@/lib/convex';
 import { i18n, initI18n } from '@/lib/i18n';
@@ -67,6 +68,7 @@ export default function RootLayout() {
             <SafeAreaProvider>
               <ToastProvider>
                 <StatusBar style="dark" />
+                <LanguageSync />
                 <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg.app } }} />
               </ToastProvider>
             </SafeAreaProvider>

@@ -171,6 +171,16 @@ Spacing scale 4/8/12/16/24/32/48 px. Screen padding 16 (mobile) / 24 (≥ 768 px
 
 On screens ≥ 1024 px (desktop web) the tabs become a left sidebar; admin pages use a two-column layout (list + detail).
 
+**Copy** (Q-014, 2026-11-27):
+| Key | English | বাংলা |
+|---|---|---|
+| `tabs.home` | Home | হোম |
+| `tabs.requests` | Requests | অনুরোধ |
+| `tabs.donate` | Donate | রক্ত দিন |
+| `tabs.volunteer` | Volunteer | স্বেচ্ছাসেবক |
+| `tabs.admin` | Admin | অ্যাডমিন |
+| `tabs.more` | More | আরও |
+
 #### 1.4.2 Header (every screen)
 Back button (when not a tab root) · screen title · `CMP-LanguageToggle` · `CMP-PracticeBadge` when applicable. No hamburger menus on mobile.
 
@@ -421,6 +431,13 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `suspended` | Your account is suspended / আপনার অ্যাকাউন্ট সাময়িকভাবে বন্ধ | Reason: {{reason}}. Until {{date}}. / কারণ: {{reason}}। {{date}} পর্যন্ত। | Call helpline |
 | `banned` | Your account is closed / আপনার অ্যাকাউন্ট বন্ধ করা হয়েছে | Reason: {{reason}}. / কারণ: {{reason}}। | Contact us (email) |
 | `deletion_pending` | Your account is being deleted / আপনার অ্যাকাউন্ট মুছে ফেলা হচ্ছে | Your personal data will be removed by {{date}}. Changed your mind? / {{date}}-এর মধ্যে আপনার ব্যক্তিগত তথ্য মুছে ফেলা হবে। মত বদলেছেন? | Cancel deletion |
+
+**Action copy** (Q-014; "Call helpline" uses `request.fallbackTitle`):
+| Key | English | বাংলা |
+|---|---|---|
+| `accountStatus.viewRequest` | View my request | আমার অনুরোধ দেখুন |
+| `accountStatus.contactUs` | Contact us by email | আমাদের ইমেইল করুন |
+| `accountStatus.cancelDeletion` | Cancel deletion | মুছে ফেলা বাতিল করুন |
 
 ### 3.2 Requester
 
@@ -714,7 +731,7 @@ List of donor-confirmed donations (date, hospital, group, component) · total ·
 
 #### SCR-M06 · Settings · `/settings`
 Rows: Language · Profile (name, date of birth read-only after 24 h, mobile number → re-verify) · Phone verification status · Notifications (link to alert guide) · Privacy & my data → `/settings/my-data` · Terms · Privacy notice · About · Sign out.
-**Copy:** `settings.title` "Settings" / "সেটিংস"; `settings.signOut` "Sign out" / "সাইন আউট"; `settings.phoneChangeNote` "Changing your number needs a new verification." / "নম্বর পরিবর্তন করলে আবার যাচাই করতে হবে।"
+**Copy:** `settings.title` "Settings" / "সেটিংস"; `settings.signOut` "Sign out" / "সাইন আউট"; `settings.phoneChangeNote` "Changing your number needs a new verification." / "নম্বর পরিবর্তন করলে আবার যাচাই করতে হবে।"; `settings.language` "Language" / "ভাষা"; `settings.privacy` "Privacy notice" / "গোপনীয়তা নীতি" (Q-014; the Terms row uses `welcome.terms`).
 
 #### SCR-M07 · Privacy & my data · `/settings/my-data`
 Sections: **Who has my number** — list of contact reveals (request date, hospital, the person's first name, role, until date) · **Download my data** — button → server builds a JSON file (profile, donor profile, my requests, my responses, consents) → download link valid 24 h · **Delete my account** — explains what is removed and kept (anonymous statistics) → confirm dialog requiring typing `DELETE` / `মুছুন` → status `deletion_pending` (cancelable for 30 days, S-27).
@@ -727,6 +744,14 @@ Sections: **Who has my number** — list of contact reveals (request date, hospi
 
 #### SCR-M10 · More · `/more`
 Rows: Settings · Can I donate? (if-time) · Learn about donating · Dengue & platelets · Apply to volunteer (if not volunteer) · About UDVASITO · Download / install app · Call helpline · Sign out.
+**Copy** (Q-014; Settings → `settings.title`, Can I donate? → `assistant.title`, Call helpline → `request.fallbackTitle`, Sign out → `settings.signOut`):
+| Key | English | বাংলা |
+|---|---|---|
+| `more.learn` | Learn about donating | রক্তদান সম্পর্কে জানুন |
+| `more.dengue` | Dengue & platelets | ডেঙ্গু ও প্লাটিলেট |
+| `more.applyVolunteer` | Apply to volunteer | স্বেচ্ছাসেবক হতে আবেদন করুন |
+| `more.about` | About UDVASITO | উদ্ভাসিত সম্পর্কে |
+| `more.download` | Download / install app | অ্যাপ ডাউনলোড / ইনস্টল করুন |
 
 ### 3.5 Volunteer
 
@@ -867,6 +892,24 @@ Versioned Markdown (`src/content/legal/privacy.<lang>.md`, `terms.<lang>.md`, re
 
 #### SCR-P08 · Download · `/download`
 Android: big **Download APK** button (`settings.apkUrl`, version, size, date) + 4-step install guide ("Allow installs from this source") + SHA-256 checksum; "Or use the web app" link. iPhone: "Add to Home Screen" 3-step guide with illustrations + note on alerts (iOS 16.4+). Desktop: "Install" button (PWA `beforeinstallprompt`) where supported.
+**Copy** (Q-014; "Or use the web app" → `update.useWeb`, iPhone alerts note → `alertGuide.ios`; icons stand in for the illustrations until they exist; the Android part is hidden while `settings.apkUrl` is empty):
+| Key | English | বাংলা |
+|---|---|---|
+| `download.title` | Get the UDVASITO app | উদ্ভাসিত অ্যাপ নিন |
+| `download.android` | Android | অ্যান্ড্রয়েড |
+| `download.apk` | Download for Android | অ্যান্ড্রয়েডের জন্য ডাউনলোড করুন |
+| `download.apkMeta` | Version {{version}} · {{size}} · {{date}} | সংস্করণ {{version}} · {{size}} · {{date}} |
+| `download.step1` | Tap the button and open the file when the download finishes. | বোতামে ট্যাপ করুন, ডাউনলোড শেষ হলে ফাইলটি খুলুন। |
+| `download.step2` | If your phone asks, allow installs from this source (your browser or Files app). | ফোন জিজ্ঞেস করলে এই উৎস থেকে ইনস্টলের অনুমতি দিন (আপনার ব্রাউজার বা ফাইলস অ্যাপ)। |
+| `download.step3` | Tap Install. | Install চাপুন। |
+| `download.step4` | Open UDVASITO and allow notifications, so blood requests reach you. | উদ্ভাসিত খুলুন এবং নোটিফিকেশনের অনুমতি দিন, যাতে রক্তের অনুরোধ আপনার কাছে পৌঁছায়। |
+| `download.checksum` | SHA-256 checksum (to check the file is genuine) | SHA-256 চেকসাম (ফাইলটি আসল কি না যাচাই করতে) |
+| `download.iphone` | iPhone | আইফোন |
+| `download.iphoneStep1` | Open udvasito.com in Safari. | Safari-তে udvasito.com খুলুন। |
+| `download.iphoneStep2` | Tap Share, then "Add to Home Screen". | Share চাপুন, তারপর "Add to Home Screen"। |
+| `download.iphoneStep3` | Open UDVASITO from your Home Screen. | হোম স্ক্রিন থেকে উদ্ভাসিত খুলুন। |
+| `download.computer` | Computer | কম্পিউটার |
+| `download.install` | Install the web app | ওয়েব অ্যাপ ইনস্টল করুন |
 
 #### SCR-P09 · Not found
 "This page doesn't exist." / "এই পৃষ্ঠাটি নেই।" + Home button. (No helpline on this page — D-R3.)

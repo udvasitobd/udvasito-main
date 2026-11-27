@@ -189,3 +189,54 @@ consent (PDPO 2025), so keeping their name and mobile number has no purpose.
 **Recommendation: A** — built this way (`profiles.completeOnboarding`); easy to change before go-live if the team prefers B.
 **Answer (2026-11-27, developer):** A — keep only the date of birth.
 Status: ✅ answered
+
+### Q-014 · 2026-11-27 · P1 · Missing words for the tab bar, More, Settings, account-status buttons and /download
+specs §1.4.1, SCR-M10, SCR-M06, SCR-O06 and SCR-P08 name these labels in English only (or not at all); there is no
+Bangla and no copy key. Draft (keys follow the specs' style; member 1 reviews the Bangla like all other copy):
+
+| Key | English | বাংলা |
+|---|---|---|
+| `tabs.home` | Home | হোম |
+| `tabs.requests` | Requests | অনুরোধ |
+| `tabs.donate` | Donate | রক্ত দিন |
+| `tabs.volunteer` | Volunteer | স্বেচ্ছাসেবক |
+| `tabs.admin` | Admin | অ্যাডমিন |
+| `tabs.more` | More | আরও |
+| `more.learn` | Learn about donating | রক্তদান সম্পর্কে জানুন |
+| `more.dengue` | Dengue & platelets | ডেঙ্গু ও প্লাটিলেট |
+| `more.applyVolunteer` | Apply to volunteer | স্বেচ্ছাসেবক হতে আবেদন করুন |
+| `more.about` | About UDVASITO | উদ্ভাসিত সম্পর্কে |
+| `more.download` | Download / install app | অ্যাপ ডাউনলোড / ইনস্টল করুন |
+| `settings.language` | Language | ভাষা |
+| `settings.privacy` | Privacy notice | গোপনীয়তা নীতি |
+| `accountStatus.viewRequest` | View my request | আমার অনুরোধ দেখুন |
+| `accountStatus.contactUs` | Contact us by email | আমাদের ইমেইল করুন |
+| `accountStatus.cancelDeletion` | Cancel deletion | মুছে ফেলা বাতিল করুন |
+| `download.title` | Get the UDVASITO app | উদ্ভাসিত অ্যাপ নিন |
+| `download.android` | Android | অ্যান্ড্রয়েড |
+| `download.apk` | Download for Android | অ্যান্ড্রয়েডের জন্য ডাউনলোড করুন |
+| `download.apkMeta` | Version {{version}} · {{size}} · {{date}} | সংস্করণ {{version}} · {{size}} · {{date}} |
+| `download.step1` | Tap the button and open the file when the download finishes. | বোতামে ট্যাপ করুন, ডাউনলোড শেষ হলে ফাইলটি খুলুন। |
+| `download.step2` | If your phone asks, allow installs from this source (your browser or Files app). | ফোন জিজ্ঞেস করলে এই উৎস থেকে ইনস্টলের অনুমতি দিন (আপনার ব্রাউজার বা ফাইলস অ্যাপ)। |
+| `download.step3` | Tap Install. | Install চাপুন। |
+| `download.step4` | Open UDVASITO and allow notifications, so blood requests reach you. | উদ্ভাসিত খুলুন এবং নোটিফিকেশনের অনুমতি দিন, যাতে রক্তের অনুরোধ আপনার কাছে পৌঁছায়। |
+| `download.checksum` | SHA-256 checksum (to check the file is genuine) | SHA-256 চেকসাম (ফাইলটি আসল কি না যাচাই করতে) |
+| `download.iphone` | iPhone | আইফোন |
+| `download.iphoneStep1` | Open udvasito.com in Safari. | Safari-তে udvasito.com খুলুন। |
+| `download.iphoneStep2` | Tap Share, then "Add to Home Screen". | Share চাপুন, তারপর "Add to Home Screen"। |
+| `download.iphoneStep3` | Open UDVASITO from your Home Screen. | হোম স্ক্রিন থেকে উদ্ভাসিত খুলুন। |
+| `download.computer` | Computer | কম্পিউটার |
+| `download.install` | Install the web app | ওয়েব অ্যাপ ইনস্টল করুন |
+
+Existing keys are reused where they already say the same thing: Settings → `settings.title`, Sign out →
+`settings.signOut`, Terms → `welcome.terms`, Call helpline → `request.fallbackTitle`, "Or use the web app" →
+`update.useWeb`, the iPhone alerts note → `alertGuide.ios`. The iPhone guide uses icons instead of the illustrations
+specs mentions (none exist yet). Rows and tabs for features not built yet stay hidden (specs §1.9).
+- **A.** Use this draft now; member 1 reviews the Bangla before the first campus drive.
+- **B.** Wait for member 1 to write the copy first (the shells wait too).
+
+**Recommendation: A.**
+**Answer (2026-11-27, developer):** "use the default Bangla translation of English everywhere" → A, and a standing rule:
+where specs gives English only, the Bangla is the plain standard translation of that English (no question needed).
+Member 1 may still polish it in review.
+Status: ✅ answered

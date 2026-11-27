@@ -12,7 +12,7 @@ export type ProfileStatus = 'active' | 'frozen' | 'suspended' | 'banned' | 'dele
 export type Role = 'member' | 'volunteer' | 'admin' | 'superadmin';
 
 /** Redirect targets that exist in this build. */
-export const AVAILABLE_ROUTES = new Set<string>(['/sign-in', '/home']);
+export const AVAILABLE_ROUTES = new Set<string>(['/sign-in', '/home', '/update-required', '/account-status']);
 
 /**
  * Built, but reachable only once member 4's privacy notice and terms are in the build (DEP-02): the consent screen,

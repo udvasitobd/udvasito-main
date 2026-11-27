@@ -4,13 +4,13 @@
  */
 import { v } from 'convex/values';
 
-import { signedInMutation, signedInQuery } from './_lib/auth';
+import { memberMutationWith, signedInMutation, signedInQuery } from './_lib/auth';
 import { writeAudit } from './_lib/audit';
 import { appError, validationError } from './_lib/errors';
 import { logEvent } from './_lib/events';
-import { getSetting, getSettings } from './_lib/settings';
+import { getSettings } from './_lib/settings';
 import { ownPhone } from './_lib/visibility';
-import { dhakaDate } from './rules/time';
+import { DAY_MS, dhakaDate } from './rules/time';
 import { checkDateOfBirth, checkName, checkPhone, firstNameOf } from './rules/validation';
 import { lang } from './schema';
 
@@ -18,7 +18,7 @@ export const me = signedInQuery({
   args: {},
   handler: async (ctx) => {
     const { profile } = ctx.signedIn;
-    const consentVersion = await getSetting(ctx, 'consentVersion');
+    const { consentVersion, deletionDays } = await getSettings(ctx);
     if (!profile) {
       return {
         profile: null,
@@ -50,7 +50,11 @@ export const me = signedInQuery({
         phoneVerified: profile.phoneVerified,
         status: profile.status,
         statusUntil: profile.statusUntil ?? null,
+        // The person's own account: the admin's reason for a suspension or ban is shown to them (SCR-O06).
+        statusReason: profile.statusReason ?? null,
         deletionRequestedAt: profile.deletionRequestedAt ?? null,
+        // When personal data is removed (S-27), so SCR-O06 never computes rule numbers on the device.
+        deletionDueAt: profile.deletionRequestedAt ? profile.deletionRequestedAt + deletionDays * DAY_MS : null,
         practiceId: profile.practiceId ?? null,
         isDemo: profile.isDemo,
       },
@@ -186,5 +190,21 @@ export const completeOnboarding = signedInMutation({
       props: { underage: false, campaign: campaignCode !== undefined },
     });
     return { result: 'ok' };
+  },
+});
+
+/**
+ * The language chosen in the app (specs §1.6 rule 2) — kept on the profile so notifications and helpline texts use it.
+ * A preference, not an action: allowed in every account state except the under-18 block, and with an older consent.
+ */
+export const updateLanguage = memberMutationWith({
+  statuses: ['active', 'frozen', 'suspended', 'banned', 'deletion_pending'],
+  allowStaleConsent: true,
+})({
+  args: { language: lang },
+  handler: async (ctx, { language }) => {
+    const { profile } = ctx.caller;
+    if (profile.language !== language) await ctx.db.patch(profile._id, { language });
+    return null;
   },
 });
