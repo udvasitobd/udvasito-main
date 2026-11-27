@@ -118,7 +118,8 @@ only needs its own bot. This one is for the test website (staging) — the real 
 - 👥 **Member 1 — missing text:** `docs/questions.md` Q-005 lists 4 small texts that need English + Bangla wording.
 - 👥 **Member 1 — check Claude's Bangla:** where the plan had English only, Claude wrote the Bangla itself (you said
   "use the default Bangla translation"). Please read these tables and fix any word that sounds wrong: `docs/questions.md`
-  **Q-014** (tab bar, More, Settings, download page) and **Q-017** (the 3 Telegram bot messages), plus the new line
+  **Q-014** (tab bar, More, Settings, download page), **Q-017** (the 3 Telegram bot messages) and **Q-018** (18 words
+  in the "Become a donor" form: gender, division/district/thana, "I don't know my group"…), plus the new line
   `home.verifyCta` "Verify / যাচাই করুন". Send corrections to the developer; Claude updates the files.
 
 ## ❓ Questions waiting for you / the team
@@ -126,7 +127,8 @@ See `docs/questions.md` — Claude writes each question with a recommended answe
 so Claude follows them unless you say otherwise. Still waiting on people: **Q-005** (member 1's texts), **Q-009**
 (member 4's legal draft), **Q-010** (two more phones).
 - ✅ Q-011, Q-012, Q-013, Q-014 — you answered (recommended options; "default Bangla translation everywhere").
-- 🟦 **Q-015** (one verified account per phone number) and **Q-017** (what the Telegram bot says) — Claude used the
+- 🟦 **Q-015** (one verified account per phone number), **Q-017** (what the Telegram bot says) and **Q-018** (donor
+  form words; the health-data consent follows the main consent version) — Claude used the
   recommendation; just read them and say if you want something different.
 - ❓ **Q-016** — when a volunteer says "It doesn't match", should the person see a short message? Claude suggests yes
   (option A, the text is in the file). Until you answer, the screen simply shows the button again.

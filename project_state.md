@@ -153,7 +153,16 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   — slice 7 adds the donor `live` recompute THERE. Telegram is hidden in the app until settings.verification.telegram
   && telegramBot ≠ ''. Bot replies: convex/_lib/copy.ts bilingual(key) from en/bn.json (JSON import, bundles fine).
   Dev deployment wry-tern-774 has the code; webhook answers 401 without the secret (checked).
-  NEXT: 7 donor setup → 8 request form → 9–15.
+  ✅ 7 donor server: donors.upsert/getMine/setAvailability, places.list (parentId), rules/donor.ts notLiveReasons,
+  refreshDonorLive in markPhoneVerified, firstLiveAt (bb6220a) · ✅ 7 donor UI: /donor/setup 4 steps + Donate tab +
+  Home donor cards, components BloodGroupPicker/ChoiceGroup/Select/SwitchRow, per-account device draft (cleared on
+  finish + sign-out), "use my location once" matched on the device, Q-018 copy (c0df3ae). Checked in Chrome via a
+  throwaway app/zzpreview.tsx (deleted): pickers with dev places, search "kot" → Kotwali, every step's errors, Bangla.
+  Found + fixed: quick taps lost checklist ticks (stale closure) → setup form updates are functional (f) => ….
+  LEFT FOR LATER SLICES: notification prompt after donor setup (slice 9 push), Requests-for-you + badge (slice 10),
+  Paused (out of P1), alert settings D05 / hide profile / history (later phases). Matching must re-check
+  notLiveReasons per candidate (age + consent drift), not trust the stored live flag alone.
+  NEXT: 8 request form + place picker → 9–15.
 - convex-test: the fake clock moves 1 ms per write → compare with returned expiresAt / loose bounds, not exact NOW.
   Stub fetch with vi.stubGlobal('fetch', …) and set process.env in beforeEach; t.fetch('/path') hits http.ts routes.
 - Telegram bot go-live (human + me): developer makes the bot in BotFather (staging bot first) and pastes the token as
@@ -167,6 +176,9 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
 - Local checks without signing in: temporary re-export routes (e.g. app/zzpreview/…) + `npx tsx scripts/serve-dist.ts`
   (8081). serve-dist forbids iframes; for a 390 px view use a frame-friendly server from the scratchpad. `pkill` does
   NOT exist in Git Bash here — stop node servers with PowerShell Stop-Process (match the command line).
+- Unit tests (vitest "unit" project) resolve @/ and @convex/ aliases (vitest.config.mts).
+- House style = prettier --single-quote --print-width 120 (no config file); run it on new files before the check.
+- Chrome screenshots can time out when the window is hidden: use read_page / javascript_tool to check the DOM.
 - Typed routes: after adding a route file run `CI=1 npx expo start --web --port 8099` ~25 s to regenerate
   .expo/types/router.d.ts, otherwise tsc rejects the new href.
 - Copy rule (developer, Q-014): specs English-only → write the plain Bangla translation; don't ask.

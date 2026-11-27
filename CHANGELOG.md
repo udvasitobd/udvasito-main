@@ -3,6 +3,7 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-27 · P1 · Become a donor: 4-step setup (blood group, area with search and "use my location once" matched on the phone, last donation and checklist, platelets, call mode, health-data consent), Donate tab with Available / Not available and when you can donate again, Home donor cards; a donor is live only with a verified number (bb6220a, c0df3ae).
 - 2026-11-27 · P1 · Phone verification by Telegram: one-time bot link, `POST /telegram/webhook` (secret header, replay guard), own-contact check, "use the Telegram number" choice, bot replies in English + Bangla, one-command webhook setup (b51c595).
 - 2026-11-27 · P1 · Phone verification in person: 6-character code, volunteer/admin check screen (first name + last 4 digits only), audit log, daily limit per verifier, one verified account per number (Q-015) (37b4e6d).
 - 2026-11-27 · P1 · App shells: tab bar (sidebar on wide screens), Home, More, Settings with language sync, account-status and update-required screens (9a6079b).
