@@ -1,23 +1,27 @@
 /**
- * Blood requests — specs §6.2. P1 slice 8: `requests.create` (SCR-M02 form path). Matching starts in slice 9.
+ * Blood requests — specs §6.2: `create` (SCR-M02), `getForOwner` and `close` (SCR-M03), `listMine` (SCR-M04).
  *
  * The contact number is checked (VAL-03) and stored; it is never put in events, logs or errors (CLAUDE.md rule 3)
  * and is read back only through `_lib/visibility.ts`.
  */
+import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { internal } from './_generated/api';
 import type { Doc, Id } from './_generated/dataModel';
-import type { MutationCtx } from './_generated/server';
-import { assertSameArea, memberMutation } from './_lib/auth';
+import type { MutationCtx, QueryCtx } from './_generated/server';
+import { noLongerNeededText, roundKm } from './_lib/alertText';
+import { assertSameArea, memberMutation, memberQuery } from './_lib/auth';
 import { appError, validationError } from './_lib/errors';
 import { logEvent } from './_lib/events';
 import { checkPlaceChain } from './_lib/places';
+import { sendAlert } from './_lib/push';
 import { randomBytes } from './_lib/random';
+import { requestPlaceNames } from './_lib/requestPlace';
 import { getSettings } from './_lib/settings';
-import { isOwnVerifiedPhone } from './_lib/visibility';
+import { confirmedDonorPhoneFor, isOwnVerifiedPhone } from './_lib/visibility';
 import { canCreateRequest } from './rules/limits';
-import { insideBangladesh } from './rules/places';
+import { distanceKm, insideBangladesh } from './rules/places';
 import {
   checkClientId,
   checkComponent,
@@ -33,6 +37,7 @@ import {
   slugFromBytes,
   urgencyOf,
 } from './rules/request';
+import { contactExpiry } from './rules/responses';
 import { dhakaMonthStart } from './rules/time';
 import { checkPhone, type Checked } from './rules/validation';
 import { component, lang, requestGroup } from './schema';
@@ -225,5 +230,202 @@ export const create = memberMutation({
     });
     await ctx.scheduler.runAfter(0, internal.matching.startRequest, { requestId });
     return { requestId, existing: false };
+  },
+});
+
+type Owner = { profile: Doc<'profiles'>; isDemo: boolean };
+
+/** The caller's own request. Anyone else's (or one across the practice / real line) is simply not found. */
+async function ownRequest(ctx: QueryCtx, requestId: Id<'requests'>, caller: Owner): Promise<Doc<'requests'>> {
+  const request = await ctx.db.get(requestId);
+  if (!request || request.requesterId !== caller.profile._id || request.isDemo !== caller.isDemo)
+    throw appError('ERR_NOT_FOUND');
+  return request;
+}
+
+/** SCR-M03's search progress: everyone alerted, who saw it, who said yes, who holds a slot. */
+function progressOf(responses: Doc<'responses'>[]) {
+  return {
+    notified: responses.length,
+    opened: responses.filter((r) => r.openedAt !== undefined || r.state !== 'notified').length,
+    accepted: responses.filter((r) => r.acceptedAt !== undefined).length,
+    confirmed: responses.filter((r) => r.state === 'confirmed').length,
+  };
+}
+
+/**
+ * `requests.getForOwner` 📞 (SCR-M03) — live status for the requester: progress counts and one card per confirmed
+ * donor. A donor's number comes only through `confirmedDonorPhoneFor` (a live reveal; none for "I'll call them").
+ * Volunteers (P3), the helpline and "no donors yet" (slice 14) join this answer with their features.
+ */
+export const getForOwner = memberQuery({
+  args: { requestId: v.id('requests') },
+  handler: async (ctx, { requestId }) => {
+    const { caller } = ctx;
+    const request = await ownRequest(ctx, requestId, caller);
+    const now = Date.now();
+    const point = { lat: request.approxLat, lng: request.approxLng };
+    const [names, responses] = await Promise.all([
+      requestPlaceNames(ctx, request),
+      ctx.db
+        .query('responses')
+        .withIndex('by_request_state', (q) => q.eq('requestId', request._id))
+        .collect(),
+    ]);
+    const confirmed = responses
+      .filter((r) => r.state === 'confirmed')
+      .sort((a, b) => (a.confirmedAt ?? 0) - (b.confirmedAt ?? 0));
+    const confirmedDonors = [];
+    for (const response of confirmed) {
+      const [donorProfile, profile] = await Promise.all([
+        ctx.db.get(response.donorProfileId),
+        ctx.db.get(response.donorId),
+      ]);
+      if (!donorProfile || !profile) continue;
+      const home = await ctx.db.get(donorProfile.upazilaId);
+      const phone = await confirmedDonorPhoneFor(ctx, caller.profile, profile, request, now);
+      confirmedDonors.push({
+        responseId: response._id,
+        firstName: profile.firstName,
+        group: donorProfile.bloodGroup,
+        area: { en: home?.nameEn ?? '', bn: home?.nameBn ?? '' },
+        km: home ? roundKm(distanceKm(home, point)) : null,
+        phone: phone ?? null,
+        callMode: response.callMode,
+      });
+    }
+    return {
+      request: {
+        requestId: request._id,
+        status: request.status,
+        closeReason: request.closeReason ?? null,
+        bloodGroup: request.bloodGroup,
+        component: request.component,
+        isDengue: request.isDengue,
+        unitsNeeded: request.unitsNeeded,
+        unitsConfirmed: request.unitsConfirmed,
+        neededBy: request.neededBy,
+        createdAt: request._creationTime,
+        verified: request.verifiedBadge,
+        phoneVerified: request.contactPhoneVerified,
+        place: names.place,
+        area: names.area,
+        patientName: request.patientName ?? null,
+        ward: request.ward ?? null,
+        note: request.note ?? null,
+      },
+      progress: progressOf(responses),
+      wave: request.wave,
+      nextWaveAt: request.nextWaveAt ?? null,
+      confirmedDonors,
+      revealsFrozen: request.revealsFrozen,
+      /** Shows CMP-PracticeBadge (specs §1.9). */
+      practice: request.isDemo,
+    };
+  },
+});
+
+/**
+ * `requests.listMine` (SCR-M04) — the caller's requests, newest first. In `by_requester_status` the statuses sort
+ * closed < covered < live, so "active" is the range after `closed` (live first, then covered).
+ */
+export const listMine = memberQuery({
+  args: { status: v.union(v.literal('active'), v.literal('closed')), paginationOpts: paginationOptsValidator },
+  handler: async (ctx, { status, paginationOpts }) => {
+    const { caller } = ctx;
+    const requesterId = caller.profile._id;
+    const result = await ctx.db
+      .query('requests')
+      .withIndex('by_requester_status', (q) =>
+        status === 'active'
+          ? q.eq('requesterId', requesterId).gt('status', 'closed')
+          : q.eq('requesterId', requesterId).eq('status', 'closed'),
+      )
+      .order('desc')
+      .paginate(paginationOpts);
+    const page = [];
+    for (const request of result.page) {
+      if (request.isDemo !== caller.isDemo) continue;
+      const names = await requestPlaceNames(ctx, request);
+      page.push({
+        requestId: request._id,
+        bloodGroup: request.bloodGroup,
+        component: request.component,
+        isDengue: request.isDengue,
+        status: request.status,
+        closeReason: request.closeReason ?? null,
+        unitsNeeded: request.unitsNeeded,
+        unitsConfirmed: request.unitsConfirmed,
+        neededBy: request.neededBy,
+        createdAt: request._creationTime,
+        place: names.place,
+        area: names.area,
+      });
+    }
+    return { ...result, page };
+  },
+});
+
+/** Donors still deciding, or on standby, are told it is no longer needed (NTF-09). */
+const STILL_WAITING = ['notified', 'opened', 'standby'] as const;
+
+/**
+ * `requests.close` (F-501, SCR-M03) — "All bags arranged" or "No longer needed". Matching jobs re-check the status
+ * before they act, so a closed request sends no further wave. Contact details stay visible S-18 days from now.
+ * Volunteer and admin closing join with their roles (P3, P5); the donation-confirmation prompt is P2.
+ */
+export const close = memberMutation({
+  args: { requestId: v.id('requests'), reason: v.union(v.literal('fulfilled'), v.literal('not_needed')) },
+  handler: async (ctx, { requestId, reason }) => {
+    const { caller } = ctx;
+    const request = await ownRequest(ctx, requestId, caller);
+    if (request.status === 'closed') throw appError('ERR_REQUEST_CLOSED');
+    const now = Date.now();
+    const settings = await getSettings(ctx);
+    await ctx.db.patch(request._id, { status: 'closed', closeReason: reason, closedAt: now, nextWaveAt: undefined });
+
+    // Reveals only ever get shorter here: a number that has already stopped showing never comes back.
+    const expiresAt = contactExpiry({ neededBy: request.neededBy, closedAt: now }, now, settings);
+    const reveals = await ctx.db
+      .query('contactReveals')
+      .withIndex('by_request', (q) => q.eq('requestId', request._id))
+      .collect();
+    for (const reveal of reveals)
+      if (reveal.reason === 'confirmed_slot' && reveal.expiresAt > expiresAt)
+        await ctx.db.patch(reveal._id, { expiresAt });
+
+    if (request.bloodGroup !== 'not_sure') {
+      const group = request.bloodGroup;
+      const names = await requestPlaceNames(ctx, request);
+      for (const state of STILL_WAITING) {
+        const waiting = await ctx.db
+          .query('responses')
+          .withIndex('by_request_state', (q) => q.eq('requestId', request._id).eq('state', state))
+          .collect();
+        for (const response of waiting) {
+          const donor = await ctx.db.get(response.donorId);
+          if (!donor) continue;
+          const place = names.place[donor.language] || names.area[donor.language];
+          await sendAlert(ctx, {
+            recipientId: donor._id,
+            template: 'NTF-09',
+            requestId: request._id,
+            ...noLongerNeededText(group, place, donor.language),
+            url: `/alerts/${request._id}`,
+            androidChannel: 'updates',
+            isDemo: request.isDemo,
+          });
+        }
+      }
+    }
+
+    await logEvent(ctx, {
+      name: 'request_closed',
+      isDemo: request.isDemo,
+      requestId: request._id,
+      actorRole: caller.role,
+      props: { reason },
+    });
+    return null;
   },
 });

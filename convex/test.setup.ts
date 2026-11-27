@@ -264,5 +264,5 @@ export async function postRequest(
   const { as, userId } = await signIn(t, `requester${people}@example.com`);
   await insertProfile(t, userId, { name: 'Karim Hossain', firstName: 'Karim', ...profile });
   const { requestId } = await as.mutation(api.requests.create, requestArgs(where, overrides));
-  return { requestId };
+  return { requestId, as };
 }

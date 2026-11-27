@@ -392,3 +392,18 @@ named in the ADRs, so CLAUDE.md says to ask before adding one.
 
 **Built for now:** option B (nothing half-working: the button is hidden where it cannot work).
 Status: ⬜ waiting for the developer
+
+### Q-023 · 2026-11-28 · P1 · Closing a request: who is told, and with which words
+`requests.close` (specs §6.2) sends NTF-09 to donors who are notified, opened or on standby. Two gaps:
+1. **Confirmed donors are not told.** If the family taps "No longer needed", a confirmed donor may already be on the
+   way. In "I'll call them" mode (D16) the family does not even have the donor's number to call them off. Their
+   SCR-D04 screen does turn to "closed" live, but nothing reaches their lock screen.
+2. **NTF-09's body says "has been arranged"**, which is wrong when the reason is "No longer needed" (e.g. the patient
+   was discharged or bags came from a blood bank).
+- **Option A (recommended):** also send NTF-09 to confirmed donors when the reason is `not_needed`; add an NTF-09
+  body variant for `not_needed`: "The {{group}} request at {{hospital}} is no longer needed. Thank you for being
+  ready." / "{{hospital}}-এর {{group}} অনুরোধটির আর প্রয়োজন নেই। প্রস্তুত থাকার জন্য ধন্যবাদ।"
+- **Option B:** keep the spec as written (confirmed donors hear nothing until the donation-confirmation prompt, P2).
+
+**Built for now:** option B, exactly as specified (copy and rules are the team's call — CLAUDE.md §3).
+Status: ⬜ waiting for the developer

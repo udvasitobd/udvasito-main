@@ -159,3 +159,23 @@ export async function requestContactFor(
   );
   return live ? request.contactPhone : undefined;
 }
+
+/**
+ * A confirmed donor's number for the request owner (SCR-M03, PRD §3.3): only with a live `confirmed_slot` reveal
+ * (none exists when the donor chose "I'll call them", D16), and never while contact details are paused.
+ */
+export async function confirmedDonorPhoneFor(
+  ctx: QueryCtx,
+  viewer: Doc<'profiles'>,
+  donor: Doc<'profiles'>,
+  request: Doc<'requests'>,
+  now: number,
+): Promise<string | undefined> {
+  if (request.revealsFrozen || viewer.isDemo !== request.isDemo || donor.isDemo !== request.isDemo) return undefined;
+  const live = await hasLiveReveal(
+    ctx,
+    { viewerId: viewer._id, subjectId: donor._id, requestId: request._id, reason: 'confirmed_slot' },
+    now,
+  );
+  return live ? donor.phone : undefined;
+}

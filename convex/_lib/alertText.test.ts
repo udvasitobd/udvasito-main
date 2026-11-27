@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { formatDhakaDeadline } from '../../src/lib/dates';
 
-import { componentText, donorAlertText, fill, groupText, kmText } from './alertText';
+import { componentText, donorAlertText, fill, groupText, kmText, noLongerNeededText } from './alertText';
 
 /** 27 Nov 2026, 10:00 in Dhaka. */
 const NOW = Date.UTC(2026, 10, 27, 4, 0);
@@ -63,5 +63,13 @@ describe('alert words (specs §6.8)', () => {
       `১ ব্যাগ, ${formatDhakaDeadline(tomorrow, NOW, 'bn')}-এর মধ্যে · ১২ কিমি। উত্তর দিতে ট্যাপ করুন।`,
     );
     expect(text.body).not.toMatch(/[0-9]|\{\{/);
+  });
+
+  it('NTF-09 names the group and the place, in the donor’s language', () => {
+    expect(noLongerNeededText('AB-', 'Chattogram Medical College Hospital', 'en')).toEqual({
+      title: 'No longer needed — thank you',
+      body: 'The AB− request at Chattogram Medical College Hospital has been arranged.',
+    });
+    expect(noLongerNeededText('B+', 'চমেক', 'bn').body).toBe('চমেক-এর B+ অনুরোধটির ব্যবস্থা হয়ে গেছে।');
   });
 });

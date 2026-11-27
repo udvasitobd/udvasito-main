@@ -78,3 +78,18 @@ export function donorConfirmedText(
         : copyText('notifications.NTF-04.body', language),
   };
 }
+
+/** NTF-09 — to donors still deciding (or on standby) when the request is closed. */
+export function noLongerNeededText(
+  bloodGroup: Exclude<RequestGroup, 'not_sure'>,
+  place: string,
+  language: Language,
+): { title: string; body: string } {
+  return {
+    title: copyText('notifications.NTF-09.title', language),
+    body: fill(copyText('notifications.NTF-09.body', language), {
+      group: groupText(bloodGroup, language),
+      hospital: place,
+    }),
+  };
+}
