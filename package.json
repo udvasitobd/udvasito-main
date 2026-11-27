@@ -78,6 +78,7 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p scripts && tsc --noEmit -p convex",
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run copy:check && npm test",
     "copy:extract": "tsx scripts/extract-copy.ts",
     "copy:check": "tsx scripts/extract-copy.ts --check",
