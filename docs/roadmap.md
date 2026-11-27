@@ -149,7 +149,7 @@ Rules: changing `app.config.ts` plugins, a native module, permissions, the icon/
 
 Status column (update as you go): ⬜ not started · 🟦 in progress · ✅ done (date).
 
-### P0 — Setup and foundations · Day 0–2 · Mon 23 – Wed 25 Nov · ⬜
+### P0 — Setup and foundations · Day 0–2 · Mon 23 – Wed 25 Nov · 🟦 (started 2026-11-27)
 **Goal:** a real but empty app — sign in with Google on the Android development build and on the web, see an empty Home in English and Bangla, served from staging and production. Everything that is expensive to change later is settled now.
 
 **Day plan**

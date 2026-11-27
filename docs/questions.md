@@ -44,6 +44,50 @@ but a renamed channel loses the user's per-channel settings, so we fix it now).
 **Answer (2026-11-27, developer): "you decide" → A.** specs §6.8 updated to match §1.2.1 (specs change log 1.3).
 Status: ✅ answered
 
+### Q-004 · 2026-11-27 · P0 · When is the `profiles` row created?
+The P0 Definition of Done says Google sign-in creates "a `profiles` row". The schema makes `name`, `dateOfBirth` and
+`phone` required, and those are asked only in onboarding (SCR-O03, P1).
+- **A.** P0 sign-in creates only the Better Auth user; `profiles.me` answers "needs onboarding"; the row is created by
+  `profiles.completeOnboarding` in P1 (no placeholder values).
+- **B.** Create a row at sign-in with empty name/DOB/phone (needs the schema to make them optional — a later required →
+  optional change on live data).
+
+**Recommendation: A** — no half-filled rows, schema stays strict. The DoD item is then checked as "a Better Auth user is
+created and `profiles.me` returns needs-onboarding" in P0 and "a `profiles` row" in P1.
+Also decided with it: `minimumAppVersion` / `latestAppVersion` are seeded as **0.1.0** (the default 1.0.0 would block
+the pilot APK v0.1.0); `fallbackContactPhone` is seeded empty until the super-admin sets it through `internal.admin.ops`.
+Status: ⏳ built as A — please confirm
+
+### Q-005 · 2026-11-27 · P0 · Copy missing from specs (not invented — waiting for text)
+These strings are needed but specs has no exact English + Bangla text. Until they arrive the code uses only existing keys:
+1. **Bangla tab labels** (specs §1.4.1 gives English only). Tabs come in P1; P0 uses a plain stack.
+2. **Not-found page button** — now uses `common.back` ("Back"); a "Go to Home" label would need new copy.
+3. **Web skip link** ("Skip to main content") — WCAG 2.4.1; not shown yet.
+4. **Language switch accessible name** — reuses `welcome.chooseLanguage`. OK?
+5. **Account-status actions** (SCR-O06) are in English only: "View my request · Call helpline", "Contact us (email)",
+   "Cancel deletion" — need Bangla (P1).
+6. **`common.offline`** says "({{count}} waiting)" even when nothing is waiting — needs a variant without the count, e.g.
+   EN "You're offline. We'll send your changes when you're back online." + BN text.
+
+**Recommendation:** member 1 (content) writes 1, 3, 5 and the no-count variant of 6 in both languages; 2 and 4 stay as
+they are. Then `npm run copy:extract` picks them up from specs.
+Status: ⏳ waiting for copy
+
+### Q-006 · 2026-11-27 · P0 · Small additions made to the specs contracts (please confirm)
+1. `public.appConfig` (specs §6.1) also returns **`helplineAvailable: boolean`** (true when `fallbackContactPhone` is
+   set). Helpline buttons are hidden while no number exists, instead of showing a button that cannot work (§1.9). The
+   number itself is still fetched only on tap (D-R3).
+2. **Practice sign-in** is not shown on the sign-in screen until the practice area is built (P5, D-R4) — an unfinished
+   feature is invisible (§1.9).
+3. **Security fix without an SDK change:** `npm audit` flagged `decode-uri-component` ≤ 0.5.0 (high, DoS) inside
+   expo-router's `query-string`. `package.json` overrides it to 0.5.1, and a 2-line shim (`src/vendor/`) lets Metro load
+   the new ESM-only build. URL parsing was tested (`%2F`, Bangla, malformed escapes). Remove both when Expo ships the fix.
+4. **`seedSettings` picks staging or production values from the deployment's `SITE_URL`**, not from `--prod`
+   (staging is the prod deployment of `udvasito-staging`, so the flag cannot tell them apart). Unknown → it stops.
+
+**Recommendation:** keep all four.
+Status: ⏳ built — please confirm
+
 ### Q-007 · 2026-11-27 · P0 · Places dataset: which files, and permission to download them
 ADR-013 candidates checked (licence first):
 - `bangladesh-geo-data` repos on GitHub: **no licence** → cannot be used.

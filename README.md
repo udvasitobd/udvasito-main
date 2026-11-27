@@ -30,12 +30,18 @@ npm run dev        # Expo dev server — press w for web
 | `npm run convex` | `npx convex dev` against your dev deployment of `udvasito-staging` |
 | `npm run check` | Type check + ESLint (incl. i18n lint) + Vitest |
 | `npm test` | Vitest only |
-| `npm run test:e2e` | Playwright web smoke test (practice area) |
+| `npm run test:e2e` | Playwright web smoke test against `dist/` (run `build:web` first; uses your installed Chrome). P6 adds the practice-area flow |
 | `npm run copy:extract` | Regenerate `en.json` / `bn.json` from the copy tables in `docs/specs.md` |
 | `npm run content:build` | `src/content/*.md` → `src/content/generated/*.json` |
-| `npm run seed:places` · `seed:settings` · `import:hospitals` | Idempotent reference-data loaders (`-- --prod` for production) |
+| `npm run places:build` | `data/sources/places/*` → `data/places.json` (after the team edits the metro-thana list) |
+| `npm run seed:places` · `seed:settings` · `import:hospitals` | Idempotent reference-data loaders (`-- --prod` = the project's prod deployment; `seed:settings` reads staging/production from the deployment's `SITE_URL`) |
 | `npm run seed:staging` | Fake data for **staging only** (refuses production) |
 | `npm run build:web` | Static web export for Vercel |
+
+## Reference data
+Places come from open datasets (BBS / UN OCHA via nuhil/bangladesh-geocode, bd-geocode-with-lat-long) — sources,
+licences and credits in [`docs/data-licences.md`](docs/data-licences.md). Hospitals come from the team's own list,
+`data/hospitals.csv` ([`docs/roadmap.md`](docs/roadmap.md) §5.1).
 
 ## Documents
 Everything the product does is decided in [`docs/`](docs/): vision, user stories, PRD, ADRs, specs, roadmap and build

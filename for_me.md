@@ -45,10 +45,19 @@ Just write in the chat: phone brand + model + Android version for each phone.
 ## 🟡 Tomorrow (Sat 28 Nov)
 
 ### Step 4 — Create the Vercel account (website hosting, free)
-**Why:** Vercel puts the web app online at `udvasito.vercel.app`.
+**Why:** Vercel puts the web app online at **udvasito.com** (your Namecheap domain is connected to it later).
 1. Go to https://vercel.com/signup → choose **Hobby (free)** → **Continue with GitHub** → sign in as the
    **udvasitobd** GitHub account.
 2. Do **not** add a card. Tell Claude when you are in — Claude does the rest (import the repo, settings, keys).
+
+### Step 5 — Let GitHub build the Android app (one secret, 3 minutes)
+**Why:** the "Android local build" button on GitHub builds the APK for free on GitHub's computers. It needs an Expo key.
+A key is like a password, so **you** create it and paste it straight into GitHub (never into the chat).
+1. Go to https://expo.dev → sign in as **udvasitos-team** → click the account picture (top right) → **Account settings**
+   → **Access tokens** → **Create token** → name it `github-actions` → **Create** → click **Copy**.
+2. Go to https://github.com/udvasitobd/udvasito-main/settings/secrets/actions → **New repository secret**.
+3. Name: `EXPO_TOKEN` · Secret: paste (Ctrl + V) → **Add secret**.
+4. Tell Claude "step 5 done". Claude adds the non-secret project id itself.
 
 ---
 
@@ -59,8 +68,20 @@ Just write in the chat: phone brand + model + Android version for each phone.
 
 ---
 
+## 👥 Jobs for the team (pass these on)
+- **Member 2 — hospital list (DEP-01):** fill `data/hospitals.csv` (the first line already has the column names; the
+  rules are in `docs/roadmap.md` §5.1). Blood-bank numbers: **only the hospital's public number, never a person's.**
+  Then run `npm run import:hospitals -- --check-only` — it lists every row that needs fixing, by line number.
+- **Member 2 — city thanas:** open `data/sources/places/chattogram-metro-thanas.csv` and check the 15 thana names
+  against the Chattogram Metropolitan Police list. **Akbar Shah** is missing its location: in Google Maps right-click
+  the middle of Akbar Shah thana → click the numbers at the top (they are copied) → paste them into the `lat,lng`
+  columns of that row (first number = lat, second = lng). Then tell Claude.
+- **Member 1 — missing text:** `docs/questions.md` Q-005 lists 4 small texts that need English + Bangla wording.
+
 ## ❓ Questions waiting for you / the team
 See `docs/questions.md` — Claude writes each question with a recommended answer. You only reply "OK" or pick another option.
+Waiting now: **Q-004, Q-005, Q-006** and the small confirm in **Q-007** (all already built the recommended way —
+a short "OK" is enough).
 
 ## Glossary (short)
 - **Convex** = our database + server (free).

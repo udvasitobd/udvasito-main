@@ -87,13 +87,16 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   isolation changes, prod deploy, EAS native build (15/month).
 - Every string via t(); exact copy from specs; rule numbers from settings; rules/* pure TS + 100 % tests.
 
-## Resume here (2026-11-27, after 0df45cd)
-- Done in P0 item 9: convex/rules/places.ts + hospitals.ts (tested), admin.seed upsertPlaces/computeNeighbours (tested),
-  scripts/seed-places.ts + scripts/lib/places-file.ts (batches ≤ 20 K chars for `convex run` on Windows), scripts/lib/csv.ts.
-- Waiting: developer OK to download the places source files (docs/questions.md Q-007). Then write scripts/build-places.ts
-  (sources → data/places.json), docs/data-licences.md, run `npm run seed:places -- --file-only`.
-- Still to do: scripts/lib/hospitals-csv.ts + admin.seed upsertHospitals + scripts/import-hospitals.ts (header-only
-  data/hospitals.csv; reject bad rows, report without printing phone numbers; min.json hospitals without phone/address),
-  scripts/seed-staging.ts (refuse --prod), test:e2e, README, questions Q-005/Q-006 notes, for_me.md steps, CHANGELOG,
-  roadmap P0 → 🟦, accounts via Chrome, spikes, PR p0/foundations → staging + review (never merge before review).
-- Dev server task bt3fs0njp still holds port 8081; Chrome tab 1020493461 is mine.
+## Resume here (2026-11-27, after the docs commit following 2c1a786)
+- P0 item 9 DONE: places dataset (data/sources/places pinned + data/places.json via `npm run places:build`), seed-places
+  (loaded on dev deployment wry-tern: 581 places), import-hospitals (header-only data/hospitals.csv), seed-staging
+  (232 fake donors on dev), test:e2e (5 tests, Chrome channel, scripts/serve-dist.ts mimics vercel.json), dataset test.
+- Environment detection: convex/rules/environment.ts from SITE_URL (dev = http://localhost:8081). Staging is the PROD
+  deployment of udvasito-staging, so `--prod` ≠ production. seedSettings no longer takes an environment arg.
+- Lessons: `convex run` JSON args must stay < ~20 K chars (Windows); `expo serve` has no SPA fallback; Playwright uses
+  installed Chrome (no browser download); stop the old dev server before e2e (port 8081).
+- Questions open: Q-004, Q-005 (copy), Q-006, Q-007 offline-file design. Akbar Shah thana needs a centre (member 2).
+- NEXT: accounts via Chrome (Google OAuth client on team Gmail → GOOGLE_CLIENT_ID/SECRET into Convex env without showing
+  them; Convex udvasito-prod project; eas init → EAS_PROJECT_ID repo variable; Firebase FCM; Telegram bot; Gemini key;
+  Cloudinary; Sentry), spikes S1–S4 in docs/spikes.md, then PR p0/foundations → staging + code review + fixes (NEVER merge
+  before review). User steps pending: Vercel account (Sat), EXPO_TOKEN secret (for_me.md step 5), test phones.
