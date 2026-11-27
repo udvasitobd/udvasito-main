@@ -169,6 +169,22 @@ describe('scrubEvent covers every field by default', () => {
       .frames[0]!;
     expect(frame).toMatchObject({ filename: 'app/home.tsx', function: 'onPress' });
     expect(frame).not.toHaveProperty('vars');
+    // Source lines keep their shape (Sentry rejects a string where it expects a list) with the number masked.
+    expect(frame).toMatchObject({ context_line: `const p = '${PHONE_MASK}';`, pre_context: [`// ${PHONE_MASK}`] });
+  });
+
+  it('keeps every context an object (Sentry discards anything else) and scrubs inside it', () => {
+    const out = scrubEvent({
+      contexts: {
+        react_native_context: { js_engine: 'hermes', component_stack: `at Home, ${phone}` },
+        trace: { trace_id: 't1' },
+        broken: 'a string',
+      },
+    });
+    expect(out.contexts).toEqual({
+      react_native_context: { js_engine: 'hermes', component_stack: `at Home, ${PHONE_MASK}` },
+      trace: { trace_id: 't1' },
+    });
   });
 
   it('passes Sentry structure through unchanged', () => {

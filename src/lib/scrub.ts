@@ -40,8 +40,22 @@ export function findPhoneNumbers(text: string): string[] {
 const SENSITIVE_KEY =
   /(phone|mobile|msisdn|name|email|address|text|note|body|comment|description|reason|message_?text|patient|relation|dob|birth|password|pin|token|otp|secret|cookie|authorization)/i;
 
-/** Keys that are safe to keep even though they match the pattern above (Sentry structure, not user data). */
-const SAFE_KEYS: ReadonlySet<string> = new Set(['filename', 'function', 'module', 'abs_path', 'type', 'mechanism', 'category']);
+/**
+ * Keys that are safe to keep even though they match the pattern above (Sentry structure, not user data). Frame
+ * source lines ("con-text") are our code: their strings are still scrubbed, but they keep their shape.
+ */
+const SAFE_KEYS: ReadonlySet<string> = new Set([
+  'filename',
+  'function',
+  'module',
+  'abs_path',
+  'type',
+  'mechanism',
+  'category',
+  'context_line',
+  'pre_context',
+  'post_context',
+]);
 /** In `contexts`, `name` is the OS / browser / runtime name — except the device name, which people personalise. */
 const CONTEXT_SAFE_KEYS: ReadonlySet<string> = new Set([...SAFE_KEYS, 'name']);
 
@@ -105,8 +119,17 @@ export function scrubEvent<T extends Scrubbable>(event: T): T {
   return out as T;
 }
 
+/**
+ * Context names (`os`, `trace`, `react_native_context`, …) are Sentry structure, so they are never matched against the
+ * sensitive-key pattern; each context must stay an object (Sentry discards anything else), so other values are dropped.
+ */
 function scrubContexts(value: unknown): unknown {
-  const contexts = scrubValue(value, 0, CONTEXT_SAFE_KEYS) as Record<string, Record<string, unknown> | undefined>;
+  if (!value || typeof value !== 'object') return {};
+  const contexts: Record<string, Record<string, unknown>> = {};
+  for (const [name, context] of Object.entries(value as Record<string, unknown>)) {
+    if (!context || typeof context !== 'object' || Array.isArray(context)) continue;
+    contexts[name] = scrubValue(context, 1, CONTEXT_SAFE_KEYS) as Record<string, unknown>;
+  }
   if (contexts.device && 'name' in contexts.device) contexts.device = { ...contexts.device, name: REMOVED };
   return contexts;
 }

@@ -30,7 +30,7 @@ browser. It can only do that if Chrome is signed in as **udvasitobd@gmail.com**.
 2. Keep the Claude extension connected. If Google asks "Is it you?" or shows a phone/2-step check, **you** do that part
    (Claude is not allowed to handle security checks).
 
-### Step 2 — Log in to Convex and Expo from this computer (2 commands)
+### Step 2 — Log in to Convex and Expo from this computer (2 commands) — ✅ done (Claude checked both)
 **Why:** these let Claude create the database and the Android builds from your PC.
 1. Run `npx convex login` → a browser page opens → click **Log in with GitHub/Google** using the team account → when it
    says "Success", go back to the terminal.
@@ -70,6 +70,19 @@ straight into Convex. It never goes into the chat or the code.
 > To test with your own Gmail: Google Cloud → **Audience** → **Test users** → **+ Add users** → type it → **Save**.
 > Before the real launch Claude asks you to switch it to **In production**.
 
+### Step 3c — Give Convex the Cloudinary key (5 minutes, can wait a few days)
+**Why:** Cloudinary makes the picture people share on Facebook/WhatsApp when someone needs blood. Claude created the
+free account (cloud name **udvasito**). Its **API key + API secret** work like a password, so **you** copy them.
+1. Open https://console.cloudinary.com → sign in with Google (**udvasitobd@gmail.com**) → ⚙️ **Settings** (bottom
+   left) → **API Keys**. You see a row with an **API Key** (numbers) and an **API Secret** (hidden — click the eye or
+   the copy button).
+2. Open https://dashboard.convex.dev/d/outstanding-grasshopper-711/settings/environment-variables (**staging**) →
+   **+ Add** → Name `CLOUDINARY_API_KEY` → Value: paste the API Key → **Save**. Again **+ Add** → Name
+   `CLOUDINARY_API_SECRET` → Value: paste the API Secret → **Save**.
+3. Do the same two on https://dashboard.convex.dev/d/wry-tern-774/settings/environment-variables (testing) and
+   https://dashboard.convex.dev/d/striped-starling-176/settings/environment-variables (**production**).
+4. Tell Claude "step 3c done".
+
 ---
 
 ## 🟡 Tomorrow (Sat 28 Nov)
@@ -88,6 +101,38 @@ A key is like a password, so **you** create it and paste it straight into GitHub
 2. Go to https://github.com/udvasitobd/udvasito-main/settings/secrets/actions → **New repository secret**.
 3. Name: `EXPO_TOKEN` · Secret: paste (Ctrl + V) → **Add secret**.
 4. Tell Claude "step 5 done". Claude adds the non-secret project id itself.
+
+### Step 6 — Android notifications + the app's signing key (15 minutes, before the first app build)
+**Why:** Claude set up Firebase (Google's free phone-notification service) for **org.udvasito.app**. Three files are
+like passwords, so **you** move them: Firebase's settings file, Firebase's "push key", and the app's **signing key**
+(Expo creates it — it proves every future update really comes from us; Expo keeps it safe).
+
+**A. Upload the Firebase settings file to Expo**
+1. Open https://expo.dev/accounts/udvasitos-team/projects/udvasito/environment-variables → **Add variables**.
+2. Name: `GOOGLE_SERVICES_JSON`. Next to the Value box click the small **file** icon → choose
+   `C:\Users\User\Downloads\udvasito-google-services.json` (Claude downloaded and renamed it — **not** the older
+   `google-services.json` in the same folder, that one is from something else).
+3. Visibility: **Secret**. Environments: tick **production**, **preview** and **development** → **Add variables**.
+
+**B. Create Firebase's push key (it downloads a file)**
+4. Open https://console.firebase.google.com/project/udvasito-516006/settings/serviceaccounts/adminsdk →
+   **Generate new private key** → **Generate key**. A file like `udvasito-516006-firebase-adminsdk-….json` downloads.
+   ⚠️ This file is a real secret: never put it in the project folder, the chat or GitHub.
+
+**C. Create the signing key and give Expo the push key (in a terminal)**
+5. In the terminal (see "How to run a command") run: `npx eas-cli@latest credentials -p android`
+6. Use the arrow keys + Enter:
+   - "Which build profile…" → **production**
+   - **Keystore: Manage everything needed to build your project** → **Set up a new keystore** → press Enter to accept
+     the suggested name → **Generate a new keystore**. (It says "Created keystore".)
+   - Back in the menu: **Google Service Account** → **Manage your Google Service Account Key for Push Notifications
+     (FCM V1)** → **Set up a Google Service Account Key for Push Notifications (FCM V1)** → **Upload a new service
+     account key** → when it asks for the path, type the full path of the file from step 4, for example
+     `C:\Users\User\Downloads\udvasito-516006-firebase-adminsdk-xxxxx.json` → Enter.
+   - **Exit**.
+7. Delete both files from Downloads (`udvasito-google-services.json` and the `…firebase-adminsdk….json` file) — Expo
+   has them now. Then empty the Recycle Bin.
+8. Tell Claude "step 6 done". Claude checks it on the Expo website (it shows only names, never the secrets).
 
 ---
 

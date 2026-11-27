@@ -3,6 +3,7 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-27 · P0 · Sentry (EU, server-side phone/email masking, no IP or location), Cloudinary (cloud `udvasito`, free) and Firebase (FCM only, Android app `org.udvasito.app`, no Analytics) set up; error scrubber keeps Sentry contexts and source lines in a valid shape (tested live).
 - 2026-11-27 · P0 · Staging live on Convex (EU): PR #1 merged (aa6dac5), functions deployed, settings + places + practice donors loaded; Google sign-in tested end to end on the dev deployment.
 - 2026-11-27 · P0 · Code-review fixes: last-admin guard, settings cross-check, VAL-18 on phone reveals, default-deny Sentry scrubber, auth hardening from SITE_URL only, spoof-proof helpline rate-limit key, signed-out race on Home, www → udvasito.com redirect (205a0f1).
 - 2026-11-27 · P0 · Test: `npm run test:e2e` web smoke (sign-in, language switch, sign-in guard, axe, no inline scripts) against `dist/` with production headers; dataset count test (2c1a786).
