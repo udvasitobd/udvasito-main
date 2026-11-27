@@ -56,6 +56,11 @@ export function appError(code: ErrorCode, params?: ErrorParams, field?: string, 
   return new ConvexError(data);
 }
 
+/** ERR_VALIDATION for a VAL rule failure from convex/rules/validation.ts (field + message key). */
+export function validationError(error: { field: string; messageKey: string; params?: ErrorParams }) {
+  return appError('ERR_VALIDATION', error.params, error.field, error.messageKey);
+}
+
 export function isErrorCode(value: unknown): value is ErrorCode {
   return typeof value === 'string' && (ERROR_CODES as readonly string[]).includes(value);
 }

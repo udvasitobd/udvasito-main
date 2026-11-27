@@ -35,16 +35,32 @@ module.exports = defineConfig([
     },
   },
   {
-    // Metro does not tree-shake: the lucide barrel ships all ~1,600 icons. Icons come from src/components/icons.ts.
+    // Metro does not tree-shake: the lucide barrel ships all ~1,600 icons (icons come from src/components/icons.ts), and
+    // the date-fns index ships all ~300 functions (import each from its own path, e.g. 'date-fns/format').
     files: ['app/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
     ignores: ['src/components/icons.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
-          paths: [{ name: 'lucide-react-native', message: "Import icons from '@/components/icons' (one module per icon)." }],
+          paths: [
+            { name: 'lucide-react-native', message: "Import icons from '@/components/icons' (one module per icon)." },
+            { name: 'date-fns', message: "Import each function from its own path, e.g. 'date-fns/format'." },
+          ],
           patterns: [{ group: ['lucide-react-native/icons'], message: "Import icons from '@/components/icons'." }],
         },
+      ],
+    },
+  },
+  {
+    // The app bundles convex/rules/* (shared checks). zod would add ~100 KB gzip to the web shell (specs §7.1), so only
+    // the server-only settings schema may use it.
+    files: ['convex/rules/**/*.ts'],
+    ignores: ['convex/rules/settings.ts', 'convex/rules/**/*.test.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { paths: [{ name: 'zod', message: 'convex/rules is bundled into the app: write the check in plain TypeScript.' }] },
       ],
     },
   },

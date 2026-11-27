@@ -3,7 +3,7 @@
 > Read this FIRST in every new context window, after CLAUDE.md. Keep it short and current.
 > Update it at the end of every slice. The human guide is `for_me.md`.
 
-Last updated: 2026-11-27 (Fri) — branch `p0/foundations`
+Last updated: 2026-11-27 (Fri) — branch `p1/walking-skeleton`
 
 ## 1. Where things are
 - Repo root: `E:\ROUGH CODING\Udvasito new` → GitHub `udvasitobd/udvasito-main` (PUBLIC). Push works via the developer's
@@ -125,7 +125,106 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   udvasito.com **ACTIVE** 2026-11-27 ("Your domain is now protected by Cloudflare").
 - for_me.md is a LIVE CHECKLIST (developer's wish): top = "👉 Do now", then "✅ Done" (move items there the moment
   the developer says done / I verify), then "⏳ Later". Keep it current in every commit.
-- NEXT: (1)+(2) DONE (nameservers switched by me after the developer's sign-in, DNSSEC off; step 5 done).
+- 2026-11-27: PR #2 MERGED (squash 3b95976) after review + fixes + CI green (developer: "merge it once the checks pass").
+  Test phone: iQOO Z10 Turbo Pro (Vivo family). Developer: "do the recommendations" for open questions → Q-004 A,
+  Q-006 keep all, Q-007 offline file confirmed, Q-005 2/4/7 stay (member 3 writes 1/3/5/6); new Q-008 (P1 on staging
+  alongside P0 leftovers), Q-009 (no legal drafts → content:build refuses without them; consent tested by tests only),
+  Q-010 (need 2 more phones). Developer: "start working on next phase" → **P1 started, branch `p1/walking-skeleton`**.
+- P1 PLAN (build-prompts §2 order, vertical slices, commit `P1: …`, PRs into staging, review + fix before merge):
+  rules first (6: eligibility/compatibility/limits, pure + 100 % tests) → 2 sign-in/helpline → 3 onboarding 18+ + ?c=
+  → 5 shells (M01/M10/M06/O05/O06/P08/P09) → 1 consent + legal renderer (content waits for DEP-02) → 4 verification
+  (in-person now; Telegram when the bots exist) → 7 donor setup/tab → 8 request form + place picker → 9 matching v1 +
+  Expo push → 10 inbox → 11 accept/decline → 12 contact exchange → 13 status/close/my requests → 14 30-s helpline →
+  15 rate limits. Human: Cloudflare GitHub app (asked in for_me), Telegram bots (RB-5), EAS build (ask), phones, DEP-01/02.
+- OLD NEXT (P0 leftovers): (1)+(2) DONE (nameservers switched by me after the developer's sign-in, DNSSEC off; step 5 done).
   (3) PR #2 p0/part-2 → staging: code review DONE (5 findings) + fixes DONE 2026-11-27 (Worker serves the app to crawlers via ASSETS binding + `routeFor`, 404 for missing files, security headers on every Worker response, serve-dist uses the same rule + no crash on broken URLs; IP finding: Better Auth limiter is OFF on Convex — probe 401×5 — noted in worker comment + spikes S3). WAITING: developer says "merge"; (4) Workers Builds (ask before installing the Cloudflare GitHub app) + staging Worker + staging.udvasito.com;
   spike S3 (Better Auth baseURL, Google redirect URIs on udvasito.com); (5) Telegram bot, Gemini key, CONVEX_DEPLOY_KEY
   (staging) for CI; spikes S1, S2, S4; EAS build #1 (ask first). Never merge a PR before review + fixes.
+- P1 PROGRESS (branch `p1/walking-skeleton`, pushed; no PR yet — open one into staging when the loop works, then
+  review + fix before merge):
+  ✅ 6 rules (220845d) · ✅ completeOnboarding + consents.accept + legal header check (6ed94a0) · ✅ 1+3 welcome/consent,
+  About you, /privacy /terms, ?c= capture (45f1582, 9fefdd0) · ✅ 5 shells: tab bar (Home, More), More, Settings,
+  account-status, update-required, profiles.updateLanguage + LanguageSync (9a6079b) · ✅ 2 sign-in was done in P0.
+  ⏭ /download (SCR-P08) moved to the go-live slice: needs the APK release; settings has no size/date fields — decide
+  then (GitHub release API vs new settings keys → ask). Home sections join with their features.
+  ✅ 4a in-person verification startInPerson/lookupInPerson/confirmInPerson + SCR-O04 + SCR-V06 (37b4e6d) · ✅ 4b
+  Telegram start/webhook/handleMessage/acceptMismatch/registerWebhook + SCR-O04 Telegram + mismatch cards (b51c595).
+  All verification goes through convex/_lib/verification.ts markPhoneVerified(ctx, profile, via, {verifierId, phone})
+  — slice 7 adds the donor `live` recompute THERE. Telegram is hidden in the app until settings.verification.telegram
+  && telegramBot ≠ ''. Bot replies: convex/_lib/copy.ts bilingual(key) from en/bn.json (JSON import, bundles fine).
+  Dev deployment wry-tern-774 has the code; webhook answers 401 without the secret (checked).
+  ✅ 7 donor server: donors.upsert/getMine/setAvailability, places.list (parentId), rules/donor.ts notLiveReasons,
+  refreshDonorLive in markPhoneVerified, firstLiveAt (bb6220a) · ✅ 7 donor UI: /donor/setup 4 steps + Donate tab +
+  Home donor cards, components BloodGroupPicker/ChoiceGroup/Select/SwitchRow, per-account device draft (cleared on
+  finish + sign-out), "use my location once" matched on the device, Q-018 copy (c0df3ae). Checked in Chrome via a
+  throwaway app/zzpreview.tsx (deleted): pickers with dev places, search "kot" → Kotwali, every step's errors, Bangla.
+  Found + fixed: quick taps lost checklist ticks (stale closure) → setup form updates are functional (f) => ….
+  LEFT FOR LATER SLICES: notification prompt after donor setup (slice 9 push), Requests-for-you + badge (slice 10),
+  Paused (out of P1), alert settings D05 / hide profile / history (later phases). Matching must re-check
+  notLiveReasons per candidate (age + consent drift), not trust the stored live flag alone.
+  ✅ 8 request server: rules/request.ts (VAL-04…11, needed-by chips, urgency, slug, clientId), requests.create
+  (by_clientId idempotency → {requestId, existing}; another account's clientId → ERR_FORBIDDEN; S-22 open/monthly
+  counts by_requester_status + _creationTime ≥ dhakaMonthStart; contactPhoneVerified via visibility.isOwnVerifiedPhone;
+  hospital → its own place ids + rounded point; else thana centre), hospitals.search (search_all; '' + districtId →
+  by_district list), _lib/places.checkPlaceChain shared with donors (2dfb014) · ✅ 8 request UI: /request/new form path
+  (BloodGroupPicker + any/not_sure, whole blood/platelets + dengue tick, Stepper, PlacePicker, needed-by chips + Pick
+  date/time, contact pre-filled, More details, Check and post summary, error summary, limit banners), Home hero +
+  dengue link, TimeField, useNow, newClientId, useLocateArea moved to features/places (returns point, kept on device
+  only — donor setup passes only ids so the draft never holds it). Q-019 copy + decisions. Checked in Chrome via a
+  throwaway app/zz-request.tsx (deleted): errors, 3 quick taps = 3 bags (stepper is step-based), district → thana →
+  place, Bangla digits/date/time, search cmch → no matches (no hospitals until DEP-01), Post reaches the server (925b2db).
+  AFTER POST: goes to /home with Sent until SCR-M03 (/request/[id], slice 13) exists — change it then.
+  convex-test creation times only move forward → fake-time tests must start at the earliest time.
+  ✅ 9 matching v1 + NTF-01 (3dfcf84) · ✅ push on Android (c24453e) · ✅ 10 inbox/markOpened (c1e3a40) · ✅ 11+12
+  accept/decline, slots, contact reveals, SCR-D03/D04 (b55f0b7, 9bdf011) · ✅ 13 getForOwner/listMine/close + SCR-M03/
+  M04 + Home cards + useLiveQuery 15 s fallback (406203b, fdea762, 6f32aea) · ✅ 14 volunteerHotline at S-13 →
+  fallbackShown + "no donors yet" with _lib/bloodBanks (4743b1c, b0d12c5) · ✅ 15 S-25 sign-up limit (f14ed09).
+  ALL 15 SLICES BUILT 2026-11-28 (769 tests). S-22 was already in requests.create; S-23/S-24/S-37 are P2.
+  S-25 key = Better Auth session.ipAddress (auth.ts advanced.ipAddress reads cf-connecting-ip first), hashed via
+  _lib/network.addressKey; session without an address → not limited. Q-022…Q-025 wait for the developer.
+  SCR-M03 body lives in src/features/requests/MyRequestView.tsx (pure, takes `view` + `now`) so previews can render it.
+  PR #3 p1/walking-skeleton → staging OPENED 2026-11-28. Code review (high) → 6 findings, ALL FIXED (2b44f89 stale
+  health consent → _lib/donors.isLiveNow in matching + accept; 257890f push.unregister in every state; 1ea789c
+  hospitals.search by caller area, Q-026; bf92eeb inbox drops hiddenByModerator; ceb89b4 placeText dropped with a
+  hospital; e5edd27 pushed alerts 'sent'). Review comment posted on the PR. CI bundle check had failed (671 KB):
+  fixed 84c4f7f (556 KB). WAITING: CI green + developer's OK to merge. Team doc Bangla tab: 15 rows added (rev 2).
+  for_me 👉 4 = helpline number (developer types own number via dashboard → admin/ops:setSetting).
+  NEXT after merge: staging deploy (Workers Builds still needs the developer's yes), 3-phone DoD run, EAS build (ask).
+- TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
+  b498ce34-9880-4845-8fc5-54431dd450cb; tab "To-do" 1e0a4b77-629a (body 8e30bb71-e1ec), tab "Bangla to check"
+  fc1b86ea-accf (body 054015cc-eff6, table mnm1hfaezn3.358: Screen | English | Claude's Bangla | Your fix | Key;
+  81 rows after 2026-11-28 — Q-020/Q-021 lines, date-fns wording, proposed Q-023 line; bookmark rev 2). Edit it ONLY via the
+  Claude Docs connector (load the docs skill, then read with sinceRev before writing — the team edits it). When a job is
+  handed over, tick it there + Status dropdown in the "Before the first campus drive" table. Read "Your fix" cells
+  and copy fixes into specs/en/bn (then copy:extract). TEAM NUMBERS: member 1 = developer; 2 recruitment; 3 Bangla/FAQ/QA
+  (reviews ALL Bangla); 4 operations/data protection (admin, legal); 5 presentation. (Earlier notes said "member 1"
+  for Bangla review — fixed to member 3 everywhere.)
+  TODO for me from the doc: internal.admin.ops op to create/activate campaigns (none exists; member 2 sends codes);
+  export the 15 city thanas for member 2.
+- convex-test: the fake clock moves 1 ms per write → compare with returned expiresAt / loose bounds, not exact NOW.
+  Stub fetch with vi.stubGlobal('fetch', …) and set process.env in beforeEach; t.fetch('/path') hits http.ts routes.
+- Telegram bot go-live (human + me): developer makes the bot in BotFather (staging bot first) and pastes the token as
+  TELEGRAM_BOT_TOKEN in the Convex dashboard; I generate TELEGRAM_WEBHOOK_SECRET and pipe it in unprinted
+  (node crypto → `npx convex env set` via stdin); then `npx convex run telegram:registerWebhook`; then set
+  settings.verification {telegram: true, telegramBot: '<name>'} via internal.admin.ops.setSetting.
+- Legal files: NONE in the repo (DEP-02). Without them /welcome, /onboarding, /privacy, /terms are "not found" and the
+  gates skip consent/onboarding (availableRoutes({legalReady})). To check those screens locally: write 4 throwaway
+  files in src/content/legal/ with front matter (version 2026-11-28-pilot, effective 2026-11-28), run
+  content:build + build:web, then DELETE them and `git checkout src/content/generated/index.ts`.
+- Local checks without signing in: temporary re-export routes (e.g. app/zzpreview/…) + `npx tsx scripts/serve-dist.ts`
+  (8081). serve-dist forbids iframes; for a 390 px view use a frame-friendly server from the scratchpad. `pkill` does
+  NOT exist in Git Bash here — stop node servers with PowerShell Stop-Process (match the command line).
+- Unit tests (vitest "unit" project) resolve @/ and @convex/ aliases (vitest.config.mts).
+- BUNDLE: Metro does NOT tree-shake. A bare `zod` import ships all locales (~100 KB gzip), bare `date-fns` ships all
+  ~300 functions. Lint now forbids zod in convex/rules (except settings.ts) and bare 'date-fns' in app code. To see
+  what is in the shell: `npx expo export --platform web --source-maps --output-dir <scratch>` then decode the map
+  (per-source byte count script was in the scratchpad as sizes.py — VLQ decode of `mappings`). bundle:check fails
+  locally when app/zz-preview.tsx has a sample +880 number: move it aside before checking.
+- House style = prettier --single-quote --print-width 120 (no config file); run it on new files before the check.
+- Chrome screenshots can time out when the window is hidden: use read_page / javascript_tool to check the DOM.
+- Previews: app/zz* and src/content/legal/ are in .git/info/exclude (can never be committed). The Chrome window is
+  maximised, so resize_window does nothing: replace the page body with 360 px iframes via javascript_tool instead.
+  Run the dev server WITHOUT CI=1 when adding files (CI mode has no file watching → "Unable to resolve").
+- Typed routes: after adding a route file run `CI=1 npx expo start --web --port 8099` ~25 s to regenerate
+  .expo/types/router.d.ts, otherwise tsc rejects the new href.
+- Copy rule (developer, Q-014): specs English-only → write the plain Bangla translation; don't ask.

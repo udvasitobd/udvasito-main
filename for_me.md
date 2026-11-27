@@ -11,7 +11,7 @@ finished and what to do next.
 | ⏳ | Later — Claude will tell you when |
 | 👥 | A job for another team member |
 
-_Last updated: Fri 27 Nov 2026._
+_Last updated: Sat 28 Nov 2026._
 
 > 🔒 **Golden rules**
 > 1. **Never enter a credit/debit card** on any website for this project. If a site asks for a card, stop and tell Claude.
@@ -23,13 +23,52 @@ _Last updated: Fri 27 Nov 2026._
 
 ## 👉 Do now
 
-### 👉 1. Say "merge" for pull request #2
-**Why:** it holds today's work (Cloudflare website setup + fixes). The automatic code review found 5 problems; Claude
-fixed all of them and every test passes. Just write **merge** in the chat (or ask Claude anything about it first).
+### 👉 1. Say "yes" to connecting Cloudflare to GitHub
+**Why:** then the test website **staging.udvasito.com** builds itself from the code. Claude opens the page in Chrome;
+you only click **Install & Authorize** (it lets Cloudflare read the code and show build results on GitHub; Claude shows
+you the exact permissions on the page before you click). Write **yes** in the chat.
 
-### 👉 2. Tell Claude your test phones
-**Why:** we test Bangla voice input and lock-screen alerts on real phones (one cheap 2 GB phone, ideally also one
-Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version** for each phone.
+### 👉 2. Share the team to-do doc with members 2–5
+Open **https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v** → **Share** → add the four members (or copy the link and send it in your team group). The most
+urgent jobs in it: **member 4's privacy notice + terms**, **the hospital list** (members 2 + 4) and **two more test
+phones** (anyone). Nobody else can open the link until you share it.
+
+### 👉 3. Make the **test** Telegram bot (about 5 minutes)
+**Why:** people verify their phone number by tapping a button that opens this bot in Telegram. The code is ready; it
+only needs its own bot. This one is for the test website (staging) — the real one comes later.
+1. On the computer open **https://web.telegram.org** → it shows a QR code. On your phone open **Telegram** →
+   **Settings** → **Devices** → **Link Desktop Device** → point the phone at the QR code.
+2. In Telegram on the computer, search **@BotFather** (the one with the blue tick ✔) → open it → click **Start**.
+3. Send this message: `/newbot`
+4. It asks for a name. Send: `UDVASITO test`
+5. It asks for a username (it must end in "bot"). Send: `udvasito_test_bot`
+   If it says the name is taken, try `udvasito_staging_bot`, then `udvasito_test1_bot`.
+6. BotFather answers **"Done! Congratulations…"**. Under **"Use this token to access the HTTP API:"** there is a long
+   line like `123456789:AAH…`. That is a **secret password for the bot** — 🔒 never paste it into the chat. Click it
+   once (Telegram copies it).
+7. Open **https://dashboard.convex.dev** → click the project **udvasito-staging** → at the top, open the deployment
+   menu and choose **Production** (its name is `outstanding-grasshopper-711` — this is our **test website's**
+   database, not the real one) → **Settings** (left) → **Environment Variables** → **+ Add**.
+   - **Name:** `TELEGRAM_BOT_TOKEN`
+   - **Value:** paste (Ctrl + V) → **Save**.
+8. Write in the chat: **"test bot done, it is @…"** with the username from step 5 (the username is not secret).
+   Claude does the rest (a second secret, connecting the bot, switching the button on).
+
+### 👉 4. Put the helpline number in (about 3 minutes)
+**Why:** when nobody says "yes" to a blood request within 30 seconds, or no donor matches at all, the app shows a
+**"Call the UDVASITO helpline"** button. The plan says this is the super-admin's phone (yours), on loud at night. The
+button stays hidden until a number is set. The number is never in the website's code: the app asks for it only when
+someone taps the button. You type it yourself because it is your personal number.
+1. Open **https://dashboard.convex.dev** → project **udvasito-staging** → deployment menu at the top → **Production**
+   (`outstanding-grasshopper-711`, the **test website's** database).
+2. Click **Functions** (left) → open **admin/ops** → click **setSetting**.
+3. Click **Run function** (top right). In the box that opens, replace everything with this, putting your number
+   after `+880` (11 digits starting with 01 → drop the first 0, e.g. 01712345678 → `+8801712345678`):
+   ```
+   {"key": "fallbackContactPhone", "value": "+8801XXXXXXXXX", "reason": "helpline for the test website"}
+   ```
+4. Click **Run**. It answers `null` = done. An error saying "wrong format" means a digit is missing: check the number.
+5. Write in the chat: **"helpline done"** (don't write the number).
 
 ---
 
@@ -56,6 +95,10 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 | ✅ | **Namecheap contact email verified** (the domain can't be suspended for that any more) | 27 Nov |
 | ✅ | **Checked the promo videos:** they show **www.udvasito.com** — fine: Claude set Cloudflare to forward www.udvasito.com to udvasito.com and tested it | 27 Nov |
 | ✅ | Cloudflare confirmed: **"Your domain is now protected by Cloudflare"** (udvasito.com is active there) | 27 Nov |
+| ✅ | Said **merge** for pull request #2 after its review + fixes (Claude merged it once GitHub's checks passed) | 27 Nov |
+| ✅ | Told Claude your test phone: **iQOO Z10 Turbo Pro** | 27 Nov |
+| ✅ | Said **"do the recommendations"** → questions Q-004, Q-006, Q-007, Q-008, Q-009 settled | 27 Nov |
+| ✅ | Said **start the next phase** → P1 (the first real version) has started | 27 Nov |
 
 > 💡 Namecheap **auto-renew is off** — the domain is paid until **26 Nov 2027**. Turning it on is your choice (it uses
 > the card saved at Namecheap — the project's one yearly payment). Claude will remind you in October 2027.
@@ -63,11 +106,10 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 ---
 
 ## ⏳ Later (Claude will tell you when)
-- ⏳ **Connect Cloudflare to GitHub (1 click):** Claude opens the page; you click **Install & Authorize** so Cloudflare
-  can build the website from the repository. Then the test website appears at **staging.udvasito.com**.
 - ⏳ **One key for the real website:** you copy a "deploy key" from Convex and paste it into Cloudflare (Claude shows
   you exactly where). Before the real website **udvasito.com** goes live, Claude asks you first.
-- ⏳ **Telegram bot:** needs your phone's Telegram app for 2 minutes (talking to @BotFather).
+- ⏳ **The real Telegram bot** (same taps as 👉 3, name `UDVASITO`, username `udvasito_bot` or similar) — just
+  before the real website goes live; its token goes into the **udvasito-prod** project instead.
 - ⏳ **Gemini AI key:** you create it in Google AI Studio and paste it into Convex (Claude shows where).
 - ⏳ **Install the first test app (APK)** on your phones: Claude sends a link; open it on the phone → **Download** →
   **Install** (Android may ask "Allow from this source?" → allow). Claude asks before using a build (15 a month).
@@ -76,19 +118,34 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 ---
 
 ## 👥 Jobs for the team (pass these on)
-- 👥 **Member 2 — hospital list (DEP-01):** fill `data/hospitals.csv` (the first line already has the column names; the
-  rules are in `docs/roadmap.md` §5.1). Blood-bank numbers: **only the hospital's public number, never a person's.**
-  Then run `npm run import:hospitals -- --check-only` — it lists every row that needs fixing, by line number.
-- 👥 **Member 2 — city thanas:** open `data/sources/places/chattogram-metro-thanas.csv` and check the 15 thana names
-  against the Chattogram Metropolitan Police list. **Akbar Shah** is missing its location: in Google Maps right-click
-  the middle of Akbar Shah thana → click the numbers at the top (they are copied) → paste them into the `lat,lng`
-  columns of that row (first number = lat, second = lng). Then tell Claude.
-- 👥 **Member 1 — missing text:** `docs/questions.md` Q-005 lists 4 small texts that need English + Bangla wording.
+Every job for members 2–5 is now in one shared doc: **UDVASITO team to-do** → https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v
+- It has a table of the **11 jobs that must be finished before the first campus drive** (with a Status column the
+  team changes themselves), then one checklist per member with plain step-by-step instructions, and a second tab
+  **Bangla to check** where member 3 types fixes next to each Bangla line Claude wrote.
+- 🔒 Only you can open the link until you share it: open it → **Share** (top right) → add the members, or copy the link.
+- When someone sends you their work (the hospital sheet, the legal text, Bangla fixes…), give it to Claude in the chat;
+  Claude puts it into the app and ticks the job in the doc.
+- Team numbers: **member 1 = you (developer)**, member 2 = recruitment, member 3 = Bangla, FAQ and testing,
+  member 4 = operations and data protection, member 5 = presentation. (Claude wrote "member 1" for the Bangla
+  review by mistake earlier; it is member 3.)
 
 ## ❓ Questions waiting for you / the team
-See `docs/questions.md` — Claude writes each question with a recommended answer. You only reply "OK" or pick another
-option. Waiting now: **Q-004, Q-005, Q-006** and the small confirm in **Q-007** (all already built the recommended
-way — a short "OK" is enough).
+See `docs/questions.md` — Claude writes each question with a recommended answer. You said "do the recommendations",
+so Claude follows them unless you say otherwise. Still waiting on people: **Q-005** (member 3's texts), **Q-009**
+(member 4's legal draft), **Q-010** (two more phones).
+- ✅ Q-011, Q-012, Q-013, Q-014 — you answered (recommended options; "default Bangla translation everywhere").
+- 🟦 **Q-015** (one verified account per phone number), **Q-017** (what the Telegram bot says), **Q-018** (donor
+  form words; the health-data consent follows the main consent version) and **Q-019** (request form words; a request
+  shows "verified" only when its contact number is your own verified number) — Claude used the
+  recommendation; just read them and say if you want something different.
+- 🟦 **Q-020, Q-021, Q-024, Q-025** — words and small rules Claude chose for push alerts, answering a request, the
+  30-second helpline and the sign-up limit. Claude used the recommendation; read them if you like.
+- ❓ **Q-022** — the "copy number" button on Android needs one small Expo add-on (and a new app build). Claude
+  suggests yes (option A); for now Android users long-press the number to copy it.
+- ❓ **Q-023** — when a family taps "No longer needed", should donors who already said yes also get a message, with
+  new words ("…is no longer needed. Thank you for being ready.")? Claude suggests yes (option A).
+- ❓ **Q-016** — when a volunteer says "It doesn't match", should the person see a short message? Claude suggests yes
+  (option A, the text is in the file). Until you answer, the screen simply shows the button again.
 
 ---
 

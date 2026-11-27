@@ -1,12 +1,11 @@
 /**
  * Validation rules — specs §4. Single source of truth: the app imports these for instant field errors and every
- * Convex mutation re-runs them (the server never trusts client validation). Pure TypeScript + zod.
+ * Convex mutation re-runs them (the server never trusts client validation). Pure TypeScript with no libraries: the
+ * web app bundles this file, and zod alone would add about 100 KB gzip to the first load (specs §7.1).
  *
  * Each failure carries the i18n key `validation.<rule>.<case>` (e.g. `validation.VAL-03.invalid`).
  * Rules are added here phase by phase, as their forms are built.
  */
-import { z } from 'zod';
-
 import { normalisePhone } from '../../src/lib/phone';
 
 export { normalisePhone, phoneLast4, toLatinDigits } from '../../src/lib/phone';
@@ -21,14 +20,18 @@ const fail = (field: string, messageKey: string, params?: Record<string, string 
 });
 
 /** Letters (Latin or Bangla, incl. Bangla vowel signs and marks), spaces, `.` `-` `'` only (VAL-01). */
-const NAME_CHARS = /^[\p{Script=Latin}\p{Script=Bengali}\p{M} .'-]+$/u;
+export const NAME_CHARS = /^[\p{Script=Latin}\p{Script=Bengali}\p{M} .'-]+$/u;
+
+/** VAL-01 length limits (specs §4). */
+export const NAME_MIN_LENGTH = 2;
+export const NAME_MAX_LENGTH = 60;
 
 /** VAL-01 Full name. */
 export function checkName(input: string, field = 'name'): Checked<string> {
   const name = input.trim().replace(/\s+/g, ' ');
   if (name === '') return fail(field, 'validation.VAL-01.empty');
-  if ([...name].length < 2) return fail(field, 'validation.VAL-01.short');
-  if ([...name].length > 60) return fail(field, 'validation.VAL-01.long');
+  if ([...name].length < NAME_MIN_LENGTH) return fail(field, 'validation.VAL-01.short');
+  if ([...name].length > NAME_MAX_LENGTH) return fail(field, 'validation.VAL-01.long');
   if (!NAME_CHARS.test(name) || /[0-9০-৯]/.test(name)) return fail(field, 'validation.VAL-01.chars');
   return ok(name);
 }
@@ -105,24 +108,51 @@ export function checkVerificationCode(input: string): Checked<string> {
   return ok(code);
 }
 
-/** Zod helpers for forms (react-hook-form resolvers) built on the same checks. */
-export const zPhone = z.string().transform((value, ctx) => {
-  const r = checkPhone(value);
-  if (r.ok) return r.value;
-  ctx.addIssue({ code: 'custom', message: r.error.messageKey });
-  return z.NEVER;
-});
+/** VAL-14d (and the donor's blood group, travel range): one of the offered options must be chosen. */
+export function checkChoice<T extends string>(
+  value: T | null | undefined,
+  options: readonly T[],
+  field: string,
+): Checked<T> {
+  if (value === null || value === undefined || !options.includes(value)) return fail(field, 'validation.VAL-14d.invalid');
+  return ok(value);
+}
 
-export const zName = z.string().transform((value, ctx) => {
-  const r = checkName(value);
-  if (r.ok) return r.value;
-  ctx.addIssue({ code: 'custom', message: r.error.messageKey });
-  return z.NEVER;
-});
+/** VAL-14b Last donation: a real date from 1970 to today, unless "I have never donated". */
+export function checkLastDonation(
+  neverDonated: boolean,
+  input: string | undefined,
+  today: string,
+): Checked<string | undefined> {
+  if (neverDonated) return ok(undefined);
+  const value = (input ?? '').trim();
+  if (!isRealDate(value) || value < '1970-01-01') return fail('lastDonationDate', 'validation.VAL-14b.missing');
+  if (value > today) return fail('lastDonationDate', 'validation.VAL-14b.future');
+  return ok(value);
+}
 
-export const zReason = z.string().transform((value, ctx) => {
-  const r = checkReason(value);
-  if (r.ok) return r.value;
-  ctx.addIssue({ code: 'custom', message: r.error.messageKey });
-  return z.NEVER;
-});
+/** VAL-14c The three self-checks must all be ticked. */
+export function checkDonorChecklist(checklist: { weight: boolean; health: boolean; screening: boolean }): Checked<true> {
+  if (!checklist.weight || !checklist.health || !checklist.screening) {
+    return fail('checklist', 'validation.VAL-14c.invalid');
+  }
+  return ok(true);
+}
+
+/** VAL-15 A consent checkbox must be ticked. */
+export function checkTicked(ticked: boolean, field = 'consent'): Checked<true> {
+  return ticked ? ok(true) : fail(field, 'validation.VAL-15.invalid');
+}
+
+/** VAL-22 / VAL-23 limit (specs §4). */
+export const SHORT_TEXT_MAX_LENGTH = 80;
+
+/** VAL-22 Institution / VAL-23 Area text: optional, trimmed, at most 80 characters; empty → undefined. */
+export function checkShortText(input: string | undefined, field: 'institution' | 'areaText'): Checked<string | undefined> {
+  const value = (input ?? '').trim().replace(/\s+/g, ' ');
+  if (value === '') return ok(undefined);
+  if ([...value].length > SHORT_TEXT_MAX_LENGTH) {
+    return fail(field, field === 'institution' ? 'validation.VAL-22.invalid' : 'validation.VAL-23.invalid');
+  }
+  return ok(value);
+}

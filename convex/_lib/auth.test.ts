@@ -48,6 +48,20 @@ describe('profiles.me (signed in)', () => {
     expect(me.flags).toMatchObject({ needsOnboarding: false, isDonor: false, isVolunteer: false });
   });
 
+  it('gives the account-status screen its own reason and the deletion date (S-27 days)', async () => {
+    const t = makeT();
+    const { as, userId } = await signIn(t, 'paused@example.com');
+    const requestedAt = Date.UTC(2026, 10, 1);
+    await insertProfile(t, userId, { status: 'deletion_pending', statusReason: 'Asked for money', deletionRequestedAt: requestedAt });
+    const { profile } = await as.query(api.profiles.me, {});
+    expect(profile?.statusReason).toBe('Asked for money');
+    expect(profile?.deletionDueAt).toBe(requestedAt + 30 * 24 * 60 * 60 * 1000);
+
+    const { as: other, userId: otherId } = await signIn(t, 'fine@example.com');
+    await insertProfile(t, otherId);
+    expect((await other.query(api.profiles.me, {})).profile).toMatchObject({ statusReason: null, deletionDueAt: null });
+  });
+
   it('reports stale consent when the consent version moved on', async () => {
     const t = makeT();
     const { as, userId } = await signIn(t, 'old@example.com');
@@ -114,6 +128,7 @@ describe('public.appConfig (public)', () => {
     await t.run((ctx) => ctx.db.insert('settings', { key: 'fallbackContactPhone', value: '+8801812345678' }));
     const config = await t.query(api.public.appConfig, {});
     expect(config.consentVersion).toBe('2026-11-28-pilot');
+    expect(config.contactEmail).toBe('udvasitobd@gmail.com');
     expect(config.helplineAvailable).toBe(true);
     expect(JSON.stringify(config)).not.toMatch(/\+?8801\d{9}|01[3-9]\d{8}/);
   });

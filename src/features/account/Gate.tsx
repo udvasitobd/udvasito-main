@@ -17,10 +17,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ErrorState, SkeletonCard } from '@/components';
 import { useAppConfig } from '@/lib/appConfig';
 import { useLocalConsentVersion } from '@/lib/consent';
-import { readMe, resolveGate } from '@/lib/gates';
+import { LEGAL_READY } from '@/features/legal/LegalDoc';
+import { availableRoutes, readMe, resolveGate } from '@/lib/gates';
 import { colors } from '@/theme/tokens';
 
 const APP_VERSION = Constants.expoConfig?.version ?? '0.0.0';
+/** Screens a gate may send someone to in this build (consent + onboarding wait for the legal files, Q-009). */
+const AVAILABLE = availableRoutes({ legalReady: LEGAL_READY });
 
 type Group = '(app)' | '(onboarding)';
 
@@ -76,6 +79,7 @@ function GateScreen({ group, focused, children }: { group: Group; focused: boole
         }
       : undefined,
     path,
+    available: AVAILABLE,
   });
 
   switch (result.kind) {

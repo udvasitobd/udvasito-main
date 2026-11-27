@@ -53,6 +53,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         prompt: 'select_account',
       },
     },
+    advanced: {
+      // The session keeps the network the person signed in from — the S-25 sign-up limit's key. Same source as
+      // `_lib/network.ts`: Cloudflare's own header first; a single-value x-forwarded-for as the fallback.
+      ipAddress: { ipAddressHeaders: ['cf-connecting-ip', 'x-forwarded-for'] },
+    },
     plugins: [expo(), convex({ authConfig }), crossDomain({ siteUrl })],
   } satisfies BetterAuthOptions;
 };

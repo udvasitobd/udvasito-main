@@ -3,7 +3,7 @@
  *
  * Formats found in specs.md:
  *   A. Copy tables         | Key | English | বাংলা |            → key as written
- *   B. Error-code table    | Code | English | বাংলা |           → errors.<CODE>
+ *   B. Error-code table    | Code | English | বাংলা |           → errors.<CODE>; a following "↳ reason `x`" row → errors.<CODE>.reason.x
  *   C. Validation table    | Rule | … | Case → message … |      → validation.<rule>.<case> (no case → "invalid")
  *   D2. Account-status table | Status | Title EN / BN | Body EN / BN | Actions | → accountStatus.<status>.title|body
  *   D. Notification table  | ID | To | Title EN / BN | Body EN / BN | Opens | → notifications.<ID>.title|body[.<label>]
@@ -104,7 +104,9 @@ export function parseValidationCell(cell: string): { name: string; en: string; b
  * `— donor_calls: \`…\` / \`…\``, `(rejected: \`…\` / \`…\`)`), a single language-neutral template (`{{kind}}`),
  * or "same as NTF-01".
  */
-export function parseNotificationCell(cell: string): { label: string | null; en: string; bn: string }[] | { sameAs: string } {
+export function parseNotificationCell(
+  cell: string,
+): { label: string | null; en: string; bn: string }[] | { sameAs: string } {
   const same = /^same as (NTF-\d+)/.exec(cell.trim());
   if (same?.[1]) return { sameAs: same[1] };
   const out: { label: string | null; en: string; bn: string }[] = [];
@@ -113,7 +115,11 @@ export function parseNotificationCell(cell: string): { label: string | null; en:
   for (const m of cell.matchAll(re)) {
     const before = cell.slice(last, m.index);
     const label = /([a-zA-Z_]+)\s*[:=]\s*$/.exec(before)?.[1] ?? null;
-    out.push({ label: out.length === 0 ? null : label ?? `variant${out.length}`, en: m[1] ?? m[2] ?? '', bn: m[3] ?? m[4] ?? '' });
+    out.push({
+      label: out.length === 0 ? null : (label ?? `variant${out.length}`),
+      en: m[1] ?? m[2] ?? '',
+      bn: m[3] ?? m[4] ?? '',
+    });
     last = (m.index ?? 0) + m[0].length;
   }
   if (out.length === 0) {
@@ -132,6 +138,7 @@ export function parseSpecs(markdown: string): ParseResult {
   const unkeyed: CopyIssue[] = [];
   const ntfBodies = new Map<string, CopyEntry[]>();
   let kind: TableKind | null = null;
+  let lastCode: string | null = null;
   let inCodeBlock = false;
 
   const add = (key: string, en: string, bn: string, line: number) => entries.push({ key, en, bn, line });
@@ -152,6 +159,7 @@ export function parseSpecs(markdown: string): ParseResult {
       const next = lines[i + 1] ?? '';
       if (isSeparator(next)) {
         kind = tableKind(cells);
+        lastCode = null;
         continue;
       }
       if (kind === 'copy') {
@@ -171,12 +179,23 @@ export function parseSpecs(markdown: string): ParseResult {
       }
       if (kind === 'errors') {
         const [code, en, bn] = cells;
-        add(`errors.${unquoteKey(code ?? '')}`, en ?? '', bn ?? '', lineNo);
+        // "↳ reason `cooldown`" fills {{reason}} of the code above it → errors.<CODE>.reason.cooldown
+        const sub = /^↳\s*reason\s+`([^`]+)`$/.exec(code ?? '');
+        if (sub) {
+          if (lastCode) add(`errors.${lastCode}.reason.${sub[1]}`, en ?? '', bn ?? '', lineNo);
+          else issues.push({ line: lineNo, message: `"${code}" without an error code above it` });
+          continue;
+        }
+        lastCode = unquoteKey(code ?? '');
+        add(`errors.${lastCode}`, en ?? '', bn ?? '', lineNo);
         continue;
       }
       if (kind === 'validation') {
         const [rules, , , messages] = cells;
-        const ids = (rules ?? '').split('/').map((r) => r.trim()).filter(Boolean);
+        const ids = (rules ?? '')
+          .split('/')
+          .map((r) => r.trim())
+          .filter(Boolean);
         const cases = parseValidationCell(messages ?? '');
         if (cases.length === 0) issues.push({ line: lineNo, message: `validation row without messages: ${rules}` });
         for (const id of ids) for (const c of cases) add(`validation.${id}.${c.name}`, c.en, c.bn, lineNo);
@@ -205,8 +224,10 @@ export function parseSpecs(markdown: string): ParseResult {
           const parsed = parseNotificationCell(cell ?? '');
           if ('sameAs' in parsed) {
             const source = ntfBodies.get(`${parsed.sameAs}.${part}`) ?? [];
-            if (source.length === 0) issues.push({ line: lineNo, message: `${id} ${part}: "same as" an unknown template` });
-            for (const s of source) add(s.key.replace(`notifications.${parsed.sameAs}.`, `notifications.${id}.`), s.en, s.bn, lineNo);
+            if (source.length === 0)
+              issues.push({ line: lineNo, message: `${id} ${part}: "same as" an unknown template` });
+            for (const s of source)
+              add(s.key.replace(`notifications.${parsed.sameAs}.`, `notifications.${id}.`), s.en, s.bn, lineNo);
             continue;
           }
           if (parsed.length === 0) issues.push({ line: lineNo, message: `${id} ${part}: no template found` });
@@ -304,6 +325,7 @@ export function buildDictionaries(
     }
   }
 
-  const sort = (o: Record<string, string>) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.localeCompare(b)));
+  const sort = (o: Record<string, string>) =>
+    Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.localeCompare(b)));
   return { en: sort(en), bn: sort(bn), duplicates, conflicts, missing, reviewedDiffers };
 }

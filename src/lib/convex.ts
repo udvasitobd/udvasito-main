@@ -6,7 +6,9 @@
 import { expoClient } from '@better-auth/expo/client';
 import { convexClient, crossDomainClient } from '@convex-dev/better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
+import { ConvexHttpClient } from 'convex/browser';
 import { ConvexReactClient } from 'convex/react';
+import type { FunctionArgs, FunctionReference, FunctionReturnType } from 'convex/server';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
@@ -34,3 +36,17 @@ export const authClient = createAuthClient({
       : [expoClient({ scheme: 'udvasito', storagePrefix: 'udvasito', storage: SecureStore })]),
   ],
 });
+
+/**
+ * One query over HTTPS, signed in as the current session — the real-time fallback (`useLiveQuery`) when the
+ * WebSocket is down but plain requests still get through.
+ */
+export async function queryOverHttp<Query extends FunctionReference<'query'>>(
+  query: Query,
+  args: FunctionArgs<Query>,
+): Promise<FunctionReturnType<Query>> {
+  const client = new ConvexHttpClient(convexUrl as string);
+  const { data } = await authClient.convex.token({ fetchOptions: { throw: false } });
+  if (data?.token) client.setAuth(data.token);
+  return client.query(query, args);
+}

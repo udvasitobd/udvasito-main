@@ -70,12 +70,15 @@ function BlockView({ block, index }: { block: Block; index: number }) {
   }
 }
 
-export function Markdown({ doc }: { doc: ContentDoc }) {
+/** `hideTitle` when the page title is already shown (a screen header or a sheet title). */
+export function Markdown({ doc, hideTitle = false }: { doc: ContentDoc; hideTitle?: boolean }) {
   return (
     <View className="gap-s4">
-      <Text variant="title" accessibilityRole="header">
-        {doc.title}
-      </Text>
+      {hideTitle ? null : (
+        <Text variant="title" accessibilityRole="header">
+          {doc.title}
+        </Text>
+      )}
       {doc.blocks.map((block, i) => (
         <BlockView key={i} block={block} index={i} />
       ))}

@@ -3,7 +3,14 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { buildDictionaries, parseNotificationCell, parseSpecs, parseValidationCell, splitBilingual, splitRow } from './copy';
+import {
+  buildDictionaries,
+  parseNotificationCell,
+  parseSpecs,
+  parseValidationCell,
+  splitBilingual,
+  splitRow,
+} from './copy';
 
 describe('copy parser', () => {
   it('reads copy tables, error codes and inline copy', () => {
@@ -16,6 +23,7 @@ describe('copy parser', () => {
       '| Code | English | বাংলা |',
       '|---|---|---|',
       '| `ERR_FORBIDDEN` | No access. | প্রবেশাধিকার নেই। |',
+      '| ↳ reason `group` | group differs | গ্রুপ আলাদা |',
       '',
       '**Copy:** `update.title` "Please update" / "আপডেট করুন"; button `update.download` "Download" / "ডাউনলোড"',
       'Example only: "Whole blood" / "Platelets"',
@@ -28,23 +36,37 @@ describe('copy parser', () => {
       ['units_one', '{{count}} bag', '{{count}} ব্যাগ'],
       ['units_other', '{{count}} bags', '{{count}} ব্যাগ'],
       ['errors.ERR_FORBIDDEN', 'No access.', 'প্রবেশাধিকার নেই।'],
+      ['errors.ERR_FORBIDDEN.reason.group', 'group differs', 'গ্রুপ আলাদা'],
       ['update.title', 'Please update', 'আপডেট করুন'],
       ['update.download', 'Download', 'ডাউনলোড'],
     ]);
   });
 
   it('reads validation cases, unlabeled messages and the special >100 case', () => {
-    expect(parseValidationCell('empty → "Enter it." / "দিন।" · >100 → "Check the year." / "সালটি যাচাই করুন।"')).toEqual([
-      { name: 'empty', en: 'Enter it.', bn: 'দিন।' },
-      { name: 'tooOld', en: 'Check the year.', bn: 'সালটি যাচাই করুন।' },
+    expect(parseValidationCell('empty → "Enter it." / "দিন।" · >100 → "Check the year." / "সালটি যাচাই করুন।"')).toEqual(
+      [
+        { name: 'empty', en: 'Enter it.', bn: 'দিন।' },
+        { name: 'tooOld', en: 'Check the year.', bn: 'সালটি যাচাই করুন।' },
+      ],
+    );
+    expect(parseValidationCell('"Keep it short." / "ছোট রাখুন।"')).toEqual([
+      { name: 'invalid', en: 'Keep it short.', bn: 'ছোট রাখুন।' },
     ]);
-    expect(parseValidationCell('"Keep it short." / "ছোট রাখুন।"')).toEqual([{ name: 'invalid', en: 'Keep it short.', bn: 'ছোট রাখুন।' }]);
-    const md = ['| Rule | Field | Rule details | Case → message |', '|---|---|---|---|', '| VAL-22 / VAL-23 | Text | ≤ 80 | "Short." / "ছোট।" |'].join('\n');
-    expect(parseSpecs(md).entries.map((e) => e.key)).toEqual(['validation.VAL-22.invalid', 'validation.VAL-23.invalid']);
+    const md = [
+      '| Rule | Field | Rule details | Case → message |',
+      '|---|---|---|---|',
+      '| VAL-22 / VAL-23 | Text | ≤ 80 | "Short." / "ছোট।" |',
+    ].join('\n');
+    expect(parseSpecs(md).entries.map((e) => e.key)).toEqual([
+      'validation.VAL-22.invalid',
+      'validation.VAL-23.invalid',
+    ]);
   });
 
   it('reads notification templates with variants and "same as"', () => {
-    expect(parseNotificationCell('`{{x}} needed` / `{{x}} প্রয়োজন` (urgent = "URGENT · " / "জরুরি · " when now)')).toEqual([
+    expect(
+      parseNotificationCell('`{{x}} needed` / `{{x}} প্রয়োজন` (urgent = "URGENT · " / "জরুরি · " when now)'),
+    ).toEqual([
       { label: null, en: '{{x}} needed', bn: '{{x}} প্রয়োজন' },
       { label: 'urgent', en: 'URGENT · ', bn: 'জরুরি · ' },
     ]);
@@ -91,7 +113,11 @@ describe('buildDictionaries', () => {
   const e = (key: string, en: string, bn: string, line = 1) => ({ key, en, bn, line });
 
   it('reports missing languages, conflicts and same-text duplicates', () => {
-    const r = buildDictionaries([e('a', 'A', 'অ'), e('a', 'A', 'অ', 2), e('b', 'B', 'ব'), e('b', 'B2', 'ব', 3), e('c', 'C', '')], {}, []);
+    const r = buildDictionaries(
+      [e('a', 'A', 'অ'), e('a', 'A', 'অ', 2), e('b', 'B', 'ব'), e('b', 'B2', 'ব', 3), e('c', 'C', '')],
+      {},
+      [],
+    );
     expect(r.duplicates).toHaveLength(1);
     expect(r.conflicts).toEqual([{ line: 3, message: 'b differs from line 1' }]);
     expect(r.missing).toEqual([{ line: 1, message: 'c: Bangla missing' }]);

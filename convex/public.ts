@@ -15,6 +15,8 @@ export const appConfig = publicQuery({
       apkUrl: s.apkUrl,
       apkSha256: s.apkSha256,
       consentVersion: s.consentVersion,
+      // The team inbox (public on the About page): "Contact us" for a closed account (SCR-O06).
+      contactEmail: s.contactEmail,
       emailSignInEnabled: s.emailSignInEnabled,
       practiceAreaEnabled: s.demoAreaEnabled,
       verification: {
@@ -27,6 +29,8 @@ export const appConfig = publicQuery({
       },
       // Whether helpline buttons can be shown (the number itself is fetched only on tap, D-R3; no dead controls, §1.9).
       helplineAvailable: s.fallbackContactPhone !== '',
+      // S-33: how often a screen re-fetches over HTTPS while the real-time connection is down (useLiveQuery).
+      realtimeFallbackSec: s.realtimeFallbackSec,
       features: s.features,
       aiFeatures: s['ai.features'],
     };

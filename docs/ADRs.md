@@ -418,6 +418,19 @@ docs (checked 2026-11-27): "Start new projects with Workers"; Pages is still sup
 against Cloudflare's limits by a unit test); `scripts/serve-dist.ts` serves `dist/` the same way for the Playwright
 smoke test. Secrets live in Convex, Cloudflare and EAS (CLAUDE.md rule 18). Spike S3 uses the Worker pass-through.
 
+### ADR-025 — Date picker: the phone's and the browser's own
+**Status:** ✅ Accepted (2026-11-27, developer — Q-011).
+**Context:** date of birth (SCR-O03), last donation (SCR-D02) and "Pick date & time" (CMP-NeededByPicker) need a date
+picker; specs names none and has no copy for typed day/month/year boxes.
+
+| Option | Pros | Cons | Cost | Beginner-friendly |
+|---|---|---|---|---|
+| **A. `@react-native-community/datetimepicker`** (MIT, in the Expo SDK) on Android + the browser's `<input type="date">` / `"datetime-local"` on the web | Native, accessible, already in the phone's / browser's language; no new copy; tiny | Android dialog follows the phone's language, not the app's; needs a native build (before build #1, so no extra build) | ৳0 | ★★★★★ |
+| B. Typed day / month / year boxes | No library | Three new copy strings; easier to mistype | ৳0 | ★★★ |
+
+**Consequences:** `src/components/DateField.tsx` (Android) and `DateField.web.tsx` (web) share one API that reads and
+writes `"YYYY-MM-DD"`; the value is still checked by the VAL rule on the server.
+
 ---
 
 ## 3. Free-tier budget table (NFR-07)

@@ -171,6 +171,16 @@ Spacing scale 4/8/12/16/24/32/48 px. Screen padding 16 (mobile) / 24 (≥ 768 px
 
 On screens ≥ 1024 px (desktop web) the tabs become a left sidebar; admin pages use a two-column layout (list + detail).
 
+**Copy** (Q-014, 2026-11-27):
+| Key | English | বাংলা |
+|---|---|---|
+| `tabs.home` | Home | হোম |
+| `tabs.requests` | Requests | অনুরোধ |
+| `tabs.donate` | Donate | রক্ত দিন |
+| `tabs.volunteer` | Volunteer | স্বেচ্ছাসেবক |
+| `tabs.admin` | Admin | অ্যাডমিন |
+| `tabs.more` | More | আরও |
+
 #### 1.4.2 Header (every screen)
 Back button (when not a tab root) · screen title · `CMP-LanguageToggle` · `CMP-PracticeBadge` when applicable. No hamburger menus on mobile.
 
@@ -422,6 +432,13 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `banned` | Your account is closed / আপনার অ্যাকাউন্ট বন্ধ করা হয়েছে | Reason: {{reason}}. / কারণ: {{reason}}। | Contact us (email) |
 | `deletion_pending` | Your account is being deleted / আপনার অ্যাকাউন্ট মুছে ফেলা হচ্ছে | Your personal data will be removed by {{date}}. Changed your mind? / {{date}}-এর মধ্যে আপনার ব্যক্তিগত তথ্য মুছে ফেলা হবে। মত বদলেছেন? | Cancel deletion |
 
+**Action copy** (Q-014; "Call helpline" uses `request.fallbackTitle`):
+| Key | English | বাংলা |
+|---|---|---|
+| `accountStatus.viewRequest` | View my request | আমার অনুরোধ দেখুন |
+| `accountStatus.contactUs` | Contact us by email | আমাদের ইমেইল করুন |
+| `accountStatus.cancelDeletion` | Cancel deletion | মুছে ফেলা বাতিল করুন |
+
 ### 3.2 Requester
 
 #### SCR-M01 · Home · `/home`
@@ -442,6 +459,7 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `home.needBloodCta` | Request blood now | এখনই রক্তের অনুরোধ করুন |
 | `home.dengueCta` | Dengue patient? Ask for platelets | ডেঙ্গু রোগী? প্লাটিলেটের অনুরোধ করুন |
 | `home.verifyBanner` | Verify your number so donors trust your requests. | আপনার নম্বর যাচাই করুন, যাতে রক্তদাতারা আপনার অনুরোধে আস্থা রাখেন। |
+| `home.verifyCta` | Verify | যাচাই করুন |
 | `home.myRequest` | Your request | আপনার অনুরোধ |
 | `home.covered` | {{confirmed}} of {{needed}} bags arranged | {{needed}} ব্যাগের মধ্যে {{confirmed}} ব্যাগের ব্যবস্থা হয়েছে |
 | `home.requestsForMe` | Requests for you | আপনার জন্য অনুরোধ |
@@ -501,6 +519,21 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `request.duplicate.body` | A {{group}} request at {{hospital}} was posted {{time}}. Is it the same patient? | {{hospital}}-এ {{group}} গ্রুপের একটি অনুরোধ {{time}} পোস্ট হয়েছে। এটি কি একই রোগী? |
 | `request.duplicate.join` | Yes, open that request | হ্যাঁ, সেই অনুরোধটি খুলুন |
 | `request.duplicate.postAnyway` | No, post mine | না, আমারটি পাঠান |
+**Copy — labels the layout names in English only, or not at all** (Q-019, 2026-11-27; member 3 reviews the Bangla):
+| Key | English | বাংলা |
+|---|---|---|
+| `request.unitsIncrease` | Increase bags | ব্যাগ বাড়ান |
+| `request.unitsDecrease` | Decrease bags | ব্যাগ কমান |
+| `request.unitsCount_one` | {{count}} bag | {{count}} ব্যাগ |
+| `request.unitsCount_other` | {{count}} bags | {{count}} ব্যাগ |
+| `request.placeText` | Hospital, clinic or area name | হাসপাতাল, ক্লিনিক বা এলাকার নাম |
+| `request.distance` | {{km}} km away | {{km}} কিমি দূরে |
+| `request.noHospitalsNear` | We couldn't find a listed hospital near you. Please choose your area below. | আপনার কাছে তালিকাভুক্ত কোনো হাসপাতাল পাওয়া যায়নি। অনুগ্রহ করে নিচে আপনার এলাকা বেছে নিন। |
+| `request.pickDate` | Date | তারিখ |
+| `request.pickTime` | Time | সময় |
+| `request.neededByAt` | Needed by {{when}} | {{when}}-এর মধ্যে লাগবে |
+| `request.monthlyLimit` | You've reached this month's request limit. | এ মাসের অনুরোধের সীমা শেষ। |
+| `validation.VAL-08.empty` | Please choose when blood is needed. | কখন রক্ত লাগবে তা বেছে নিন। |
 **States:**
 - *Loading:* form renders immediately (no network needed); places/hospitals come from the bundled list.
 - *AI working:* "Fill the form for me" shows spinner; form remains editable; timeout 8 s → `request.aiUnavailable`.
@@ -538,6 +571,8 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `requestStatus.closed` | Closed | বন্ধ |
 | `request.helpComing` | Help is on the way | সাহায্য আসছে |
 | `contact.donorWillCall` | {{name}} will call you | {{name}} আপনাকে কল করবেন |
+| `contact.role.requester` | Requester | অনুরোধকারী |
+| `contact.role.donor` | Donor | রক্তদাতা |
 | `request.donorNotResponding` | Donor not responding | রক্তদাতা সাড়া দিচ্ছেন না |
 | `request.donorNotRespondingConfirm` | We'll confirm the next donor and keep searching. {{name}} stays on your list in case they call. | আমরা পরের রক্তদাতাকে নিশ্চিত করব এবং খোঁজা চালিয়ে যাব। {{name}} কল করলে যাতে পান, তালিকায় থাকবেন। |
 | `request.volunteerIn` | A volunteer's number will appear in {{time}} if no donor answers | কোনো রক্তদাতা সাড়া না দিলে {{time}} পর একজন স্বেচ্ছাসেবকের নম্বর দেখাবে |
@@ -606,6 +641,7 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `donor.notLive.group` | Add your blood group to start receiving requests. | অনুরোধ পেতে আপনার রক্তের গ্রুপ যোগ করুন। |
 | `donor.notLive.consent` | Please review the updated consent to keep receiving requests. | অনুরোধ পেতে থাকতে হালনাগাদ সম্মতি পর্যালোচনা করুন। |
 | `donor.alertsOff` | Alerts may not reach you. Fix it in 1 minute. | অ্যালার্ট হয়তো আপনার কাছে পৌঁছাবে না। ১ মিনিটে ঠিক করুন। |
+| `donor.alertsFix` | Fix | ঠিক করুন |
 **States:** loading skeleton; error → `CMP-ErrorState`; availability change is optimistic (outbox) with revert + toast on failure.
 **Events:** `availability_changed{state}`.
 
@@ -643,12 +679,33 @@ Four steps with a progress indicator "Step x of 4"; Back keeps entries; data sav
 | `donor.setup.consentHealth` | I agree that UDVASITO stores my blood group, donation dates and area to match me with requests, and shares my number only as described above. | আমি সম্মত যে উদ্ভাসিত আমার রক্তের গ্রুপ, রক্তদানের তারিখ ও এলাকা সংরক্ষণ করবে অনুরোধের সঙ্গে মেলাতে, এবং উপরে বর্ণিতভাবে শুধু আমার নম্বর শেয়ার করবে। |
 | `donor.setup.finish` | Start receiving requests | অনুরোধ পাওয়া শুরু করুন |
 | `donor.setup.done` | You're a donor now. Thank you! We'll alert you only when you can help. | আপনি এখন একজন রক্তদাতা। ধন্যবাদ! শুধু যখন সাহায্য করতে পারবেন, তখনই জানাব। |
+**Copy — labels the layout names in English only** (Q-018, 2026-11-27; member 3 reviews the Bangla):
+| Key | English | বাংলা |
+|---|---|---|
+| `donor.setup.dontKnowGroup` | I don't know my group | আমি আমার গ্রুপ জানি না |
+| `donor.setup.division` | Division | বিভাগ |
+| `donor.setup.district` | District | জেলা |
+| `donor.setup.upazila` | Thana / upazila | থানা / উপজেলা |
+| `donor.setup.area` | Area (optional) | এলাকা (ঐচ্ছিক) |
+| `donor.setup.locationFailed` | We couldn't find your area. Please choose it below. | আপনার এলাকা খুঁজে পাওয়া যায়নি। নিচে থেকে বেছে নিন। |
+| `donor.setup.gender` | Gender | লিঙ্গ |
+| `donor.setup.genderMale` | Male | পুরুষ |
+| `donor.setup.genderFemale` | Female | নারী |
+| `donor.setup.genderOther` | Other | অন্যান্য |
+| `donor.setup.genderUnspecified` | Prefer not to say | বলতে চাই না |
+| `donor.setup.lastDate` | Date of your last donation | শেষ রক্তদানের তারিখ |
+| `donor.setup.lastType` | Type of last donation | শেষ রক্তদানের ধরন |
+| `donor.availability` | Your status | আপনার অবস্থা |
+| `donor.edit` | Update my donor details | আমার রক্তদাতার তথ্য হালনাগাদ করুন |
+| `common.choose` | Choose | বেছে নিন |
+| `common.search` | Search | খুঁজুন |
+| `common.noMatches` | Nothing found. Try another spelling. | কিছু পাওয়া যায়নি। অন্য বানানে চেষ্টা করুন। |
 **States:** step validation errors (§4); server error banner; success → `donor.setup.done` + prompt to allow notifications (OS dialog now — first contextual moment) → `/donor/alert-guide` if denied.
 **Events:** `donor_profile_live`.
 
 #### SCR-D03 · Requests for you · `/alerts`
 **Layout:** list of requests where I'm `notified`/`opened`/`accepted`/`confirmed`/`standby`, newest first, grouped **Needs your answer** / **You said yes** / **Earlier**. Item: group chip, component chip, hospital, area, distance, needed-by (relative), verified chip, my state chip.
-**Copy:** `alerts.title` "Requests for you" / "আপনার জন্য অনুরোধ"; `alerts.needsAnswer` "Needs your answer" / "আপনার উত্তরের অপেক্ষায়"; `alerts.saidYes` "You said yes" / "আপনি রাজি হয়েছেন"; `alerts.earlier` "Earlier" / "আগের"; `alerts.empty` "No requests right now. We'll alert you when someone nearby needs your help." / "এখন কোনো অনুরোধ নেই। আশেপাশে কারও আপনার সাহায্য লাগলে জানাব।"; `alerts.closedItem` "No longer needed" / "আর প্রয়োজন নেই".
+**Copy:** `alerts.title` "Requests for you" / "আপনার জন্য অনুরোধ"; `alerts.needsAnswer` "Needs your answer" / "আপনার উত্তরের অপেক্ষায়"; `alerts.saidYes` "You said yes" / "আপনি রাজি হয়েছেন"; `alerts.earlier` "Earlier" / "আগের"; `alerts.empty` "No requests right now. We'll alert you when someone nearby needs your help." / "এখন কোনো অনুরোধ নেই। আশেপাশে কারও আপনার সাহায্য লাগলে জানাব।"; `alerts.closedItem` "No longer needed" / "আর প্রয়োজন নেই"; `alerts.state.new` "New" / "নতুন"; `alerts.state.confirmed` "Confirmed" / "নিশ্চিত"; `alerts.state.standby` "On standby" / "অপেক্ষমাণ".
 **States:** loading skeleton; empty; error; closed requests greyed with `alerts.closedItem`.
 
 #### SCR-D04 · Request for you · `/alerts/[requestId]`
@@ -687,6 +744,11 @@ Four steps with a progress indicator "Step x of 4"; Back keeps entries; data sav
 | `alert.reason.donated` | Donated recently | সম্প্রতি রক্ত দিয়েছি |
 | `alert.reason.unwell` | Not feeling well | শরীর ভালো নেই |
 | `alert.reason.other` | Other | অন্য কারণ |
+| `alert.callMode.label` | How will you talk to the family? | পরিবারের সঙ্গে কীভাবে যোগাযোগ করবেন? |
+| `alert.callMode.mutual` | Share numbers | নম্বর শেয়ার করুন |
+| `alert.callMode.donorCalls` | I'll call them | আমি নিজেই কল করব |
+| `alert.confirm` | Confirm | নিশ্চিত করুন |
+| `alert.send` | Send | পাঠান |
 **States:** loading skeleton; `ERR_NOT_ELIGIBLE` (became ineligible) → banner with eligible date; `ERR_REQUEST_CLOSED`; `ERR_ALREADY_RESPONDED`; `ERR_BLOCKED`; offline → accept goes to the outbox with state line; screen open from a push → `notifications.markOpened` (once).
 **Events:** `notification_opened`, `donor_accepted`, `donor_confirmed`/`donor_standby` (server), `donor_declined{reason}`, `still_coming_answered`, `donor_withdrew`.
 
@@ -714,7 +776,7 @@ List of donor-confirmed donations (date, hospital, group, component) · total ·
 
 #### SCR-M06 · Settings · `/settings`
 Rows: Language · Profile (name, date of birth read-only after 24 h, mobile number → re-verify) · Phone verification status · Notifications (link to alert guide) · Privacy & my data → `/settings/my-data` · Terms · Privacy notice · About · Sign out.
-**Copy:** `settings.title` "Settings" / "সেটিংস"; `settings.signOut` "Sign out" / "সাইন আউট"; `settings.phoneChangeNote` "Changing your number needs a new verification." / "নম্বর পরিবর্তন করলে আবার যাচাই করতে হবে।"
+**Copy:** `settings.title` "Settings" / "সেটিংস"; `settings.signOut` "Sign out" / "সাইন আউট"; `settings.phoneChangeNote` "Changing your number needs a new verification." / "নম্বর পরিবর্তন করলে আবার যাচাই করতে হবে।"; `settings.language` "Language" / "ভাষা"; `settings.privacy` "Privacy notice" / "গোপনীয়তা নীতি" (Q-014; the Terms row uses `welcome.terms`).
 
 #### SCR-M07 · Privacy & my data · `/settings/my-data`
 Sections: **Who has my number** — list of contact reveals (request date, hospital, the person's first name, role, until date) · **Download my data** — button → server builds a JSON file (profile, donor profile, my requests, my responses, consents) → download link valid 24 h · **Delete my account** — explains what is removed and kept (anonymous statistics) → confirm dialog requiring typing `DELETE` / `মুছুন` → status `deletion_pending` (cancelable for 30 days, S-27).
@@ -727,6 +789,14 @@ Sections: **Who has my number** — list of contact reveals (request date, hospi
 
 #### SCR-M10 · More · `/more`
 Rows: Settings · Can I donate? (if-time) · Learn about donating · Dengue & platelets · Apply to volunteer (if not volunteer) · About UDVASITO · Download / install app · Call helpline · Sign out.
+**Copy** (Q-014; Settings → `settings.title`, Can I donate? → `assistant.title`, Call helpline → `request.fallbackTitle`, Sign out → `settings.signOut`):
+| Key | English | বাংলা |
+|---|---|---|
+| `more.learn` | Learn about donating | রক্তদান সম্পর্কে জানুন |
+| `more.dengue` | Dengue & platelets | ডেঙ্গু ও প্লাটিলেট |
+| `more.applyVolunteer` | Apply to volunteer | স্বেচ্ছাসেবক হতে আবেদন করুন |
+| `more.about` | About UDVASITO | উদ্ভাসিত সম্পর্কে |
+| `more.download` | Download / install app | অ্যাপ ডাউনলোড / ইনস্টল করুন |
 
 ### 3.5 Volunteer
 
@@ -860,9 +930,31 @@ Mission, team (5 members, roles — no personal phone numbers), the 7 Responsibl
 
 #### SCR-P06 / SCR-P07 · Privacy / Terms · `/privacy`, `/terms`
 Versioned Markdown (`src/content/legal/privacy.<lang>.md`, `terms.<lang>.md`, rendered by `CMP-Markdown`) with version + effective date at the top; the version string equals `settings.consentVersion`. Content drafted by member 4 (data-protection lead) and reviewed per NFR-08. **Must cover:** who we are (OQ-09), what we collect and why (per field), legal basis (consent), who sees what (PRD §3.3 in plain words), AI processing and voice notice, processors (Convex, Cloudflare, Google — sign-in, Gemini, FCM; Expo; Telegram; Cloudinary; Sentry), hosting outside Bangladesh, retention (PRD §5.9), your rights (access, correction, deletion, withdraw consent), 18+ only, contact, changes.
+**Copy** (Q-012, 2026-11-27):
+| Key | English | বাংলা |
+|---|---|---|
+| `legal.version` | Version {{version}} · in effect from {{date}} | সংস্করণ {{version}} · কার্যকর {{date}} থেকে |
 
 #### SCR-P08 · Download · `/download`
 Android: big **Download APK** button (`settings.apkUrl`, version, size, date) + 4-step install guide ("Allow installs from this source") + SHA-256 checksum; "Or use the web app" link. iPhone: "Add to Home Screen" 3-step guide with illustrations + note on alerts (iOS 16.4+). Desktop: "Install" button (PWA `beforeinstallprompt`) where supported.
+**Copy** (Q-014; "Or use the web app" → `update.useWeb`, iPhone alerts note → `alertGuide.ios`; icons stand in for the illustrations until they exist; the Android part is hidden while `settings.apkUrl` is empty):
+| Key | English | বাংলা |
+|---|---|---|
+| `download.title` | Get the UDVASITO app | উদ্ভাসিত অ্যাপ নিন |
+| `download.android` | Android | অ্যান্ড্রয়েড |
+| `download.apk` | Download for Android | অ্যান্ড্রয়েডের জন্য ডাউনলোড করুন |
+| `download.apkMeta` | Version {{version}} · {{size}} · {{date}} | সংস্করণ {{version}} · {{size}} · {{date}} |
+| `download.step1` | Tap the button and open the file when the download finishes. | বোতামে ট্যাপ করুন, ডাউনলোড শেষ হলে ফাইলটি খুলুন। |
+| `download.step2` | If your phone asks, allow installs from this source (your browser or Files app). | ফোন জিজ্ঞেস করলে এই উৎস থেকে ইনস্টলের অনুমতি দিন (আপনার ব্রাউজার বা ফাইলস অ্যাপ)। |
+| `download.step3` | Tap Install. | Install চাপুন। |
+| `download.step4` | Open UDVASITO and allow notifications, so blood requests reach you. | উদ্ভাসিত খুলুন এবং নোটিফিকেশনের অনুমতি দিন, যাতে রক্তের অনুরোধ আপনার কাছে পৌঁছায়। |
+| `download.checksum` | SHA-256 checksum (to check the file is genuine) | SHA-256 চেকসাম (ফাইলটি আসল কি না যাচাই করতে) |
+| `download.iphone` | iPhone | আইফোন |
+| `download.iphoneStep1` | Open udvasito.com in Safari. | Safari-তে udvasito.com খুলুন। |
+| `download.iphoneStep2` | Tap Share, then "Add to Home Screen". | Share চাপুন, তারপর "Add to Home Screen"। |
+| `download.iphoneStep3` | Open UDVASITO from your Home Screen. | হোম স্ক্রিন থেকে উদ্ভাসিত খুলুন। |
+| `download.computer` | Computer | কম্পিউটার |
+| `download.install` | Install the web app | ওয়েব অ্যাপ ইনস্টল করুন |
 
 #### SCR-P09 · Not found
 "This page doesn't exist." / "এই পৃষ্ঠাটি নেই।" + Home button. (No helpline on this page — D-R3.)
@@ -984,6 +1076,7 @@ export default defineSchema({
     selfCheckAt: v.number(),                      // checklist confirmed
     healthConsentVersion: v.string(),
     noShowAt: v.array(v.number()),                // timestamps (last 90 days kept)
+    firstLiveAt: v.optional(v.number()),          // set once, when `donor_profile_live` fires (specs §6.3)
     isDemo: v.boolean(),
   }).index("by_profile", ["profileId"])
     .index("by_match", ["isDemo", "live", "bloodGroup", "districtId"])
@@ -1023,7 +1116,8 @@ export default defineSchema({
     status: v.union(v.literal("pending"), v.literal("verified"), v.literal("mismatch"), v.literal("expired")),
     verifiedPhone: v.optional(v.string()),
     externalUserId: v.optional(v.string()),       // Telegram user id / WhatsApp wa_id
-  }).index("by_token", ["token"]).index("by_code", ["code"]).index("by_profile", ["profileId"]),
+  }).index("by_token", ["token"]).index("by_code", ["code"]).index("by_profile", ["profileId"])
+    .index("by_external", ["externalUserId"]),   // Telegram contact → the chat's open row
 
   blocks: defineTable({ blockerId: v.id("profiles"), blockedId: v.id("profiles") })
     .index("by_blocker", ["blockerId"]).index("by_pair", ["blockerId", "blockedId"]),
@@ -1353,7 +1447,7 @@ reports *─1 moderationItems            notifications *─1 profiles, *─0..1 
 | Function | Type | Args | Returns | Who | Errors | Side effects |
 |---|---|---|---|---|---|---|
 | `places.bundleVersion` | query | — | `{version}` | public | — | App refreshes its bundled list if newer |
-| `places.list` | query | `{level, parentId?}` | `[{_id, nameEn, nameBn, lat, lng}]` | public | — | — |
+| `places.list` | query | `{level, parentId?}` | `[{_id, nameEn, nameBn, lat, lng, parentId}]` | public | — | `parentId` lets the app resolve "use my location" on the device |
 | `hospitals.search` | query | `{text, districtId?}` | top 10 `[{_id, nameEn, nameBn, upazila, lat, lng}]` — matches names **and aliases** (`search_all`) | public | — | — |
 | `hospitals.bloodBanksNear` | query | `{districtId, upazilaId}` | `[{nameEn, nameBn, phone, distanceKm}]` (institutional numbers) | member | — | — |
 | `intake.parse` | action | `{text, lang, source: "voice"\|"text"\|"paste"}` | `{fields: Partial<RequestFields>, hospitalCandidates: [...], missing: string[], aiUsed: bool, aiError?: "disabled"\|"quota"\|"unavailable", extractedPhone?: string}` | member | `ERR_VALIDATION` (VAL-13), `ERR_RATE_LIMITED` (10/h) | Rules parser → redaction (PRD §6.2) → AI only if required fields missing and allowed (S-29, quota, feature switch) → JSON validated → hospital names matched; `aiCalls` row (redacted); event `ai_call` |
@@ -1441,6 +1535,15 @@ reports *─1 moderationItems            notifications *─1 profiles, *─0..1 
 | `GET /health` | Convex site | none | — | `{ok: true, time}` | For uptime checks |
 | `/api/auth/*` | Convex site | Better Auth | — | — | Managed by the Better Auth component. Email + password: **staging** — any test account (P-10); **production** — only `*@practice.udvasito.invalid` accounts whose profile has `isDemo: true`, only while `demoAreaEnabled`, sign-up disabled, 5 wrong PINs per ID → 15-minute lock (server hook, D-R4) |
 | `GET /r/:slug` | Cloudflare Worker | none | — | HTML with Open Graph tags (title "{{group}} {{component}} needed · {{hospital}}", description, `og:image` = Cloudinary card) + `<meta http-equiv="refresh">` to the app route `/r/<slug>` | No personal data; 404 page if not found |
+**Telegram bot replies** (`POST /telegram/webhook`; each reply is the English line, then the Bangla line). The reply to
+`/start <token>` is `telegramBot.share` with the one-button keyboard. A link that is unknown or past its 10 minutes
+gets `verify.expired`; a shared number that is not a Bangladeshi mobile gets `validation.VAL-03.invalid`; a number
+already verified on another account gets `errors.ERR_PHONE_IN_USE` and nothing changes (Q-015, Q-017).
+| Key | English | বাংলা |
+|---|---|---|
+| `telegramBot.share` | Share my phone number | আমার ফোন নম্বর শেয়ার করুন |
+| `telegramBot.verified` | ✅ Verified — go back to UDVASITO | ✅ যাচাই হয়েছে — উদ্ভাসিতে ফিরে যান |
+| `telegramBot.ownNumber` | Please share your own number. | অনুগ্রহ করে নিজের নম্বর শেয়ার করুন। |
 
 ### 6.6 Scheduled and internal jobs (ADR-009)
 | Job | Trigger | Logic (all idempotent — re-check state first) |
@@ -1496,6 +1599,12 @@ AI problems are **never** thrown as errors; `intake.parse` and `assistant.ask` r
 
 ### 6.8 Notification templates (push; language = recipient's `profile.language`)
 **Lock-screen privacy:** no phone numbers, no patient names, no requester names in any push. Android channel `blood-requests` (importance MAX, §1.2.1) for NTF-01/02/07/08/16; `updates` (default) for the rest. Payload `data: {url, notificationId}`.
+
+**Channel names** (Android Settings → Apps → UDVASITO → Notifications; set in the app language at launch, Q-020):
+| Key | English | বাংলা |
+|---|---|---|
+| `notifications.channel.bloodRequests` | Blood requests | রক্তের অনুরোধ |
+| `notifications.channel.updates` | Updates | হালনাগাদ |
 
 | ID | To | Title EN / BN | Body EN / BN | Opens |
 |---|---|---|---|---|

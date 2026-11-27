@@ -37,3 +37,9 @@ export function normalisePhone(input: string | null | undefined): PhoneResult {
 export function phoneLast4(stored: string): string {
   return stored.slice(-4);
 }
+
+/** A stored number as people write it: `+8801712345678` → `01712-345678`. */
+export function displayPhone(stored: string): string {
+  const national = stored.startsWith('+88') ? stored.slice(3) : stored;
+  return national.length === 11 ? `${national.slice(0, 5)}-${national.slice(5)}` : national;
+}

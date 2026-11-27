@@ -86,6 +86,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-localization',
     'expo-font',
     '@sentry/react-native',
+    // Date of birth, last donation, needed-by date (ADR-025).
+    '@react-native-community/datetimepicker',
   ],
   experiments: {
     typedRoutes: true,

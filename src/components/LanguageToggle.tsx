@@ -6,7 +6,7 @@ import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/cn';
-import { setLanguage } from '@/lib/i18n';
+import { chooseLanguage } from '@/lib/i18n';
 import type { Language } from '@/lib/language';
 
 import { Text, useLanguage } from './Text';
@@ -21,7 +21,7 @@ export function LanguageToggle({ large = false, onChange }: { large?: boolean; o
   const { t } = useTranslation();
   const current = useLanguage();
   const choose = (value: Language) => {
-    void setLanguage(value);
+    void chooseLanguage(value);
     onChange?.(value);
   };
 

@@ -2,13 +2,20 @@
  * The only door to phone numbers (PRD §3.3, specs §6.0, CLAUDE.md rule 2).
  *
  * - `ownPhone` returns the caller's own number (profiles.me) — not a reveal.
+ * - `ownVerifiedPhone` returns the number Telegram/WhatsApp shared for the caller's own verification row.
+ * - `verifierHint` returns the last 4 digits only — all an in-person verifier ever sees (D-R1).
+ * - `phoneVerifiedElsewhere` and `isOwnVerifiedPhone` compare numbers on the server and return only yes/no.
  * - `revealPhone` returns another person's number and, in the same transaction, writes a `contactReveals` row (once
  *   per viewer + request + subject + reason) and an audit entry. Functions marked 📞 in specs §6 must use it.
+ * - `grantReveal` writes the same row and audit entry without returning a number (`responses.accept` grants both
+ *   sides of a confirmed slot; each side reads its number later).
+ * - `requestContactFor` returns a request's contact number to a viewer holding a live `confirmed_slot` reveal of the
+ *   requester (`responses.getForDonor`); nobody else ever gets it from here.
  * The number never goes into the audit `meta`, events, logs or errors.
  */
 import type { Doc, Id } from '../_generated/dataModel';
-import type { MutationCtx } from '../_generated/server';
-import { checkReason } from '../rules/validation';
+import type { MutationCtx, QueryCtx } from '../_generated/server';
+import { checkReason, phoneLast4 } from '../rules/validation';
 import { writeAudit, type AuditAction } from './audit';
 import { appError } from './errors';
 
@@ -31,18 +38,56 @@ export function ownPhone(profile: Doc<'profiles'>): string {
   return profile.phone;
 }
 
-export async function revealPhone(
-  ctx: MutationCtx,
-  input: {
-    viewer: Doc<'profiles'>;
-    subject: Doc<'profiles'>;
-    subjectRole: RevealSubjectRole;
-    requestId: Id<'requests'>;
-    reason: RevealReason;
-    reasonText?: string;
-    expiresAt: number;
-  },
-): Promise<string> {
+/**
+ * Whether a request's contact number is the caller's own verified number (`requests.contactPhoneVerified`). Compared
+ * on the server; only yes/no leaves this file.
+ */
+export function isOwnVerifiedPhone(profile: Doc<'profiles'>, phone: string): boolean {
+  return profile.phoneVerified && profile.phone === phone;
+}
+
+/** The number shared by Telegram/WhatsApp on the caller's own row (`phoneVerification.status`, SCR-O04 mismatch). */
+export function ownVerifiedPhone(row: Doc<'phoneVerifications'>): string | undefined {
+  return row.verifiedPhone;
+}
+
+/** Last 4 digits of a member's number — `phoneVerification.lookupInPerson` (D-R1). Never the full number. */
+export function verifierHint(profile: Doc<'profiles'>): string {
+  return phoneLast4(profile.phone);
+}
+
+/**
+ * Whether `phone` is already verified on another account in the same area (real or practice). One verified account
+ * per number (ERR_PHONE_IN_USE, Q-015).
+ */
+export async function phoneVerifiedElsewhere(
+  ctx: QueryCtx,
+  profile: Doc<'profiles'>,
+  phone: string = profile.phone,
+): Promise<boolean> {
+  const owners = await ctx.db
+    .query('profiles')
+    .withIndex('by_phone', (q) => q.eq('phone', phone))
+    .collect();
+  return owners.some((other) => other._id !== profile._id && other.phoneVerified && other.isDemo === profile.isDemo);
+}
+
+export type RevealInput = {
+  viewer: Doc<'profiles'>;
+  subject: Doc<'profiles'>;
+  subjectRole: RevealSubjectRole;
+  requestId: Id<'requests'>;
+  reason: RevealReason;
+  reasonText?: string;
+  expiresAt: number;
+};
+
+export async function revealPhone(ctx: MutationCtx, input: RevealInput): Promise<string> {
+  await grantReveal(ctx, input);
+  return input.subject.phone;
+}
+
+export async function grantReveal(ctx: MutationCtx, input: RevealInput): Promise<void> {
   const { viewer, subject } = input;
   if (viewer.isDemo !== subject.isDemo) throw appError('ERR_DEMO_ISOLATION');
   // VAL-18: a trimmed reason of 5–200 characters where one is required; the trimmed text is what gets stored.
@@ -81,5 +126,56 @@ export async function revealPhone(
       meta: { requestId: input.requestId, subjectRole: input.subjectRole, revealReason: input.reason },
     });
   }
-  return subject.phone;
+}
+
+/** Whether `viewer` holds an unexpired reveal of `subject` for this request and reason. */
+export async function hasLiveReveal(
+  ctx: QueryCtx,
+  input: { viewerId: Id<'profiles'>; subjectId: Id<'profiles'>; requestId: Id<'requests'>; reason: RevealReason },
+  now: number,
+): Promise<boolean> {
+  const rows = await ctx.db
+    .query('contactReveals')
+    .withIndex('by_viewer_request', (q) => q.eq('viewerId', input.viewerId).eq('requestId', input.requestId))
+    .collect();
+  return rows.some((r) => r.subjectId === input.subjectId && r.reason === input.reason && r.expiresAt > now);
+}
+
+/**
+ * The request's contact number for a confirmed donor (PRD §3.3): only with a live `confirmed_slot` reveal of the
+ * requester, and never while contact details are paused after a report (`revealsFrozen`).
+ */
+export async function requestContactFor(
+  ctx: QueryCtx,
+  viewer: Doc<'profiles'>,
+  request: Doc<'requests'>,
+  now: number,
+): Promise<string | undefined> {
+  if (request.revealsFrozen || viewer.isDemo !== request.isDemo) return undefined;
+  const live = await hasLiveReveal(
+    ctx,
+    { viewerId: viewer._id, subjectId: request.requesterId, requestId: request._id, reason: 'confirmed_slot' },
+    now,
+  );
+  return live ? request.contactPhone : undefined;
+}
+
+/**
+ * A confirmed donor's number for the request owner (SCR-M03, PRD §3.3): only with a live `confirmed_slot` reveal
+ * (none exists when the donor chose "I'll call them", D16), and never while contact details are paused.
+ */
+export async function confirmedDonorPhoneFor(
+  ctx: QueryCtx,
+  viewer: Doc<'profiles'>,
+  donor: Doc<'profiles'>,
+  request: Doc<'requests'>,
+  now: number,
+): Promise<string | undefined> {
+  if (request.revealsFrozen || viewer.isDemo !== request.isDemo || donor.isDemo !== request.isDemo) return undefined;
+  const live = await hasLiveReveal(
+    ctx,
+    { viewerId: viewer._id, subjectId: donor._id, requestId: request._id, reason: 'confirmed_slot' },
+    now,
+  );
+  return live ? donor.phone : undefined;
 }

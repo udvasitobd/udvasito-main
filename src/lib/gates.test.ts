@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { compareVersions } from './version';
-import { readMe, requiredRole, resolveGate, routeKind, safeNext, type GateInput } from './gates';
+import { availableRoutes, readMe, requiredRole, resolveGate, routeKind, safeNext, type GateInput } from './gates';
 
 const ALL = new Set(['/sign-in', '/home', '/welcome', '/onboarding', '/update-required', '/account-status']);
 
@@ -107,6 +107,21 @@ describe('resolveGate', () => {
     });
     expect(gate({ available: p0, auth: 'signedOut', me: undefined })).toEqual({ kind: 'redirect', to: '/sign-in?next=%2Fhome' });
     expect(gate({ available: p0, appVersion: '0.0.1' })).toEqual({ kind: 'ok' });
+  });
+
+  it('consent and onboarding exist only once the legal files are in the build (Q-009)', () => {
+    const without = availableRoutes({ legalReady: false });
+    const withLegal = availableRoutes({ legalReady: true });
+    expect([...without]).toEqual(['/sign-in', '/home', '/update-required', '/account-status']);
+    expect(withLegal.has('/welcome') && withLegal.has('/onboarding')).toBe(true);
+
+    const newcomer = { localConsentVersion: null, me: { needsOnboarding: true, serverConsentCurrent: false, status: null, role: null } };
+    expect(gate({ ...newcomer, available: without })).toEqual({ kind: 'ok' });
+    expect(gate({ ...newcomer, available: withLegal })).toEqual({ kind: 'redirect', to: '/welcome?next=%2Fhome' });
+    expect(gate({ ...newcomer, localConsentVersion: '2026-11-28-pilot', available: withLegal })).toEqual({
+      kind: 'redirect',
+      to: '/onboarding?next=%2Fhome',
+    });
   });
 });
 
