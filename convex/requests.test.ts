@@ -333,4 +333,29 @@ describe('hospitals.search', () => {
     expect(await t.query(api.hospitals.search, { text: '' })).toEqual([]);
     expect(await t.query(api.hospitals.search, { text: '', districtId: where.districtId })).toHaveLength(1);
   });
+
+  it('a practice account sees practice hospitals only, and can post at one', async () => {
+    const t = makeT();
+    const where = await insertPlaces(t);
+    await insertHospital(t, where);
+    const practiceId = await insertHospital(t, where, {
+      nameEn: 'Practice Hospital',
+      searchText: 'practice hospital cmch',
+      isDemo: true,
+    });
+    const practising = await member(t, { isDemo: true });
+    const real = await member(t);
+
+    const names = async (
+      as: Awaited<ReturnType<typeof member>>['as'],
+      args: { text: string; districtId?: Id<'places'> },
+    ) => (await as.query(api.hospitals.search, args)).map((h) => h.nameEn);
+    expect(await names(practising.as, { text: 'cmch' })).toEqual(['Practice Hospital']);
+    expect(await names(practising.as, { text: '', districtId: where.districtId })).toEqual(['Practice Hospital']);
+    expect(await names(real.as, { text: 'cmch' })).toEqual(['Chattogram Medical College Hospital']);
+
+    await practising.as.mutation(api.requests.create, form(where, { hospitalId: practiceId, placeText: undefined }));
+    const [request] = await requestsOf(t, practising.profileId);
+    expect(request).toMatchObject({ hospitalId: practiceId, isDemo: true });
+  });
 });
