@@ -73,6 +73,12 @@ export default function Onboarding() {
 
   const today = todayInDhaka();
 
+  /** Editing a field clears its message; the next Continue checks again. */
+  const edit = (field: FieldName, set: (value: string) => void) => (value: string) => {
+    set(value);
+    if (errors[field]) setErrors(({ [field]: _cleared, ...rest }) => rest);
+  };
+
   /** VAL-01/02/03 on the device for instant messages; the server checks again. */
   const validate = (): Errors => {
     const found: Errors = {};
@@ -144,7 +150,7 @@ export default function Onboarding() {
       <Input
         label={t('onboarding.name')}
         value={name}
-        onChangeText={setName}
+        onChangeText={edit('name', setName)}
         error={errors.name}
         maxLength={NAME_MAX_LENGTH}
         counter
@@ -156,7 +162,7 @@ export default function Onboarding() {
       <DateField
         label={t('onboarding.dob')}
         value={dateOfBirth}
-        onChange={setDateOfBirth}
+        onChange={edit('dateOfBirth', setDateOfBirth)}
         helper={t('onboarding.dobHelp')}
         error={errors.dateOfBirth}
         max={today}
@@ -165,7 +171,7 @@ export default function Onboarding() {
       <Input
         label={t('onboarding.phone')}
         value={phone}
-        onChangeText={setPhone}
+        onChangeText={edit('phone', setPhone)}
         helper={t('onboarding.phoneHelp')}
         error={errors.phone}
         prefix={PHONE_PREFIX}
