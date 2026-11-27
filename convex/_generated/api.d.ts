@@ -11,6 +11,7 @@
 import type * as _lib_alertText from "../_lib/alertText.js";
 import type * as _lib_audit from "../_lib/audit.js";
 import type * as _lib_auth from "../_lib/auth.js";
+import type * as _lib_bloodBanks from "../_lib/bloodBanks.js";
 import type * as _lib_copy from "../_lib/copy.js";
 import type * as _lib_donors from "../_lib/donors.js";
 import type * as _lib_environment from "../_lib/environment.js";
@@ -73,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   "_lib/alertText": typeof _lib_alertText;
   "_lib/audit": typeof _lib_audit;
   "_lib/auth": typeof _lib_auth;
+  "_lib/bloodBanks": typeof _lib_bloodBanks;
   "_lib/copy": typeof _lib_copy;
   "_lib/donors": typeof _lib_donors;
   "_lib/environment": typeof _lib_environment;
