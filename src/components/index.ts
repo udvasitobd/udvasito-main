@@ -1,6 +1,8 @@
 export { Banner } from './Banner';
 export { Button, type ButtonProps } from './Button';
 export { Checkbox } from './Checkbox';
+export { Chip } from './Chip';
+export { ContactCard } from './ContactCard';
 export { DateField } from './DateField';
 export { Dialog, Sheet } from './Dialog';
 export { ErrorState } from './ErrorState';
@@ -12,6 +14,7 @@ export { LanguageToggle } from './LanguageToggle';
 export { Markdown } from './Markdown';
 export { OfflineBanner } from './OfflineBanner';
 export { PracticeBadge } from './PracticeBadge';
+export { SafetyCard } from './SafetyCard';
 export { LogoMark, Screen } from './Screen';
 export { Skeleton, SkeletonCard } from './Skeleton';
 export { FontsLoadedContext, Text, useLanguage } from './Text';

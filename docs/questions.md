@@ -346,3 +346,49 @@ Status: 🟦 applied, waiting for review
 **Recommendation:** keep as built; member 3 reviews the 3 Bangla lines.
 **Applied:** as above (standing instruction "do the recommendations").
 Status: 🟦 applied, waiting for review
+
+### Q-021 · 2026-11-28 · P1 · Answering a request (SCR-D03, SCR-D04): words and rules specs leaves open
+- **New copy** (specs gives English only, or no words; standard Bangla per Q-014) — member 3 to check:
+  - SCR-D03 state chips: `alerts.state.new` "New" / "নতুন", `alerts.state.confirmed` "Confirmed" / "নিশ্চিত",
+    `alerts.state.standby` "On standby" / "অপেক্ষমাণ".
+  - SCR-D04 sheet: `alert.callMode.label` "How will you talk to the family?" / "পরিবারের সঙ্গে কীভাবে যোগাযোগ
+    করবেন?", `alert.callMode.mutual` "Share numbers" / "নম্বর শেয়ার করুন", `alert.callMode.donorCalls` "I'll call
+    them" / "আমি নিজেই কল করব", `alert.confirm` "Confirm" / "নিশ্চিত করুন", `alert.send` "Send" / "পাঠান".
+  - CMP-ContactCard role chip: `contact.role.requester` "Requester" / "অনুরোধকারী", `contact.role.donor` "Donor" /
+    "রক্তদাতা".
+  - Time left after the deadline comes from date-fns ("in 2 hours" / "২ ঘন্টা এর মধ্যে"); member 3: is the date-fns
+    Bangla wording acceptable, or should we write our own?
+- **`ERR_NOT_ELIGIBLE` reasons:** the "↳ reason" rows of specs §6.7 are now read by `copy:extract` as
+  `errors.ERR_NOT_ELIGIBLE.reason.<reason>` (they produced broken keys before). The cooldown date and the age limits
+  are shown in the reader's language.
+- **Who is confirmed:** the first `unitsNeeded + S-12` donors to tap Confirm (one transaction, so never more). The
+  request becomes `covered` when `unitsConfirmed` reaches `unitsNeeded`; it stays open until the family closes it.
+- **When the number stops showing:** a confirmed slot's reveal expires S-18 days after the latest possible close
+  (needed-by + S-17 auto-close). Slice 13 moves it to closedAt + S-18 when the family closes the request.
+- **Contact details paused** (`revealsFrozen`): accept still confirms the donor but grants no reveal and the screen
+  says `request.revealsFrozen`.
+- **"Donated recently" when declining:** the date is optional; when given it becomes the last donation (the later of
+  the known and the new date), counted as whole blood (the longer interval, as in donor setup), and the next eligible
+  date moves.
+- **Requester's track record:** "donations confirmed" counts confirmed donors on the requester's earlier requests
+  that either side marked as donated (the confirmation flow is P3, so it is 0 until then).
+- **Directions:** a listed hospital opens Google Maps at its own point; a typed place opens a search for its name and
+  thana (its point is only the thana centre).
+- **Closed request:** banner `alerts.closedItem` with `publicRequest.closed` as the thanks line.
+- **Not visible in P1** (build prompt scope): "Still coming?", "I can't make it anymore", Report and block, the
+  offline outbox. NTF-04 opens `/request/{id}` (SCR-M03, slice 13).
+
+**Recommendation:** keep as built; member 3 reviews the 10 Bangla lines and the date-fns wording.
+**Applied:** as above (standing instruction "do the recommendations").
+Status: 🟦 applied, waiting for review
+
+### Q-022 · 2026-11-28 · P1 · Copy-number button on Android needs a clipboard library
+CMP-ContactCard has a copy-number button. React Native no longer ships a clipboard, and no clipboard library is
+named in the ADRs, so CLAUDE.md says to ask before adding one.
+- **Option A (recommended):** add `expo-clipboard` (Expo's own module, MIT, free, stores nothing, part of the Expo
+  SDK we already use) with a one-line ADR-012 note. Needs a new native build (EAS, counts toward the 15/month).
+- **Option B:** keep what is built now — the button on web (browser clipboard); on Android the number is selectable
+  text (long-press → Copy), Call and WhatsApp work as specified.
+
+**Built for now:** option B (nothing half-working: the button is hidden where it cannot work).
+Status: ⬜ waiting for the developer

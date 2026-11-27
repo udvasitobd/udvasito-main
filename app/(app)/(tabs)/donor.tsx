@@ -1,9 +1,9 @@
 /**
  * SCR-D01 · Donate tab. No donor profile → the intro and "Become a donor". With a profile → the status card
- * (Available / Not available, eligibility, why requests are not arriving yet), alert health on Android ("Alerts may
- * not reach you" + Fix) and a way back into donor setup. Sections whose features are not built yet stay hidden
- * (specs §1.9): Paused, Requests for you, alert & privacy settings, donation history and "Hide my donor profile"
- * join with their screens.
+ * (Available / Not available, eligibility, why requests are not arriving yet), Requests for you (with the number
+ * waiting for an answer), alert health on Android ("Alerts may not reach you" + Fix) and a way back into donor setup.
+ * Sections whose features are not built yet stay hidden (specs §1.9): Paused, alert & privacy settings, donation
+ * history and "Hide my donor profile" join with their screens.
  */
 import { api } from '@convex/_generated/api';
 import { useMutation, useQuery } from 'convex/react';
@@ -13,7 +13,7 @@ import { Linking, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Banner, Button, ChoiceGroup, ListGroup, ListRow, Screen, SkeletonCard, Text, useToast } from '@/components';
-import { Check, Droplet, Pencil } from '@/components/icons';
+import { Bell, Check, Droplet, Pencil } from '@/components/icons';
 import { EligibilityLine, NotLiveBanner } from '@/features/donor/DonorStatus';
 import { useEnablePush, usePushPermission } from '@/features/push/usePush';
 import { errorMessage } from '@/lib/errors';
@@ -75,6 +75,7 @@ export default function DonateTab() {
   const { t } = useTranslation();
   const toast = useToast();
   const mine = useQuery(api.donors.getMine);
+  const inbox = useQuery(api.responses.inbox);
   const [failure, setFailure] = useState<string | null>(null);
   // Optimistic: the control moves at once and moves back if the server refuses (SCR-D01 states).
   const setAvailability = useMutation(api.donors.setAvailability).withOptimisticUpdate((store, { availability }) => {
@@ -138,6 +139,12 @@ export default function DonateTab() {
       </View>
       <AlertsHealth />
       <ListGroup>
+        <ListRow
+          label={t('alerts.title')}
+          icon={Bell}
+          badge={inbox?.needsAnswer.length ?? 0}
+          onPress={() => router.push('/alerts')}
+        />
         <ListRow label={t('donor.edit')} icon={Pencil} onPress={() => router.push('/donor/setup')} />
       </ListGroup>
     </Screen>

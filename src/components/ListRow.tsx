@@ -5,10 +5,11 @@
 import { Children, Fragment, isValidElement, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { toBanglaDigits } from '@/lib/dates';
 import { colors } from '@/theme/tokens';
 
 import { ChevronDown, ChevronRight, type LucideIcon } from './icons';
-import { Text } from './Text';
+import { Text, useLanguage } from './Text';
 
 type ListRowProps = {
   label: string;
@@ -17,13 +18,18 @@ type ListRowProps = {
   /** `open` goes somewhere; `expand` shows more below the row (then pass `expanded`). */
   kind?: 'open' | 'expand';
   expanded?: boolean;
+  /** A count shown as a pill before the chevron (e.g. requests waiting for an answer); hidden at 0. */
+  badge?: number;
 };
 
-export function ListRow({ label, onPress, icon: Icon, kind = 'open', expanded }: ListRowProps) {
+export function ListRow({ label, onPress, icon: Icon, kind = 'open', expanded, badge = 0 }: ListRowProps) {
   const Chevron = kind === 'expand' ? ChevronDown : ChevronRight;
+  const language = useLanguage();
+  const count = language === 'bn' ? toBanglaDigits(String(badge)) : String(badge);
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={badge > 0 ? [label, count].join(', ') : label}
       aria-expanded={kind === 'expand' ? Boolean(expanded) : undefined}
       onPress={onPress}
       className="min-h-touch flex-row items-center gap-s3 px-s4 py-s3 active:bg-surface web:hover:bg-surface"
@@ -32,6 +38,13 @@ export function ListRow({ label, onPress, icon: Icon, kind = 'open', expanded }:
       <Text variant="bodyStrong" className="flex-1">
         {label}
       </Text>
+      {badge > 0 ? (
+        <View className="min-w-s6 items-center rounded-pill bg-brand-primary px-s2 py-s1" aria-hidden>
+          <Text variant="small" tone="inverse" className="font-semibold">
+            {count}
+          </Text>
+        </View>
+      ) : null}
       <Chevron
         size={22}
         color={colors.text.muted}

@@ -3,18 +3,19 @@
  * - `usePushRegistration` — mounted once in the signed-in layout: names the Android channels in the app language,
  *   registers the push token whenever notifications are allowed (at launch, when the app comes back to the front —
  *   the person may have allowed them in Android Settings — and when the token changes), and opens what a tapped
- *   alert points to.
+ *   alert points to (marking that alert opened, `notifications.markOpened`).
  * - `useEnablePush` — the contextual permission prompt (after donor setup, SCR-D02; "Fix" on SCR-D01).
  * - `usePushPermission` — the current permission, for the "Alerts may not reach you" banner (SCR-D01).
  */
 import { api } from '@convex/_generated/api';
+import type { Id } from '@convex/_generated/dataModel';
 import { useMutation } from 'convex/react';
 import { router, type Href } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { alertPath } from './alertPath';
+import { tappedHref, tappedNotificationId } from './alertPath';
 import {
   askPermission,
   deviceToken,
@@ -69,12 +70,15 @@ export function usePushRegistration(): void {
 
   const tapped = useTappedAlertData();
   const opened = useRef<unknown>(null);
+  const markOpened = useMutation(api.notifications.markOpened);
   useEffect(() => {
     if (!tapped || tapped === opened.current) return;
     opened.current = tapped;
-    const path = alertPath(tapped);
-    if (path) router.push(path as Href);
-  }, [tapped]);
+    const notificationId = tappedNotificationId(tapped);
+    if (notificationId) quietly(markOpened({ notificationId: notificationId as Id<'notifications'> }));
+    const href = tappedHref(tapped);
+    if (href) router.push(href as Href);
+  }, [tapped, markOpened]);
 }
 
 /** Shows the Android permission dialog (when it may still be shown) and registers this device. */

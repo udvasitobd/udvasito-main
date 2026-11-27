@@ -571,6 +571,8 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `requestStatus.closed` | Closed | বন্ধ |
 | `request.helpComing` | Help is on the way | সাহায্য আসছে |
 | `contact.donorWillCall` | {{name}} will call you | {{name}} আপনাকে কল করবেন |
+| `contact.role.requester` | Requester | অনুরোধকারী |
+| `contact.role.donor` | Donor | রক্তদাতা |
 | `request.donorNotResponding` | Donor not responding | রক্তদাতা সাড়া দিচ্ছেন না |
 | `request.donorNotRespondingConfirm` | We'll confirm the next donor and keep searching. {{name}} stays on your list in case they call. | আমরা পরের রক্তদাতাকে নিশ্চিত করব এবং খোঁজা চালিয়ে যাব। {{name}} কল করলে যাতে পান, তালিকায় থাকবেন। |
 | `request.volunteerIn` | A volunteer's number will appear in {{time}} if no donor answers | কোনো রক্তদাতা সাড়া না দিলে {{time}} পর একজন স্বেচ্ছাসেবকের নম্বর দেখাবে |
@@ -703,7 +705,7 @@ Four steps with a progress indicator "Step x of 4"; Back keeps entries; data sav
 
 #### SCR-D03 · Requests for you · `/alerts`
 **Layout:** list of requests where I'm `notified`/`opened`/`accepted`/`confirmed`/`standby`, newest first, grouped **Needs your answer** / **You said yes** / **Earlier**. Item: group chip, component chip, hospital, area, distance, needed-by (relative), verified chip, my state chip.
-**Copy:** `alerts.title` "Requests for you" / "আপনার জন্য অনুরোধ"; `alerts.needsAnswer` "Needs your answer" / "আপনার উত্তরের অপেক্ষায়"; `alerts.saidYes` "You said yes" / "আপনি রাজি হয়েছেন"; `alerts.earlier` "Earlier" / "আগের"; `alerts.empty` "No requests right now. We'll alert you when someone nearby needs your help." / "এখন কোনো অনুরোধ নেই। আশেপাশে কারও আপনার সাহায্য লাগলে জানাব।"; `alerts.closedItem` "No longer needed" / "আর প্রয়োজন নেই".
+**Copy:** `alerts.title` "Requests for you" / "আপনার জন্য অনুরোধ"; `alerts.needsAnswer` "Needs your answer" / "আপনার উত্তরের অপেক্ষায়"; `alerts.saidYes` "You said yes" / "আপনি রাজি হয়েছেন"; `alerts.earlier` "Earlier" / "আগের"; `alerts.empty` "No requests right now. We'll alert you when someone nearby needs your help." / "এখন কোনো অনুরোধ নেই। আশেপাশে কারও আপনার সাহায্য লাগলে জানাব।"; `alerts.closedItem` "No longer needed" / "আর প্রয়োজন নেই"; `alerts.state.new` "New" / "নতুন"; `alerts.state.confirmed` "Confirmed" / "নিশ্চিত"; `alerts.state.standby` "On standby" / "অপেক্ষমাণ".
 **States:** loading skeleton; empty; error; closed requests greyed with `alerts.closedItem`.
 
 #### SCR-D04 · Request for you · `/alerts/[requestId]`
@@ -742,6 +744,11 @@ Four steps with a progress indicator "Step x of 4"; Back keeps entries; data sav
 | `alert.reason.donated` | Donated recently | সম্প্রতি রক্ত দিয়েছি |
 | `alert.reason.unwell` | Not feeling well | শরীর ভালো নেই |
 | `alert.reason.other` | Other | অন্য কারণ |
+| `alert.callMode.label` | How will you talk to the family? | পরিবারের সঙ্গে কীভাবে যোগাযোগ করবেন? |
+| `alert.callMode.mutual` | Share numbers | নম্বর শেয়ার করুন |
+| `alert.callMode.donorCalls` | I'll call them | আমি নিজেই কল করব |
+| `alert.confirm` | Confirm | নিশ্চিত করুন |
+| `alert.send` | Send | পাঠান |
 **States:** loading skeleton; `ERR_NOT_ELIGIBLE` (became ineligible) → banner with eligible date; `ERR_REQUEST_CLOSED`; `ERR_ALREADY_RESPONDED`; `ERR_BLOCKED`; offline → accept goes to the outbox with state line; screen open from a push → `notifications.markOpened` (once).
 **Events:** `notification_opened`, `donor_accepted`, `donor_confirmed`/`donor_standby` (server), `donor_declined{reason}`, `still_coming_answered`, `donor_withdrew`.
 
