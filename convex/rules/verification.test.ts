@@ -5,9 +5,11 @@ import {
   codeFromBytes,
   effectiveStatus,
   isOpen,
+  telegramDeepLink,
   tokenFromBytes,
   VERIFICATION_CODE_LENGTH,
   VERIFICATION_TTL_MS,
+  WEBHOOK_REPLAY_MS,
 } from './verification';
 
 describe('codeFromBytes (VAL-26)', () => {
@@ -68,5 +70,16 @@ describe('isOpen / effectiveStatus', () => {
 
   it('the code lives 10 minutes', () => {
     expect(VERIFICATION_TTL_MS).toBe(600_000);
+  });
+});
+
+describe('telegramDeepLink', () => {
+  it('builds the start link, with or without "@"', () => {
+    expect(telegramDeepLink('udvasito_bot', 'abc123')).toBe('https://t.me/udvasito_bot?start=abc123');
+    expect(telegramDeepLink(' @udvasito_bot ', 'abc123')).toBe('https://t.me/udvasito_bot?start=abc123');
+  });
+
+  it('the replay window is 10 minutes', () => {
+    expect(WEBHOOK_REPLAY_MS).toBe(600_000);
   });
 });

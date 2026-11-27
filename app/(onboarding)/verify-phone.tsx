@@ -1,20 +1,23 @@
 /**
  * SCR-O04 · Verify your phone (specs §3.1, ADR-004, D-R1). Never blocks: "Do this later" goes on to `next`.
  *
- * Methods appear only when they work (specs §1.9): in person when `settings.verification.inPerson` is on; Telegram once
- * its bot and webhook exist; WhatsApp is off in v1. In person: the member gets a 6-character code for 10 minutes, shows
- * it to a volunteer, and this screen follows `phoneVerification.status` live until the volunteer confirms.
+ * Methods appear only when they work (specs §1.9): in person when `settings.verification.inPerson` is on; Telegram when
+ * `verification.telegram` is on and the bot's name is set; WhatsApp is off in v1. Either way this screen follows
+ * `phoneVerification.status` live: waiting → verified / mismatch / expired.
+ *   In person — a 6-character code for 10 minutes that the member shows to a volunteer.
+ *   Telegram  — a one-time link to the bot; the person shares their number there. A number different from the typed
+ *               one is a mismatch the person can accept here ("Yes, use …").
  */
 import { api } from '@convex/_generated/api';
 import type { Id } from '@convex/_generated/dataModel';
 import { useMutation, useQuery } from 'convex/react';
 import { Redirect, router, useLocalSearchParams, type Href } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Banner, Button, Screen, Text } from '@/components';
-import { ShieldCheck } from '@/components/icons';
+import { Send, ShieldCheck } from '@/components/icons';
 import { LoadingScreen } from '@/features/account/Gate';
 import { useAppConfig } from '@/lib/appConfig';
 import { errorMessage } from '@/lib/errors';
@@ -27,7 +30,10 @@ import { colors } from '@/theme/tokens';
 const SUCCESS_PAUSE_MS = 2000;
 const CODE_MARKER = '§CODE§';
 
-type Started = { verificationId: Id<'phoneVerifications'>; code: string; expiresAt: number };
+type Started =
+  | { method: 'in_person'; verificationId: Id<'phoneVerifications'>; code: string; expiresAt: number }
+  | { method: 'telegram'; verificationId: Id<'phoneVerifications'>; deepLink: string; expiresAt: number };
+type Busy = 'in_person' | 'telegram' | 'accept';
 
 export default function VerifyPhone() {
   const { t } = useTranslation();
@@ -36,11 +42,15 @@ export default function VerifyPhone() {
   const config = useAppConfig();
   const me = useQuery(api.profiles.me);
   const startInPerson = useMutation(api.phoneVerification.startInPerson);
+  const startTelegram = useMutation(api.phoneVerification.start);
+  const acceptMismatch = useMutation(api.phoneVerification.acceptMismatch);
 
   const [started, setStarted] = useState<Started | null>(null);
   /** The code whose 10 minutes ran out on this device. */
   const [lateId, setLateId] = useState<Id<'phoneVerifications'> | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<Busy | null>(null);
+  /** The mismatch the person answered "Cancel" to. */
+  const [dismissedId, setDismissedId] = useState<Id<'phoneVerifications'> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const live = useQuery(api.phoneVerification.status, started ? { verificationId: started.verificationId } : 'skip');
 
@@ -67,22 +77,56 @@ export default function VerifyPhone() {
 
   const methods = availableMethods(config);
 
-  const start = async () => {
+  const run = async (step: Busy, action: () => Promise<unknown>) => {
     setError(null);
-    setBusy(true);
+    setBusy(step);
     try {
-      setStarted(await startInPerson({}));
+      await action();
     } catch (caught) {
       const message = errorMessage(caught);
       setError(t(message.key, message.params ?? {}));
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   };
 
-  // "It doesn't match" closes the code card and brings the button back (Q-016).
+  // In person, "It doesn't match" closes the code card and brings the button back (Q-016).
   const waiting = started !== null && (status === undefined || status === 'pending');
+  const waitingFor = waiting ? started.method : null;
+  const mismatch =
+    started?.method === 'telegram' &&
+    status === 'mismatch' &&
+    live?.verifiedPhone !== undefined &&
+    dismissedId !== started.verificationId
+      ? {
+          verificationId: started.verificationId,
+          verified: displayPhone(live.verifiedPhone),
+          entered: displayPhone(live.enteredPhone),
+        }
+      : null;
   const [beforeCode, afterCode] = aroundValue(t('verify.inPersonCode', { code: CODE_MARKER }), CODE_MARKER);
+
+  const onInPerson = () =>
+    void run('in_person', async () => {
+      setStarted({ method: 'in_person', ...(await startInPerson({})) });
+    });
+
+  // While a link is still open, the button opens it again instead of making a new one (5 an hour).
+  const onTelegram = () => {
+    if (waitingFor === 'telegram' && started?.method === 'telegram') {
+      void Linking.openURL(started.deepLink);
+      return;
+    }
+    void run('telegram', async () => {
+      const result = await startTelegram({ method: 'telegram' });
+      setStarted({ method: 'telegram', ...result });
+      await Linking.openURL(result.deepLink);
+    });
+  };
+
+  const onAccept = () => {
+    if (mismatch) void run('accept', () => acceptMismatch({ verificationId: mismatch.verificationId }));
+  };
 
   return (
     <Screen root>
@@ -99,9 +143,52 @@ export default function VerifyPhone() {
       {error ? <Banner kind="error" text={error} /> : null}
       {status === 'expired' ? <Banner kind="warning" text={t('verify.expired')} /> : null}
 
-      {methods.inPerson && status !== 'verified' ? (
+      {mismatch ? (
+        <View className="gap-s3 rounded-md border border-line bg-app p-s4" accessibilityLiveRegion="polite">
+          <Banner kind="warning" text={t('verify.mismatch', { verified: mismatch.verified, entered: mismatch.entered })} />
+          <Button
+            label={t('verify.useVerified', { verified: mismatch.verified })}
+            block
+            loading={busy === 'accept'}
+            onPress={onAccept}
+          />
+          <Button
+            label={t('common.cancel')}
+            variant="secondary"
+            block
+            disabled={busy === 'accept'}
+            onPress={() => setDismissedId(mismatch.verificationId)}
+          />
+        </View>
+      ) : null}
+
+      {methods.telegram && status !== 'verified' && !mismatch ? (
         <View className="gap-s4 rounded-md border border-line bg-app p-s4">
-          {waiting && started ? (
+          <View className="gap-s2">
+            {splitSteps(t('verify.telegramSteps')).map((step) => (
+              <Text key={step}>{step}</Text>
+            ))}
+          </View>
+          <Button
+            label={t('verify.telegram')}
+            icon={Send}
+            block
+            loading={busy === 'telegram'}
+            disabled={busy !== null && busy !== 'telegram'}
+            onPress={onTelegram}
+          />
+          {waitingFor === 'telegram' ? (
+            <View className="flex-row items-center gap-s3" accessibilityLiveRegion="polite">
+              <ActivityIndicator color={colors.brand.primary} />
+              <Text tone="muted">{t('verify.waiting')}</Text>
+            </View>
+          ) : null}
+        </View>
+      ) : null}
+
+      {methods.inPerson && status !== 'verified' && !mismatch ? (
+        <View className="gap-s4 rounded-md border border-line bg-app p-s4">
+          {waitingFor === 'in_person' && started?.method === 'in_person' ? (
             <>
               <View className="items-center gap-s2 rounded-md bg-surface p-s4">
                 <Text tone="muted">{beforeCode}</Text>
@@ -127,7 +214,15 @@ export default function VerifyPhone() {
               </View>
             </>
           ) : (
-            <Button label={t('verify.inPerson')} icon={ShieldCheck} block loading={busy} onPress={() => void start()} />
+            <Button
+              label={t('verify.inPerson')}
+              icon={ShieldCheck}
+              block
+              variant={methods.telegram ? 'secondary' : 'primary'}
+              loading={busy === 'in_person'}
+              disabled={busy !== null && busy !== 'in_person'}
+              onPress={onInPerson}
+            />
           )}
         </View>
       ) : null}

@@ -1071,7 +1071,8 @@ export default defineSchema({
     status: v.union(v.literal("pending"), v.literal("verified"), v.literal("mismatch"), v.literal("expired")),
     verifiedPhone: v.optional(v.string()),
     externalUserId: v.optional(v.string()),       // Telegram user id / WhatsApp wa_id
-  }).index("by_token", ["token"]).index("by_code", ["code"]).index("by_profile", ["profileId"]),
+  }).index("by_token", ["token"]).index("by_code", ["code"]).index("by_profile", ["profileId"])
+    .index("by_external", ["externalUserId"]),   // Telegram contact → the chat's open row
 
   blocks: defineTable({ blockerId: v.id("profiles"), blockedId: v.id("profiles") })
     .index("by_blocker", ["blockerId"]).index("by_pair", ["blockerId", "blockedId"]),
@@ -1489,6 +1490,15 @@ reports *─1 moderationItems            notifications *─1 profiles, *─0..1 
 | `GET /health` | Convex site | none | — | `{ok: true, time}` | For uptime checks |
 | `/api/auth/*` | Convex site | Better Auth | — | — | Managed by the Better Auth component. Email + password: **staging** — any test account (P-10); **production** — only `*@practice.udvasito.invalid` accounts whose profile has `isDemo: true`, only while `demoAreaEnabled`, sign-up disabled, 5 wrong PINs per ID → 15-minute lock (server hook, D-R4) |
 | `GET /r/:slug` | Cloudflare Worker | none | — | HTML with Open Graph tags (title "{{group}} {{component}} needed · {{hospital}}", description, `og:image` = Cloudinary card) + `<meta http-equiv="refresh">` to the app route `/r/<slug>` | No personal data; 404 page if not found |
+**Telegram bot replies** (`POST /telegram/webhook`; each reply is the English line, then the Bangla line). The reply to
+`/start <token>` is `telegramBot.share` with the one-button keyboard. A link that is unknown or past its 10 minutes
+gets `verify.expired`; a shared number that is not a Bangladeshi mobile gets `validation.VAL-03.invalid`; a number
+already verified on another account gets `errors.ERR_PHONE_IN_USE` and nothing changes (Q-015, Q-017).
+| Key | English | বাংলা |
+|---|---|---|
+| `telegramBot.share` | Share my phone number | আমার ফোন নম্বর শেয়ার করুন |
+| `telegramBot.verified` | ✅ Verified — go back to UDVASITO | ✅ যাচাই হয়েছে — উদ্ভাসিতে ফিরে যান |
+| `telegramBot.ownNumber` | Please share your own number. | অনুগ্রহ করে নিজের নম্বর শেয়ার করুন। |
 
 ### 6.6 Scheduled and internal jobs (ADR-009)
 | Job | Trigger | Logic (all idempotent — re-check state first) |

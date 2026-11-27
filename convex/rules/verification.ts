@@ -40,3 +40,11 @@ export function isOpen(row: Row, now: number): boolean {
 export function effectiveStatus(row: Row, now: number): VerificationStatus {
   return row.status === 'pending' && now >= row.expiresAt ? 'expired' : row.status;
 }
+
+/** Webhooks ignore messages older than 10 minutes — replays (specs §7 security NFR). */
+export const WEBHOOK_REPLAY_MS = 10 * 60 * 1000;
+
+/** `https://t.me/<bot>?start=<token>` (SCR-O04). The bot name may be stored with or without "@". */
+export function telegramDeepLink(bot: string, token: string): string {
+  return `https://t.me/${encodeURIComponent(bot.trim().replace(/^@/, ''))}?start=${encodeURIComponent(token)}`;
+}

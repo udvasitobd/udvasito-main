@@ -18,8 +18,12 @@ describe('availableMethods / canVerify', () => {
     expect(canVerify(undefined)).toBe(false);
   });
 
-  it('Telegram stays hidden until it is built, even with a bot name', () => {
-    expect(availableMethods(config(false, 'udvasito_bot')).telegram).toBe(false);
+  it('Telegram needs the switch and the bot name', () => {
+    expect(availableMethods(config(false, 'udvasito_bot'))).toEqual({ inPerson: false, telegram: true });
+    expect(canVerify(config(false, 'udvasito_bot'))).toBe(true);
+    expect(availableMethods(config(false, '  ')).telegram).toBe(false);
+    const off = { verification: { ...config(false, 'udvasito_bot').verification, telegram: false } };
+    expect(availableMethods(off).telegram).toBe(false);
   });
 });
 

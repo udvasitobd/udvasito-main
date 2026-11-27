@@ -10,6 +10,7 @@
 
 import type * as _lib_audit from "../_lib/audit.js";
 import type * as _lib_auth from "../_lib/auth.js";
+import type * as _lib_copy from "../_lib/copy.js";
 import type * as _lib_environment from "../_lib/environment.js";
 import type * as _lib_errors from "../_lib/errors.js";
 import type * as _lib_events from "../_lib/events.js";
@@ -17,6 +18,7 @@ import type * as _lib_network from "../_lib/network.js";
 import type * as _lib_random from "../_lib/random.js";
 import type * as _lib_rateLimits from "../_lib/rateLimits.js";
 import type * as _lib_settings from "../_lib/settings.js";
+import type * as _lib_telegram from "../_lib/telegram.js";
 import type * as _lib_verification from "../_lib/verification.js";
 import type * as _lib_visibility from "../_lib/visibility.js";
 import type * as admin_bootstrap from "../admin/bootstrap.js";
@@ -41,6 +43,7 @@ import type * as rules_validation from "../rules/validation.js";
 import type * as rules_verification from "../rules/verification.js";
 import type * as support from "../support.js";
 import type * as supportInternal from "../supportInternal.js";
+import type * as telegram from "../telegram.js";
 
 import type {
   ApiFromModules,
@@ -51,6 +54,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   "_lib/audit": typeof _lib_audit;
   "_lib/auth": typeof _lib_auth;
+  "_lib/copy": typeof _lib_copy;
   "_lib/environment": typeof _lib_environment;
   "_lib/errors": typeof _lib_errors;
   "_lib/events": typeof _lib_events;
@@ -58,6 +62,7 @@ declare const fullApi: ApiFromModules<{
   "_lib/random": typeof _lib_random;
   "_lib/rateLimits": typeof _lib_rateLimits;
   "_lib/settings": typeof _lib_settings;
+  "_lib/telegram": typeof _lib_telegram;
   "_lib/verification": typeof _lib_verification;
   "_lib/visibility": typeof _lib_visibility;
   "admin/bootstrap": typeof admin_bootstrap;
@@ -82,6 +87,7 @@ declare const fullApi: ApiFromModules<{
   "rules/verification": typeof rules_verification;
   support: typeof support;
   supportInternal: typeof supportInternal;
+  telegram: typeof telegram;
 }>;
 
 /**

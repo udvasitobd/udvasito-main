@@ -265,3 +265,22 @@ SCR-O04 has copy for a Telegram mismatch, but none for the member's screen after
 
 **Recommendation: A.** Until answered the screen does **B** (no new copy is invented).
 Status: ⬜ open
+
+### Q-017 · 2026-11-27 · P1 · Telegram bot: what it says, and the edge cases specs leaves open
+Specs (§6.5) gives the webhook ("upsert verification") and the app-side copy, but not the bot's own messages or what
+happens when the shared contact is odd. The Telegram flow is built as follows (specs §6.5 has a new copy table):
+- **Bot replies** (English line, then Bangla): `telegramBot.share` "Share my phone number" (the button label — the same
+  words `verify.telegramSteps` already quotes), `telegramBot.verified` "✅ Verified — go back to UDVASITO",
+  `telegramBot.ownNumber` "Please share your own number.". Late or unknown links reuse `verify.expired`.
+- **Someone else's contact** (a forwarded card) → `telegramBot.ownNumber`; nothing changes.
+- **Not a Bangladeshi mobile** (e.g. a foreign Telegram number) → `validation.VAL-03.invalid`; the link stays open so
+  the person can verify in person instead.
+- **Number already verified on another account** (Q-015) → `errors.ERR_PHONE_IN_USE`; nothing changes.
+- **A link opened from a second Telegram account** → `verify.expired`; a link belongs to the first account that opens it.
+- **Different number than the one typed** → the bot still says "Verified — go back"; the app then asks
+  `verify.mismatch` with `verify.useVerified` / Cancel (specs SCR-O04).
+
+**Recommendation:** keep as built — every case is safe (nothing is verified unless it is the person's own Bangladeshi
+number, not used elsewhere), and the new English lines are short enough for member 1 to review with the Bangla.
+**Applied:** as above (standing instruction "do the recommendations"); member 1 to review the three new bot lines.
+Status: 🟦 applied, waiting for review

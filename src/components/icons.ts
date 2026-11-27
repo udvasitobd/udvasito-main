@@ -29,3 +29,4 @@ export { default as Menu } from 'lucide-react-native/icons/menu';
 export { default as Settings } from 'lucide-react-native/icons/settings';
 export { default as ShieldCheck } from 'lucide-react-native/icons/shield-check';
 export { default as Smartphone } from 'lucide-react-native/icons/smartphone';
+export { default as Send } from 'lucide-react-native/icons/send';

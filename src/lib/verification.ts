@@ -7,10 +7,15 @@ export type Methods = { inPerson: boolean; telegram: boolean };
 
 /**
  * Methods that work in this build (specs §1.9: a method is shown only when it works). In person follows
- * `settings.verification.inPerson`. Telegram joins once its bot and webhook exist; WhatsApp is off in v1.
+ * `settings.verification.inPerson`; Telegram needs `verification.telegram` and the bot's name (set once the bot and its
+ * webhook exist). WhatsApp is off in v1.
  */
 export function availableMethods(config: Pick<AppConfig, 'verification'> | undefined): Methods {
-  return { inPerson: config?.verification.inPerson === true, telegram: false };
+  const verification = config?.verification;
+  return {
+    inPerson: verification?.inPerson === true,
+    telegram: verification?.telegram === true && verification.telegramBot.trim() !== '',
+  };
 }
 
 /** Whether the Home banner and the verify screen have anything to offer. */

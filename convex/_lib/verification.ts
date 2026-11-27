@@ -10,14 +10,20 @@ import { phoneVerifiedElsewhere } from './visibility';
 
 export type VerificationMethod = Doc<'phoneVerifications'>['method'];
 
+/**
+ * `phone`: the number Telegram/WhatsApp shared when the person chose it over the one they typed (`acceptMismatch`).
+ * `verifierId`: the admin or volunteer, for in-person checks.
+ */
 export async function markPhoneVerified(
   ctx: MutationCtx,
   profile: Doc<'profiles'>,
   via: VerificationMethod,
-  verifierId?: Id<'profiles'>,
+  options: { verifierId?: Id<'profiles'>; phone?: string } = {},
 ): Promise<void> {
-  if (await phoneVerifiedElsewhere(ctx, profile)) throw appError('ERR_PHONE_IN_USE');
+  const { verifierId, phone } = options;
+  if (await phoneVerifiedElsewhere(ctx, profile, phone)) throw appError('ERR_PHONE_IN_USE');
   await ctx.db.patch(profile._id, {
+    ...(phone !== undefined ? { phone } : {}),
     phoneVerified: true,
     phoneVerifiedAt: Date.now(),
     phoneVerifiedVia: via,
