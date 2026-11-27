@@ -25,10 +25,13 @@ export function componentText(component: Component, language: Language): string 
   return copyText(component === 'platelets' ? 'blood.platelets' : 'blood.wholeBlood', language);
 }
 
-/** One decimal under 10 km ("3.2"), whole kilometres beyond ("12"). */
+/** One decimal under 10 km (3.2), whole kilometres beyond (12). */
+export function roundKm(km: number): number {
+  return km < 10 ? Math.round(km * 10) / 10 : Math.round(km);
+}
+
 export function kmText(km: number, language: Language): string {
-  const rounded = km < 10 ? Math.round(km * 10) / 10 : Math.round(km);
-  return digits(String(rounded), language);
+  return digits(String(roundKm(km)), language);
 }
 
 export type DonorAlert = {

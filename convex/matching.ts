@@ -10,9 +10,10 @@ import { v } from 'convex/values';
 
 import type { Doc } from './_generated/dataModel';
 import { internalMutation, type MutationCtx } from './_generated/server';
-import { donorAlertText, type Language } from './_lib/alertText';
+import { donorAlertText } from './_lib/alertText';
 import { logEvent } from './_lib/events';
 import { sendAlert } from './_lib/push';
+import { requestPlaceNames } from './_lib/requestPlace';
 import { getSettings } from './_lib/settings';
 import { groupsFor } from './rules/compatibility';
 import { rankCandidates, type Candidate } from './rules/ranking';
@@ -66,15 +67,6 @@ async function loadCandidates(ctx: MutationCtx, request: Doc<'requests'>, settin
   return { candidates, rows, places };
 }
 
-/** Hospital name in each language, else the typed place, else the thana name. */
-async function placeNames(ctx: MutationCtx, request: Doc<'requests'>): Promise<Record<Language, string>> {
-  const hospital = request.hospitalId ? await ctx.db.get(request.hospitalId) : null;
-  if (hospital) return { en: hospital.nameEn, bn: hospital.nameBn };
-  if (request.placeText) return { en: request.placeText, bn: request.placeText };
-  const thana = await ctx.db.get(request.upazilaId);
-  return { en: thana?.nameEn ?? '', bn: thana?.nameBn ?? '' };
-}
-
 /**
  * Sends wave `wave` unless it was already sent (idempotent). Returns how many donors were eligible before the wave
  * size cut, and how many were alerted.
@@ -111,7 +103,7 @@ async function runWave(
     { finalWave: false, alreadyNotified: new Set(earlier.map((r) => r.donorProfileId)) },
   );
   const chosen = ranked.slice(0, nextWaveSize(wave, openedUnanswered, settings));
-  const place = chosen.length > 0 ? await placeNames(ctx, request) : { en: '', bn: '' };
+  const { place } = chosen.length > 0 ? await requestPlaceNames(ctx, request) : { place: { en: '', bn: '' } };
 
   for (const donor of chosen) {
     const row = rows.get(donor.donorProfileId);

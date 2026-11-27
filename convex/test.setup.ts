@@ -8,7 +8,7 @@ import { register as registerPush } from '@convex-dev/expo-push-notifications/te
 import { register as registerRateLimiter } from '@convex-dev/rate-limiter/test';
 import { convexTest } from 'convex-test';
 
-import { components } from './_generated/api';
+import { api, components } from './_generated/api';
 import type { Doc, Id } from './_generated/dataModel';
 import schema from './schema';
 
@@ -130,4 +130,139 @@ export async function insertPlaces(t: T) {
       otherDistrict,
     };
   });
+}
+
+// ── Matching fixtures (matching, responses tests) ───────────────────────
+
+const HOUR = 60 * 60 * 1000;
+
+export type MatchPlaces = Awaited<ReturnType<typeof insertPlaces>> & {
+  panchlaish: Id<'places'>;
+  farThana: Id<'places'>;
+};
+
+/**
+ * Places for matching tests: the base chain plus Panchlaish (≈ 2 km north of Kotwali) and a far thana (≈ 11 km), and
+ * small waves (S-08 = [3, 5, 8]) so the tests stay readable.
+ */
+export async function setupMatching() {
+  const t = makeT();
+  const base = await insertPlaces(t);
+  const more = await t.run(async (ctx) => {
+    const thana = {
+      level: 'upazila' as const,
+      parentId: base.districtId,
+      lng: 91.83,
+      isMetroThana: true,
+      neighbourIds: [],
+    };
+    return {
+      panchlaish: await ctx.db.insert('places', {
+        ...thana,
+        code: '201557',
+        nameEn: 'Panchlaish',
+        nameBn: 'পাঁচলাইশ',
+        lat: 22.37,
+      }),
+      farThana: await ctx.db.insert('places', { ...thana, code: '201599', nameEn: 'Far', nameBn: 'দূর', lat: 22.45 }),
+    };
+  });
+  await t.run((ctx) => ctx.db.insert('settings', { key: 'waveSizes', value: [3, 5, 8] }));
+  return { t, where: { ...base, ...more } as MatchPlaces };
+}
+
+let people = 0;
+export type DonorOptions = Partial<
+  Pick<
+    Doc<'donorProfiles'>,
+    'bloodGroup' | 'upazilaId' | 'districtId' | 'live' | 'availability' | 'plateletOptIn' | 'isDemo'
+  >
+> & {
+  profile?: ProfileOverrides;
+  authUserId?: string;
+};
+
+/** A live, verified, available B+ donor in Kotwali unless the options say otherwise. */
+export async function donor(t: T, where: MatchPlaces, options: DonorOptions = {}) {
+  people += 1;
+  const { profile = {}, authUserId = `auth-donor-${people}`, ...fields } = options;
+  const isDemo = fields.isDemo ?? false;
+  const profileId = await insertProfile(t, authUserId, {
+    name: `Donor ${people}`,
+    firstName: 'Donor',
+    phone: `+88017${String(people).padStart(8, '0')}`,
+    phoneVerified: true,
+    isDemo,
+    ...profile,
+  });
+  const donorProfileId = await t.run((ctx) =>
+    ctx.db.insert('donorProfiles', {
+      profileId,
+      bloodGroup: 'B+',
+      gender: 'male',
+      divisionId: where.divisionId,
+      districtId: where.districtId,
+      upazilaId: where.upazilaId,
+      travelRange: 'district',
+      neverDonated: true,
+      plateletOptIn: false,
+      availability: 'available',
+      availabilityConfirmedAt: Date.now(),
+      eligibleFrom: 0,
+      eligibleFromPlatelets: 0,
+      callMode: 'mutual',
+      volunteersMayCall: false,
+      verifiedRequestsOnly: false,
+      alertCapPerDay: 3,
+      quietStart: '00:00',
+      quietEnd: '07:00',
+      urgentOverride: true,
+      hidden: false,
+      live: true,
+      selfCheckAt: Date.now(),
+      healthConsentVersion: '2026-11-28-pilot',
+      noShowAt: [],
+      isDemo,
+      ...fields,
+    }),
+  );
+  return { profileId, donorProfileId };
+}
+
+let clients = 0;
+/** `requests.create` arguments for a B+ whole-blood request in Kotwali, needed in 2 hours. */
+export function requestArgs(where: MatchPlaces, overrides: Record<string, unknown> = {}) {
+  clients += 1;
+  return {
+    clientId: `match-${String(clients).padStart(4, '0')}`,
+    bloodGroup: 'B+' as const,
+    component: 'whole_blood' as const,
+    isDengue: false,
+    unitsNeeded: 2,
+    divisionId: where.divisionId,
+    districtId: where.districtId,
+    upazilaId: where.upazilaId,
+    placeText: 'Max Hospital, Mehedibag',
+    neededBy: Date.now() + 2 * HOUR,
+    contactPhone: '01812345678',
+    patientName: 'Amina Begum',
+    source: 'form' as const,
+    aiAssisted: false,
+    lang: 'en' as const,
+    ...overrides,
+  };
+}
+
+/** Posts a request as a new signed-in requester (Karim). */
+export async function postRequest(
+  t: T,
+  where: MatchPlaces,
+  overrides: Record<string, unknown> = {},
+  profile: ProfileOverrides = {},
+) {
+  people += 1;
+  const { as, userId } = await signIn(t, `requester${people}@example.com`);
+  await insertProfile(t, userId, { name: 'Karim Hossain', firstName: 'Karim', ...profile });
+  const { requestId } = await as.mutation(api.requests.create, requestArgs(where, overrides));
+  return { requestId };
 }

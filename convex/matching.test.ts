@@ -8,13 +8,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { formatDhakaDeadline } from '../src/lib/dates';
 
 import { api, internal } from './_generated/api';
-import type { Doc, Id } from './_generated/dataModel';
+import type { Id } from './_generated/dataModel';
 import type { MutationCtx } from './_generated/server';
 import { pushNotifications } from './_lib/push';
-import { insertPlaces, insertProfile, makeT, signIn, type ProfileOverrides, type T } from './test.setup';
+import { donor, postRequest, requestArgs, setupMatching as setup, signIn, type T } from './test.setup';
 
 const HOUR = 60 * 60 * 1000;
-type Where = Awaited<ReturnType<typeof insertPlaces>> & { panchlaish: Id<'places'>; farThana: Id<'places'> };
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -23,126 +22,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
 });
-
-async function setup() {
-  const t = makeT();
-  const base = await insertPlaces(t);
-  const more = await t.run(async (ctx) => {
-    const thana = {
-      level: 'upazila' as const,
-      parentId: base.districtId,
-      lng: 91.83,
-      isMetroThana: true,
-      neighbourIds: [],
-    };
-    return {
-      panchlaish: await ctx.db.insert('places', {
-        ...thana,
-        code: '201557',
-        nameEn: 'Panchlaish',
-        nameBn: 'পাঁচলাইশ',
-        lat: 22.37,
-      }),
-      farThana: await ctx.db.insert('places', { ...thana, code: '201599', nameEn: 'Far', nameBn: 'দূর', lat: 22.45 }),
-    };
-  });
-  // Small waves keep the tests readable: S-08 = [3, 5, 8].
-  await t.run((ctx) => ctx.db.insert('settings', { key: 'waveSizes', value: [3, 5, 8] }));
-  return { t, where: { ...base, ...more } as Where };
-}
-
-let people = 0;
-type DonorOptions = Partial<
-  Pick<
-    Doc<'donorProfiles'>,
-    'bloodGroup' | 'upazilaId' | 'districtId' | 'live' | 'availability' | 'plateletOptIn' | 'isDemo'
-  >
-> & {
-  profile?: ProfileOverrides;
-  authUserId?: string;
-};
-
-async function donor(t: T, where: Where, options: DonorOptions = {}) {
-  people += 1;
-  const { profile = {}, authUserId = `auth-donor-${people}`, ...fields } = options;
-  const isDemo = fields.isDemo ?? false;
-  const profileId = await insertProfile(t, authUserId, {
-    name: `Donor ${people}`,
-    firstName: 'Donor',
-    phone: `+88017${String(people).padStart(8, '0')}`,
-    phoneVerified: true,
-    isDemo,
-    ...profile,
-  });
-  const donorProfileId = await t.run((ctx) =>
-    ctx.db.insert('donorProfiles', {
-      profileId,
-      bloodGroup: 'B+',
-      gender: 'male',
-      divisionId: where.divisionId,
-      districtId: where.districtId,
-      upazilaId: where.upazilaId,
-      travelRange: 'district',
-      neverDonated: true,
-      plateletOptIn: false,
-      availability: 'available',
-      availabilityConfirmedAt: Date.now(),
-      eligibleFrom: 0,
-      eligibleFromPlatelets: 0,
-      callMode: 'mutual',
-      volunteersMayCall: false,
-      verifiedRequestsOnly: false,
-      alertCapPerDay: 3,
-      quietStart: '00:00',
-      quietEnd: '07:00',
-      urgentOverride: true,
-      hidden: false,
-      live: true,
-      selfCheckAt: Date.now(),
-      healthConsentVersion: '2026-11-28-pilot',
-      noShowAt: [],
-      isDemo,
-      ...fields,
-    }),
-  );
-  return { profileId, donorProfileId };
-}
-
-let clients = 0;
-function requestArgs(where: Where, overrides: Record<string, unknown> = {}) {
-  clients += 1;
-  return {
-    clientId: `match-${String(clients).padStart(4, '0')}`,
-    bloodGroup: 'B+' as const,
-    component: 'whole_blood' as const,
-    isDengue: false,
-    unitsNeeded: 2,
-    divisionId: where.divisionId,
-    districtId: where.districtId,
-    upazilaId: where.upazilaId,
-    placeText: 'Max Hospital, Mehedibag',
-    neededBy: Date.now() + 2 * HOUR,
-    contactPhone: '01812345678',
-    patientName: 'Amina Begum',
-    source: 'form' as const,
-    aiAssisted: false,
-    lang: 'en' as const,
-    ...overrides,
-  };
-}
-
-async function postRequest(
-  t: T,
-  where: Where,
-  overrides: Record<string, unknown> = {},
-  profile: ProfileOverrides = {},
-) {
-  people += 1;
-  const { as, userId } = await signIn(t, `requester${people}@example.com`);
-  await insertProfile(t, userId, { name: 'Karim Hossain', firstName: 'Karim', ...profile });
-  const { requestId } = await as.mutation(api.requests.create, requestArgs(where, overrides));
-  return { requestId };
-}
 
 const start = (t: T, requestId: Id<'requests'>) => t.mutation(internal.matching.startRequest, { requestId });
 const responsesOf = (t: T, requestId: Id<'requests'>) =>
@@ -256,6 +135,23 @@ describe('wave 1', () => {
     );
     expect(rows.map((n) => [n.channel, n.status])).toEqual([['expo', 'queued']]);
     expect(english.data.notificationId).toBe(rows[0]!._id);
+  });
+
+  it('masks a phone number typed into the place before it reaches a lock screen', async () => {
+    const { t, where } = await setup();
+    const d = await donor(t, where);
+    await t.run((ctx) =>
+      pushNotifications.recordToken(ctx as unknown as MutationCtx, {
+        userId: d.profileId,
+        pushToken: `ExponentPushToken[token-${d.profileId}]`,
+      }),
+    );
+    const { requestId } = await postRequest(t, where, { placeText: 'Max Hospital, call 018-1234 5678' });
+    await start(t, requestId);
+    const [alert] = await t.run((ctx) =>
+      pushNotifications.getNotificationsForUser(ctx as unknown as MutationCtx, { userId: d.profileId }),
+    );
+    expect(alert?.title).toBe('URGENT · B+ Whole blood needed · Max Hospital, call [phone]');
   });
 
   it('never alerts the requester about their own request; platelets only reach opted-in donors', async () => {
