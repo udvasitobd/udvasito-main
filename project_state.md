@@ -162,7 +162,20 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   LEFT FOR LATER SLICES: notification prompt after donor setup (slice 9 push), Requests-for-you + badge (slice 10),
   Paused (out of P1), alert settings D05 / hide profile / history (later phases). Matching must re-check
   notLiveReasons per candidate (age + consent drift), not trust the stored live flag alone.
-  NEXT: 8 request form + place picker → 9–15.
+  ✅ 8 request server: rules/request.ts (VAL-04…11, needed-by chips, urgency, slug, clientId), requests.create
+  (by_clientId idempotency → {requestId, existing}; another account's clientId → ERR_FORBIDDEN; S-22 open/monthly
+  counts by_requester_status + _creationTime ≥ dhakaMonthStart; contactPhoneVerified via visibility.isOwnVerifiedPhone;
+  hospital → its own place ids + rounded point; else thana centre), hospitals.search (search_all; '' + districtId →
+  by_district list), _lib/places.checkPlaceChain shared with donors (2dfb014) · ✅ 8 request UI: /request/new form path
+  (BloodGroupPicker + any/not_sure, whole blood/platelets + dengue tick, Stepper, PlacePicker, needed-by chips + Pick
+  date/time, contact pre-filled, More details, Check and post summary, error summary, limit banners), Home hero +
+  dengue link, TimeField, useNow, newClientId, useLocateArea moved to features/places (returns point, kept on device
+  only — donor setup passes only ids so the draft never holds it). Q-019 copy + decisions. Checked in Chrome via a
+  throwaway app/zz-request.tsx (deleted): errors, 3 quick taps = 3 bags (stepper is step-based), district → thana →
+  place, Bangla digits/date/time, search cmch → no matches (no hospitals until DEP-01), Post reaches the server (925b2db).
+  AFTER POST: goes to /home with Sent until SCR-M03 (/request/[id], slice 13) exists — change it then.
+  convex-test creation times only move forward → fake-time tests must start at the earliest time.
+  NEXT: 9 matching v1 + Expo push (schedule internal.matching.startRequest from requests.create) → 10–15.
 - convex-test: the fake clock moves 1 ms per write → compare with returned expiresAt / loose bounds, not exact NOW.
   Stub fetch with vi.stubGlobal('fetch', …) and set process.env in beforeEach; t.fetch('/path') hits http.ts routes.
 - Telegram bot go-live (human + me): developer makes the bot in BotFather (staging bot first) and pastes the token as

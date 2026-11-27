@@ -3,6 +3,7 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-27 · P1 · Request blood (form path): blood group incl. "any" / "not sure", whole blood or platelets + dengue, bags, hospital search or "my place isn't in the list" (district → thana → name) with "use my current location" kept on the phone, needed by Now / Today / Tomorrow / a picked time, contact pre-filled; the server checks every field, a retried Post never makes a second request, open and monthly limits apply; Home "Need blood?" hero (2dfb014, 925b2db).
 - 2026-11-27 · P1 · Become a donor: 4-step setup (blood group, area with search and "use my location once" matched on the phone, last donation and checklist, platelets, call mode, health-data consent), Donate tab with Available / Not available and when you can donate again, Home donor cards; a donor is live only with a verified number (bb6220a, c0df3ae).
 - 2026-11-27 · P1 · Phone verification by Telegram: one-time bot link, `POST /telegram/webhook` (secret header, replay guard), own-contact check, "use the Telegram number" choice, bot replies in English + Bangla, one-command webhook setup (b51c595).
 - 2026-11-27 · P1 · Phone verification in person: 6-character code, volunteer/admin check screen (first name + last 4 digits only), audit log, daily limit per verifier, one verified account per number (Q-015) (37b4e6d).
