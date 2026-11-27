@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalisePhone, phoneLast4, toLatinDigits } from './phone';
+import { displayPhone, normalisePhone, phoneLast4, toLatinDigits } from './phone';
 
 describe('normalisePhone (VAL-03)', () => {
   it.each([
@@ -33,5 +33,16 @@ describe('normalisePhone (VAL-03)', () => {
 
   it('shows only the last four digits', () => {
     expect(phoneLast4('+8801712345678')).toBe('5678');
+  });
+});
+
+describe('displayPhone', () => {
+  it('shows a stored number the way people write it', () => {
+    expect(displayPhone('+8801712345678')).toBe('01712-345678');
+  });
+
+  it('leaves anything unexpected as it is (minus +88)', () => {
+    expect(displayPhone('+88123')).toBe('123');
+    expect(displayPhone('017')).toBe('017');
   });
 });

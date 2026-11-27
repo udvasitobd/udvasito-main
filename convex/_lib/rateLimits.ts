@@ -10,9 +10,11 @@ import { appError } from './errors';
 export const rateLimiter = new RateLimiter(components.rateLimiter, {
   /** `GET /public/helpline`: 30 per hour per network (IP) — specs §6.5. */
   publicHelpline: { kind: 'fixed window', rate: 30, period: HOUR },
+  /** `phoneVerification.start` / `startInPerson`: 5 per hour per person and method — specs §6.1. */
+  phoneVerificationStart: { kind: 'fixed window', rate: 5, period: HOUR },
 });
 
-export type RateLimitName = 'publicHelpline';
+export type RateLimitName = 'publicHelpline' | 'phoneVerificationStart';
 
 /** Minutes to wait, rounded up, at least 1 — the `{{minutes}}` of ERR_RATE_LIMITED. */
 export function retryAfterMinutes(retryAfterMs: number | undefined): number {

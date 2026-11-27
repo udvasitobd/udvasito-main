@@ -2,13 +2,16 @@
  * The only door to phone numbers (PRD §3.3, specs §6.0, CLAUDE.md rule 2).
  *
  * - `ownPhone` returns the caller's own number (profiles.me) — not a reveal.
+ * - `ownVerifiedPhone` returns the number Telegram/WhatsApp shared for the caller's own verification row.
+ * - `verifierHint` returns the last 4 digits only — all an in-person verifier ever sees (D-R1).
+ * - `phoneVerifiedElsewhere` compares numbers on the server and returns only yes/no.
  * - `revealPhone` returns another person's number and, in the same transaction, writes a `contactReveals` row (once
  *   per viewer + request + subject + reason) and an audit entry. Functions marked 📞 in specs §6 must use it.
  * The number never goes into the audit `meta`, events, logs or errors.
  */
 import type { Doc, Id } from '../_generated/dataModel';
-import type { MutationCtx } from '../_generated/server';
-import { checkReason } from '../rules/validation';
+import type { MutationCtx, QueryCtx } from '../_generated/server';
+import { checkReason, phoneLast4 } from '../rules/validation';
 import { writeAudit, type AuditAction } from './audit';
 import { appError } from './errors';
 
@@ -29,6 +32,32 @@ export const REVEAL_NEEDS_REASON_TEXT: ReadonlySet<RevealReason> = new Set(['adm
 
 export function ownPhone(profile: Doc<'profiles'>): string {
   return profile.phone;
+}
+
+/** The number shared by Telegram/WhatsApp on the caller's own row (`phoneVerification.status`, SCR-O04 mismatch). */
+export function ownVerifiedPhone(row: Doc<'phoneVerifications'>): string | undefined {
+  return row.verifiedPhone;
+}
+
+/** Last 4 digits of a member's number — `phoneVerification.lookupInPerson` (D-R1). Never the full number. */
+export function verifierHint(profile: Doc<'profiles'>): string {
+  return phoneLast4(profile.phone);
+}
+
+/**
+ * Whether `phone` is already verified on another account in the same area (real or practice). One verified account
+ * per number (ERR_PHONE_IN_USE, Q-015).
+ */
+export async function phoneVerifiedElsewhere(
+  ctx: QueryCtx,
+  profile: Doc<'profiles'>,
+  phone: string = profile.phone,
+): Promise<boolean> {
+  const owners = await ctx.db
+    .query('profiles')
+    .withIndex('by_phone', (q) => q.eq('phone', phone))
+    .collect();
+  return owners.some((other) => other._id !== profile._id && other.phoneVerified && other.isDemo === profile.isDemo);
 }
 
 export async function revealPhone(

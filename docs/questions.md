@@ -240,3 +240,28 @@ specs mentions (none exist yet). Rows and tabs for features not built yet stay h
 where specs gives English only, the Bangla is the plain standard translation of that English (no question needed).
 Member 1 may still polish it in review.
 Status: ✅ answered
+
+### Q-015 · 2026-11-27 · P1 · Phone verification: one verified account per number, and what the daily limit counts
+Specs gives `ERR_PHONE_IN_USE` ("already verified on another account") only on `acceptMismatch`, and says
+`inPersonVerificationsPerDay` limits `confirmInPerson` without saying which outcomes count.
+- **A.** Every way a number becomes verified (in person, Telegram, WhatsApp) refuses a number that is already verified
+  on another account **in the same area** (real or practice — practice accounts use real numbers, D-R4). The daily limit
+  counts **successful** in-person verifications only; "It doesn't match" verifies nothing and is always allowed (still
+  audit-logged). The SCR-V06 footer "{{n}} of {{max}}" shows the same count.
+- **B.** Check only on `acceptMismatch`, as written; count every confirmation.
+
+**Recommendation: A** — otherwise one number could verify any number of accounts, which is what the error exists to
+stop; and a limit on "no match" answers would only block honest volunteers.
+**Applied:** A (standing instruction "do the recommendations"); tell me if you want B.
+Status: 🟦 applied, waiting for review
+
+### Q-016 · 2026-11-27 · P1 · What the member sees when an in-person check says "It doesn't match"
+SCR-O04 has copy for a Telegram mismatch, but none for the member's screen after a volunteer taps "It doesn't match"
+(the volunteer sees `verifyInPerson.failed`).
+- **A.** Add `verify.inPersonFailed` — "The volunteer couldn't match your number. Check the number you entered, then
+  get a new code." / "স্বেচ্ছাসেবক আপনার নম্বর মেলাতে পারেননি। আপনার দেওয়া নম্বরটি দেখে নিন, তারপর নতুন কোড নিন।"
+- **B.** No message: the code card closes and the "Verify in person" button comes back (the volunteer tells the person
+  face to face).
+
+**Recommendation: A.** Until answered the screen does **B** (no new copy is invented).
+Status: ⬜ open

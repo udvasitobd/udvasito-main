@@ -211,6 +211,7 @@
   "home.requestsForMeCount_one": "{{count}} request waiting for your answer",
   "home.requestsForMeCount_other": "{{count}} requests waiting for your answer",
   "home.verifyBanner": "Verify your number so donors trust your requests.",
+  "home.verifyCta": "Verify",
   "landing.hero": "One request. The right donor. Minutes, not hours.",
   "landing.how1": "Post one request — type, speak or paste",
   "landing.how2": "Matching donors nearby are alerted in seconds",

@@ -34,3 +34,8 @@ export function dhakaMonthStart(timestamp: number): number {
   const [y, m] = parts(dhakaDate(timestamp));
   return Date.UTC(y, m - 1, 1) - DHAKA_OFFSET_MS;
 }
+
+/** 00:00 in Dhaka on the calendar day that contains `timestamp` (for daily limits). */
+export function dhakaDayStart(timestamp: number): number {
+  return dhakaMidnight(dhakaDate(timestamp));
+}

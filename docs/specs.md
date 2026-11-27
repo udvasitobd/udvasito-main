@@ -459,6 +459,7 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `home.needBloodCta` | Request blood now | এখনই রক্তের অনুরোধ করুন |
 | `home.dengueCta` | Dengue patient? Ask for platelets | ডেঙ্গু রোগী? প্লাটিলেটের অনুরোধ করুন |
 | `home.verifyBanner` | Verify your number so donors trust your requests. | আপনার নম্বর যাচাই করুন, যাতে রক্তদাতারা আপনার অনুরোধে আস্থা রাখেন। |
+| `home.verifyCta` | Verify | যাচাই করুন |
 | `home.myRequest` | Your request | আপনার অনুরোধ |
 | `home.covered` | {{confirmed}} of {{needed}} bags arranged | {{needed}} ব্যাগের মধ্যে {{confirmed}} ব্যাগের ব্যবস্থা হয়েছে |
 | `home.requestsForMe` | Requests for you | আপনার জন্য অনুরোধ |
