@@ -1,21 +1,24 @@
 /**
  * The tab bar (specs §1.4.1): a bottom bar on phones and tablets, a left sidebar from 1024 px. Only tabs whose
  * screens exist are registered in `app/(app)/(tabs)/_layout.tsx` (specs §1.9); role tabs join when their screens do.
+ * A tab's `tabBarBadge` shows as a count pill on its icon and is read out with the label.
  */
 import type { BottomTabBarProps } from 'expo-router/tabs';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Text } from '@/components';
-import { Droplet, House, Menu, type LucideIcon } from '@/components/icons';
+import { Text, useLanguage } from '@/components';
+import { ClipboardList, Droplet, House, Menu, type LucideIcon } from '@/components/icons';
 import { cn } from '@/lib/cn';
+import { toBanglaDigits } from '@/lib/dates';
 import { colors } from '@/theme/tokens';
 
 /** Route name → icon (specs §1.4.1 icon column). */
-const ICONS: Record<string, LucideIcon> = { home: House, donor: Droplet, more: Menu };
+const ICONS: Record<string, LucideIcon> = { home: House, requests: ClipboardList, donor: Droplet, more: Menu };
 
 export function TabBar({ state, descriptors, navigation, sidebar }: BottomTabBarProps & { sidebar: boolean }) {
   const insets = useSafeAreaInsets();
+  const language = useLanguage();
 
   const items = state.routes.map((route, index) => {
     const { options } = descriptors[route.key]!;
@@ -23,6 +26,8 @@ export function TabBar({ state, descriptors, navigation, sidebar }: BottomTabBar
     const focused = state.index === index;
     const Icon = ICONS[route.name] ?? Menu;
     const color = focused ? colors.brand.primary : colors.text.muted;
+    const badge = typeof options.tabBarBadge === 'number' && options.tabBarBadge > 0 ? options.tabBarBadge : 0;
+    const count = language === 'bn' ? toBanglaDigits(String(badge)) : String(badge);
 
     const onPress = () => {
       const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
@@ -34,7 +39,7 @@ export function TabBar({ state, descriptors, navigation, sidebar }: BottomTabBar
         key={route.key}
         accessibilityRole="tab"
         aria-selected={focused}
-        accessibilityLabel={label}
+        accessibilityLabel={badge > 0 ? [label, count].join(', ') : label}
         onPress={onPress}
         className={cn(
           'min-h-touch items-center rounded-md active:bg-surface web:hover:bg-surface',
@@ -42,7 +47,16 @@ export function TabBar({ state, descriptors, navigation, sidebar }: BottomTabBar
           sidebar && focused && 'bg-brand-primarySoft',
         )}
       >
-        <Icon size={sidebar ? 22 : 24} color={color} strokeWidth={focused ? 2.5 : 2} aria-hidden />
+        <View aria-hidden>
+          <Icon size={sidebar ? 22 : 24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          {badge > 0 ? (
+            <View className="absolute -right-s3 -top-s1 min-w-s4 items-center rounded-pill bg-brand-primary px-s1">
+              <Text variant="caption" tone="inverse" className="font-semibold">
+                {count}
+              </Text>
+            </View>
+          ) : null}
+        </View>
         <Text variant={sidebar ? 'bodyStrong' : 'small'} style={{ color }} numberOfLines={1}>
           {label}
         </Text>

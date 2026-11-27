@@ -46,3 +46,5 @@ export { default as MessageCircle } from 'lucide-react-native/icons/message-circ
 export { default as Navigation } from 'lucide-react-native/icons/navigation';
 export { default as ShieldAlert } from 'lucide-react-native/icons/shield-alert';
 export { default as HeartHandshake } from 'lucide-react-native/icons/heart-handshake';
+export { default as ClipboardList } from 'lucide-react-native/icons/clipboard-list';
+export { default as ChevronUp } from 'lucide-react-native/icons/chevron-up';

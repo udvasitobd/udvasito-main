@@ -26,3 +26,6 @@ export { Select, type SelectOption } from './Select';
 export { SwitchRow } from './SwitchRow';
 export { Stepper } from './Stepper';
 export { TimeField } from './TimeField';
+export { StatusTimeline, type TimelineStep } from './StatusTimeline';
+export { UnitsBar } from './UnitsBar';
+export { SegmentedTabs } from './SegmentedTabs';

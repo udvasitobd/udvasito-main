@@ -146,7 +146,7 @@ function RequestFormScreen({ initial, phoneVerified }: { initial: RequestForm; p
     setPosting(true);
     try {
       const { hospitalId, divisionId, districtId, upazilaId, ...rest } = toCreateArgs(form, at, clientId, language);
-      await create({
+      const result = await create({
         ...rest,
         ...(hospitalId ? { hospitalId: hospitalId as Id<'hospitals'> } : {}),
         divisionId: divisionId as Id<'places'>,
@@ -154,7 +154,7 @@ function RequestFormScreen({ initial, phoneVerified }: { initial: RequestForm; p
         upazilaId: upazilaId as Id<'places'>,
       });
       toast.show(t('common.sent'));
-      router.replace('/home');
+      router.replace({ pathname: '/request/[id]', params: { id: result.requestId } });
     } catch (error) {
       const message = errorMessage(error);
       const field = (error as { data?: { field?: string } }).data?.field as FormField | undefined;

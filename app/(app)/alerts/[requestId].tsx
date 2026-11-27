@@ -1,6 +1,6 @@
 /**
  * SCR-D04 · Request for you (`/alerts/[requestId]`) — specs §4, F-401–F-405, D16. Live: the screen follows my answer
- * and the request (`responses.getForDonor`).
+ * and the request (`responses.getForDonor`, with the S-33 HTTPS fallback through `useLiveQuery`).
  * - Not answered yet: the request, the note, `common.notMedicalAdvice`, **I can help** / **Can't this time**.
  * - Confirmed: `alert.confirmed`, CMP-SafetyCard, the requester's CMP-ContactCard, Directions, patient and ward.
  * - Standby: `alert.standby`, no contact details. Declined: what I answered. Closed: `alerts.closedItem` + thanks.
@@ -10,7 +10,7 @@
  */
 import { api } from '@convex/_generated/api';
 import type { Id } from '@convex/_generated/dataModel';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation } from 'convex/react';
 import { useLocalSearchParams, type ErrorBoundaryProps } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Banner, Button, ContactCard, ErrorState, SafetyCard, Screen, SkeletonCard, Text } from '@/components';
 import { AcceptSheet, DeclineSheet } from '@/features/alerts/AnswerSheets';
 import { RequestDetails, type DonorView } from '@/features/alerts/RequestDetails';
+import { useLiveQuery } from '@/lib/useLiveQuery';
 import { useNow } from '@/lib/useNow';
 
 const MINUTE = 60 * 1000;
@@ -59,7 +60,7 @@ export default function RequestForYou() {
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ requestId: string; n?: string }>();
   const requestId = params.requestId as Id<'requests'>;
-  const view = useQuery(api.responses.getForDonor, { requestId });
+  const view = useLiveQuery(api.responses.getForDonor, { requestId });
   const markOpened = useMutation(api.responses.markOpened);
   const now = useNow(MINUTE);
   const [sheet, setSheet] = useState<'accept' | 'decline' | null>(null);
