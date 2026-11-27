@@ -13,6 +13,7 @@ import type * as _lib_auth from "../_lib/auth.js";
 import type * as _lib_environment from "../_lib/environment.js";
 import type * as _lib_errors from "../_lib/errors.js";
 import type * as _lib_events from "../_lib/events.js";
+import type * as _lib_network from "../_lib/network.js";
 import type * as _lib_rateLimits from "../_lib/rateLimits.js";
 import type * as _lib_settings from "../_lib/settings.js";
 import type * as _lib_visibility from "../_lib/visibility.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   "_lib/environment": typeof _lib_environment;
   "_lib/errors": typeof _lib_errors;
   "_lib/events": typeof _lib_events;
+  "_lib/network": typeof _lib_network;
   "_lib/rateLimits": typeof _lib_rateLimits;
   "_lib/settings": typeof _lib_settings;
   "_lib/visibility": typeof _lib_visibility;

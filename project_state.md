@@ -22,7 +22,7 @@ Last updated: 2026-11-27 (Fri) — branch `p0/foundations`
 | GitHub repo udvasitobd/udvasito-main | public; `main` + `staging` pushed (0273b96) |
 | Convex team `udvasitobd` | All EU (Ireland, eu-west-1). **udvasito-staging**: dev `wry-tern-774` (`npx convex dev`), prod = **STAGING** `outstanding-grasshopper-711` (created 2026-11-27, never deployed). **udvasito-prod** (created 2026-11-27): prod = **PRODUCTION** `striped-starling-176` (never deployed), unused dev `silent-elk-966`. CLI reaches any of them with `--deployment <name>` (no re-linking). |
 | Convex CLI | named account `udvasito` selected for this folder only (`~/.convex/config.json` directories map); developer's personal login kept as default account `personal` — never overwrite it |
-| Convex env vars (names only) | dev wry-tern: BETTER_AUTH_SECRET, SITE_URL=http://localhost:8081, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID (staging client). staging outstanding-grasshopper: BETTER_AUTH_SECRET (own random), SITE_URL=https://staging.udvasito.com, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID (staging client). production striped-starling: BETTER_AUTH_SECRET (own random), SITE_URL=https://udvasito.com, GOOGLE_CLIENT_ID (production client); NEVER PASSWORD_SIGNIN. All three miss GOOGLE_CLIENT_SECRET (user step 3b). APP_ENV removed 2026-11-27. |
+| Convex env vars (names only) | dev wry-tern: BETTER_AUTH_SECRET, SITE_URL=http://localhost:8081, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID (staging client). staging outstanding-grasshopper: BETTER_AUTH_SECRET (own random), SITE_URL=https://staging.udvasito.com, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID (staging client). production striped-starling: BETTER_AUTH_SECRET (own random), SITE_URL=https://udvasito.com, GOOGLE_CLIENT_ID (production client); NEVER PASSWORD_SIGNIN. GOOGLE_CLIENT_SECRET set on all three by the developer (step 3b ✅ 2026-11-27; old unseen secrets LH4C + zrYy deleted, checked). APP_ENV removed 2026-11-27. |
 | Expo | account `udvasitos-team`; project **udvasito** id `3e11ddf3-c86f-4d08-8d22-433104d9a7b2` (public) hard-coded in app.config.ts (no EAS_PROJECT_ID env any more). eas-cli not installed locally; EXPO_TOKEN GitHub secret = for_me step 5. |
 | Vercel | developer creates it on 2026-11-28 (Sat) |
 | Domain udvasito.com | Namecheap (only paid item). ADR-023: used everywhere; staging = staging.udvasito.com |
@@ -99,7 +99,14 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
 - Google OAuth client DONE (see §2) except the secret (user). docs/spikes.md written (all 4 wait on accounts/phones).
 - 2026-11-27 later: review fixes 205a0f1 (+ changelog 2db9b43), PR comment posted, CI green. Created Convex staging +
   production deployments, Expo project (id in app.config.ts), Google production client; staging/prod env vars set.
-- NEXT: after step 3b test "Continue with Google" on localhost:8081 (dev) end-to-end. Then (each needs the developer):
-  first staging deploy (after PR #1 merge OK) + CONVEX_DEPLOY_KEY for CI; Firebase FCM (google-services.json = EAS file
-  secret); Telegram bot (BotFather, developer's phone); Gemini key (developer pastes into Convex); Cloudinary; Sentry;
-  Vercel (Sat); spikes S1–S4; EAS build #1 (ask first). PR #1 NOT merged — waits for the developer's OK.
+- 2026-11-27: PR #1 MERGED into staging (aa6dac5, developer OK). Staging Convex deployed (`npx convex deploy -y`, targets
+  outstanding-grasshopper-711 because CONVEX_DEPLOYMENT=dev:wry-tern-774 is in udvasito-staging) + seeded: settings 61
+  (staging values, pilotDistrictIds filled), places 581, hospitals 0, practice donors 232.
+- Google sign-in TESTED on localhost:8081 → dev: account chooser → consent → /home; reload keeps session; Sign out →
+  /sign-in; no console errors. The consent screen says "Sign in to wry-tern-774.eu-west-1.convex.site" — ADR-023 wants
+  udvasito.com: TODO with Vercel = rewrite `/api/auth/*` on udvasito.com (and staging.udvasito.com) to the Convex site,
+  point Better Auth baseURL + Google redirect URIs there, and fill Branding (name, logo, privacy/terms links).
+- Branch p0/part-2 (open): generated api.d.ts (network module), clearer seed-places label.
+- NEXT: Firebase FCM (google-services.json = EAS file secret); Telegram bot (BotFather, developer's phone); Gemini key
+  (developer pastes into Convex); Cloudinary; Sentry; Vercel (Sat) incl. the auth rewrite above; CONVEX_DEPLOY_KEY
+  (staging) GitHub secret for CI deploys; spikes S1–S4; EAS build #1 (ask first). Never merge a PR before review + fixes.

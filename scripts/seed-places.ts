@@ -48,7 +48,7 @@ if (!fileOnly) {
     totals.updated += r.updated;
     totals.unchanged += r.unchanged;
   }
-  console.log(`places (${target.prod ? 'production' : 'dev/staging'}): ${totals.inserted} added, ${totals.updated} updated, ${totals.unchanged} unchanged`);
+  console.log(`places (${target.prod ? '--prod deployment: staging or production, by its SITE_URL' : 'dev deployment'}): ${totals.inserted} added, ${totals.updated} updated, ${totals.unchanged} unchanged`);
 
   const n = runFunction<{ km: number; changed: number; metroThanas: number }>('admin/seed:computeNeighbours', {}, target);
   console.log(`neighbours: within ${n.km} km, ${n.changed} upazilas/thanas changed`);

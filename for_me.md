@@ -42,7 +42,7 @@ Just write in the chat: phone brand + model + Android version for each phone.
 
 ---
 
-### Step 3b — Give Convex the Google sign-in secrets (10 minutes)
+### Step 3b — Give Convex the Google sign-in secrets (10 minutes) — ✅ done 27 Nov (Claude checked it: sign-in works)
 **Why:** Claude created two Google sign-in "clients": **UDVASITO staging (dev + staging)** for testing and
 **UDVASITO production** for the real app. Each has a **secret** (like a password), so **you** copy it from Google
 straight into Convex. It never goes into the chat or the code.
