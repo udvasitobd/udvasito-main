@@ -74,7 +74,7 @@ READ FIRST
 
 PRE-FLIGHT (ask the developer to confirm before you write code)
 1. Runbooks RB-1 to RB-9 (roadmap §6) are done or in progress; list which env values you will
-   need and where each goes (Convex / Vercel / EAS). Never ask for secrets in chat.
+   need and where each goes (Convex / Cloudflare / EAS). Never ask for secrets in chat.
 2. Node LTS, git and the Expo CLI are installed; `npx eas login` and `npx convex login` done.
 3. The developer's operating system (scripts must be cross-platform anyway).
 
@@ -123,7 +123,7 @@ BUILD, IN THIS ORDER (each item = one or more commits "P0: …")
 11. CI: GitHub Actions on every push — install, tsc, eslint, i18n lint, vitest + convex-test.
     A manual workflow "Android local build" that runs `eas build --local` on Ubuntu and
     uploads the APK as an artifact (roadmap §2.4 fallback).
-12. Web: Vercel build per roadmap RB-3, SPA rewrites, security headers from specs §7.4,
+12. Web: Cloudflare Workers build per roadmap RB-3 (ADR-024), SPA rewrites, security headers from specs §7.4,
     staging branch → staging Convex, main → production.
 13. Sentry for web and native with a beforeSend scrubber removing phone-number patterns
     (Bangla and Latin digits, +880 / 01 forms) — unit-tested.
@@ -132,7 +132,7 @@ BUILD, IN THIS ORDER (each item = one or more commits "P0: …")
 
 SPIKES (1 hour each, write results to docs/spikes.md — roadmap P0 table S1–S4)
 S1 Bangla speech recognition on 3 phones + Chrome. S2 locked-screen push on a Xiaomi/Redmi.
-S3 Better Auth callback through udvasito.com (Vercel rewrite). S4 Gemini free-tier
+S3 Better Auth callback through udvasito.com (Cloudflare Worker pass-through). S4 Gemini free-tier
 call from a Convex action (EU) returning JSON with the current Flash-Lite model ID → put the
 working ID in settings.ai.models.
 
@@ -150,7 +150,7 @@ OUT OF SCOPE IN P0
 Any feature screen beyond sign-in and the empty Home. No sample data in production.
 
 HUMAN STEPS TO ASK FOR (tell the developer when)
-- Env values into Convex/Vercel/EAS (names from specs §7.4 and .env.example)
+- Env values into Convex/Cloudflare/EAS (names from specs §7.4 and .env.example)
 - `npx eas build --profile development --platform android` (build #1) once native config is
   final; install the dev build on the test phones
 - Run bootstrapSuperAdmin on staging and production after signing in once
@@ -626,7 +626,7 @@ READ FIRST
 ORDER (one feature = plan → tests → build → QA → switch on → next)
 1  duplicateWarning — F-208 duplicate warning (rules first; AI "probably the same?" hint only
    on redacted fields) + F-707 merge (keeps acceptances, stops duplicate alerts, informs)
-2  sharedLinks — F-1002 /r/<slug> (Vercel function with Open Graph, anonymised view,
+2  sharedLinks — F-1002 /r/<slug> (Cloudflare Worker route with Open Graph, anonymised view,
    "I can help" flow) + F-1005 appeal card (Cloudinary image, template fallback without AI)
 3  campaignStats — F-708 campus QR codes + per-campaign sign-ups on the dashboard
 4  impactNumbers — F-1001 live numbers on the landing page from /public/stats (real data only)

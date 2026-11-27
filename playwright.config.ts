@@ -1,6 +1,6 @@
 /**
  * npm run test:e2e — web smoke test against the static web export (`dist/`, built by `npm run build:web`), served
- * by scripts/serve-dist.ts with vercel.json's rewrite and headers (CSP included).
+ * by scripts/serve-dist.ts the way Cloudflare serves it (SPA fallback, public/_headers incl. CSP — ADR-024).
  * Uses the installed Google Chrome (no browser download). Port 8081 because the dev deployment's SITE_URL — and so
  * Better Auth's trusted origin — is http://localhost:8081.
  * P6 extends this to the practice-area flow (post → match → accept) in CI before every production deploy.

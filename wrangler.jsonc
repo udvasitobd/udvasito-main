@@ -1,0 +1,34 @@
+// Cloudflare Workers config for the web app (ADR-024). Built and deployed by Workers Builds from GitHub.
+// Top level = PRODUCTION: Worker "udvasito-web", branch `main`, https://udvasito.com.
+// `env.staging` = STAGING: Worker "udvasito-web-staging", branch `staging`, https://staging.udvasito.com, plus preview
+// URLs for other branches. Only public values here — secrets live in the Cloudflare dashboard (CLAUDE.md rule 18).
+{
+  "name": "udvasito-web",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    // `npm run build:web` (expo export) writes the site here; `public/_headers` sets CSP and other headers.
+    "directory": "./dist",
+    // Expo Router web output is one index.html (app.config.ts `web.output: 'single'`). Cloudflare's fallback answers
+    // browser navigations only; other requests that match no file (crawlers, link previews) reach worker/index.ts,
+    // which serves the app through this binding for app addresses and 404 for missing files.
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    // These paths always run worker/index.ts first; real files and navigations are free static-asset requests.
+    "run_worker_first": ["/api/*"],
+  },
+  "workers_dev": false,
+  "preview_urls": false,
+  // www.udvasito.com (on the promo videos) never reaches this Worker: a proxied placeholder DNS record + the zone
+  // Redirect Rule "www to udvasito.com" answer 301 → https://udvasito.com/<same path and query> (dashboard, ADR-024).
+  "routes": [{ "pattern": "udvasito.com", "custom_domain": true }],
+  "vars": { "CONVEX_SITE_URL": "https://striped-starling-176.eu-west-1.convex.site" },
+  "env": {
+    "staging": {
+      "workers_dev": true,
+      "preview_urls": true,
+      "routes": [{ "pattern": "staging.udvasito.com", "custom_domain": true }],
+      "vars": { "CONVEX_SITE_URL": "https://outstanding-grasshopper-711.eu-west-1.convex.site" },
+    },
+  },
+}

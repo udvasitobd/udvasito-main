@@ -55,7 +55,7 @@ Real people will use this to find blood in emergencies. Correctness, privacy and
 17. Only `seed-places`, `seed-settings` and `import-hospitals` may run against production.
 
 **Secrets**
-18. Secrets live only in Convex, Vercel and EAS environment variables. Never commit `.env.local`, keys, tokens, `google-services.json` or PINs. `.env.example` lists names only. The repository is **public**.
+18. Secrets live only in Convex, Cloudflare and EAS environment variables. Never commit `.env.local`, keys, tokens, `google-services.json` or PINs. `.env.example` lists names only. The repository is **public**.
 
 ---
 
@@ -92,14 +92,14 @@ Real people will use this to find blood in emergencies. Correctness, privacy and
 | `npm run content:build` | `src/content/*.md` → `src/content/generated/*.json` |
 | `npm run seed:places` · `npm run seed:settings` · `npm run import:hospitals` | Idempotent reference-data loaders (`-- --prod` for production) |
 | `npm run seed:staging` | Fake data for **staging only** — refuses to run against production |
-| `npm run build:web` | Static web export for Vercel |
+| `npm run build:web` | Static web export for Cloudflare Workers (`dist/`, `wrangler.jsonc`) |
 
 Scripts must work on **Windows, macOS and Linux** (use `tsx` and Node APIs; no bash-only syntax).
 
 ---
 
 ## 5. Stack at a glance (details: `docs/ADRs.md`)
-Expo SDK 57 · Expo Router · TypeScript strict · React Native Web · NativeWind v4 + React Native Reusables · Noto Sans + Noto Sans Bengali · Convex (EU) with scheduler, crons, `@convex-dev/expo-push-notifications`, `@convex-dev/rate-limiter`, Better Auth component (Google; practice sign-in in production; password sign-in in staging) · Telegram bot + in-person phone verification · Expo Push (Android) + Web Push (VAPID) · Gemini Flash-Lite free tier from Convex actions · `expo-speech-recognition` · `expo-location` · Cloudinary (share cards) · Convex storage (slip photos) · Sentry · Vitest + convex-test + Playwright · GitHub Actions · Vercel Hobby · EAS Build / Update · Android package `org.udvasito.app`.
+Expo SDK 57 · Expo Router · TypeScript strict · React Native Web · NativeWind v4 + React Native Reusables · Noto Sans + Noto Sans Bengali · Convex (EU) with scheduler, crons, `@convex-dev/expo-push-notifications`, `@convex-dev/rate-limiter`, Better Auth component (Google; practice sign-in in production; password sign-in in staging) · Telegram bot + in-person phone verification · Expo Push (Android) + Web Push (VAPID) · Gemini Flash-Lite free tier from Convex actions · `expo-speech-recognition` · `expo-location` · Cloudinary (share cards) · Convex storage (slip photos) · Sentry · Vitest + convex-test + Playwright · GitHub Actions · Cloudflare Workers (web + DNS) · EAS Build / Update · Android package `org.udvasito.app`.
 
 ## 6. Branches and environments
-`main` → production (`udvasito-prod`, `udvasito.com`, EAS channel `production`). `staging` → staging (`udvasito-staging`, Vercel staging, channel `preview`). Feature branches → Vercel previews against staging.
+`main` → production (`udvasito-prod`, `udvasito.com`, EAS channel `production`). `staging` → staging (`udvasito-staging`, `staging.udvasito.com` on the Cloudflare Worker `udvasito-web-staging`, channel `preview`). Feature branches → Cloudflare preview URLs against staging.

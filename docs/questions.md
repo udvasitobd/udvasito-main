@@ -29,7 +29,7 @@ The developer bought **udvasito.com** (Namecheap, the only paid item). All docum
 
 **Recommendation: B** — a real domain builds trust with families and judges, costs nothing extra on Vercel, and makes
 the Google sign-in screen show our own address. Needs team approval because it changes copy and an accepted decision.
-**Answer (2026-11-27, developer): B — use the new domain everywhere.** Written as ADR-023; all docs switched to `udvasito.com`; staging web = `staging.udvasito.com`.
+**Answer (2026-11-27, developer): B — use the new domain everywhere.** Written as ADR-023; all docs switched to `udvasito.com`; staging web = `staging.udvasito.com`. *(2026-11-27 later: hosting moved from Vercel to Cloudflare — ADR-024; `udvasito.vercel.app` was never created.)*
 Status: ✅ answered
 
 ### Q-003 · 2026-11-27 · P0 · Android notification channel names disagree

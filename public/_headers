@@ -1,0 +1,15 @@
+# Response headers for the web app on Cloudflare (ADR-024, specs §7.4). Expo copies this file to dist/; Cloudflare
+# applies it to static assets (not to worker/index.ts responses). Limits: 100 rules, 2,000 characters per line.
+# scripts/serve-dist.ts reads the same file, so the Playwright smoke test sees the production headers.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://res.cloudinary.com https://tiles.openfreemap.org; connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://*.convex.site https://api.cloudinary.com https://tiles.openfreemap.org https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://accounts.google.com; worker-src 'self'; manifest-src 'self'; form-action 'self' https://accounts.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(self), microphone=(self), camera=(self)
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Frame-Options: DENY
+
+# Bundles carry a content hash in their name, so they never change. index.html keeps Cloudflare's default
+# (revalidate on every visit), so a new deploy reaches people at once.
+/_expo/*
+  Cache-Control: public, max-age=31536000, immutable

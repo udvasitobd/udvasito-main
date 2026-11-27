@@ -42,7 +42,7 @@ Families still find donors by calling around and posting in scattered Facebook/W
 | Surface | Who | Notes |
 |---|---|---|
 | Android app | Requesters, donors, volunteers, admins | One codebase with the web app (Expo — confirmed in Step 5). **Distributed as an APK download from the website and GitHub Releases** (OQ-05 — Google Play later if the fee is sponsored) |
-| Web app (mobile and desktop browsers) | Everyone | Installable (PWA) on Android, iPhone and desktop; hosted on Vercel |
+| Web app (mobile and desktop browsers) | Everyone | Installable (PWA) on Android, iPhone and desktop; hosted on Cloudflare (ADR-024) |
 | Admin & volunteer panel | Volunteers, admins | Same app, role-gated screens; usable on phone and desktop |
 | Public pages | Visitors, judges | Impact, education, dengue page, anonymised shared request links — no login |
 
@@ -514,7 +514,7 @@ All numbers below are **defaults**, stored as settings (§5.10) and never hard-c
 | A-08 | A doctor or transfusion-medicine teacher will review §5.1–§5.2, the FAQ and the dengue page before public launch | Rules stay labelled "general guidance" |
 
 ### 9.2 Constraints
-- ৳0 budget, no credit card; one developer; 15–20 days; Expo (Android + web) + GitHub + Vercel + Cloudinary + Gemini free tier are team decisions (final details in Step 5).
+- ৳0 budget, no credit card; one developer; 15–20 days; Expo (Android + web) + GitHub + Vercel + Cloudinary + Gemini free tier are team decisions (final details in Step 5; web hosting moved to Cloudflare by ADR-024).
 - AI provider terms: no personal data, no medical advice, no under-18 audience.
 - Bangladesh PDPO 2025 obligations for sensitive (health) data.
 - Push delivery limits on some Android brands and on iPhone web apps.

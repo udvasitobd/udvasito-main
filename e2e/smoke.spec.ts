@@ -50,6 +50,20 @@ test('the sign-in screen has no serious accessibility problems (axe, WCAG 2.2 AA
   expect(serious.map((v) => `${v.id}: ${v.nodes.length} node(s)`)).toEqual([]);
 });
 
+test('crawlers get the app for app addresses and a 404 for missing files, with the security headers', async ({ request }) => {
+  // APIRequestContext sends no Sec-Fetch-Mode, like WhatsApp/Facebook previews and search bots (review of PR #2).
+  const page = await request.get('/learn/dengue');
+  expect(page.status()).toBe(200);
+  expect(await page.text()).toContain('<div id="root">');
+  expect(page.headers()['x-frame-options']).toBe('DENY');
+  expect(page.headers()['strict-transport-security']).toContain('max-age=');
+  for (const missing of ['/_expo/static/js/web/entry-missing.js', '/robots.txt', '/api/r/abc', '/%E0%A4.js']) {
+    const response = await request.get(missing);
+    expect(response.status(), missing).toBe(404);
+    expect(response.headers()['x-content-type-options'], missing).toBe('nosniff');
+  }
+});
+
 test('the page ships no inline scripts (CSP script-src self)', async ({ request }) => {
   const html = await (await request.get('/')).text();
   expect(html).not.toMatch(/<script(?![^>]*\bsrc=)[^>]*>/i);

@@ -8,8 +8,9 @@ describe('environmentFromSiteUrl', () => {
     ['https://www.udvasito.com/', 'production'],
     ['https://UDVASITO.com', 'production'],
     ['https://staging.udvasito.com', 'staging'],
-    // A *.vercel.app address may belong to the production project — never treated as staging.
-    ['https://udvasito-git-p0-foundations-team.vercel.app', 'unknown'],
+    // Preview and workers.dev addresses may belong to the production Worker — never treated as staging (ADR-024).
+    ['https://udvasito-web.udvasito.workers.dev', 'unknown'],
+    ['https://abc123-udvasito-web-staging.udvasito.workers.dev', 'unknown'],
     ['https://udvasito.vercel.app', 'unknown'],
     ['http://localhost:8081', 'staging'],
     ['http://127.0.0.1:8081', 'staging'],

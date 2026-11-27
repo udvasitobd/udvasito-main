@@ -55,3 +55,6 @@ test-results/
 
 # Large local-only files (brand-kit zip, promo videos) — kept on the developer's PC
 _local/
+
+# Cloudflare Wrangler local state
+.wrangler/

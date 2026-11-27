@@ -1,6 +1,6 @@
 # উদ্ভাসিত / UDVASITO: Brand Kit · The Ripple Drop
 
-> Note (2026-11-27, ADR-023): the web address is now **udvasito.com**. The rendered videos still show `udvasito.vercel.app`, which redirects to udvasito.com.
+> Note (2026-11-27, ADR-023, ADR-024): the web address is **udvasito.com**. The rendered videos show **www.udvasito.com** on the end card (checked by the developer, 2026-11-27); `www` redirects to `udvasito.com` (Cloudflare Redirect Rule), so the videos can be shared as they are.
 
 **The idea:** one blood request is one drop. UDVASITO sends it out in ripples: first the nearest matching donors, then a wider wave, then a wider one, until someone answers. The two ripples are the product's matching waves (10 → 25 → 50 donors, `specs.md` S-08). The glint on the drop is the light in উদ্ভাসিত, which means "lit up": the moment a donor says yes. In the wordmark, the last **O** is a ripple holding the drop.
 
@@ -100,7 +100,7 @@ Every line comes from the approved landing-page copy (`specs.md` SCR-P01) or des
 | 11.4–15.5 s | Matching donors nearby are alerted in seconds. | কয়েক সেকেন্ডে কাছের উপযুক্ত রক্তদাতাদের জানানো হয়। | Ripples with the chips "Wave 1 · 10", "Wave 2 · 25", "Wave 3 · 50" |
 | 15.6–19.5 s | Numbers are shared only when a donor says yes. | রক্তদাতা রাজি হলেই কেবল নম্বর শেয়ার হয়। | Donor alert → "I can help" → confirmed, with the safety card |
 | 19.6–22.5 s | No answer in 30 seconds? A volunteer steps in. | ৩০ সেকেন্ডে কেউ সাড়া না দিলে একজন স্বেচ্ছাসেবক এগিয়ে আসেন। | Countdown → volunteer card |
-| 22.5–27 s | One request. The right donor. Minutes, not hours. | একটি অনুরোধ। সঠিক রক্তদাতা। ঘণ্টা নয়, মিনিটে। | Red end card: logo, udvasito.vercel.app, "Free · English & বাংলা · Android & web", "A student initiative · University of Chittagong" |
+| 22.5–27 s | One request. The right donor. Minutes, not hours. | একটি অনুরোধ। সঠিক রক্তদাতা। ঘণ্টা নয়, মিনিটে। | Red end card: logo, www.udvasito.com, "Free · English & বাংলা · Android & web", "A student initiative · University of Chittagong" |
 
 The videos are silent because social feeds autoplay muted. To add music or a voice-over, use a free editor such as CapCut and pick a track you have the rights to use.
 
@@ -115,7 +115,7 @@ The videos are silent because social feeds autoplay muted. To add music or a voi
 | `app-assets/favicon.png`, `favicon.ico` | `public/favicon.png`, `public/favicon.ico` | Web |
 | `app-assets/icon-192.png`, `icon-512.png` | `public/icon-192.png`, `public/icon-512.png` | PWA manifest (`purpose: "any maskable"`; the mark sits in the safe zone) |
 | `app-assets/apple-touch-icon.png` | `public/apple-touch-icon.png` | iPhone "Add to Home Screen" |
-| `app-assets/og-image.png` | `public/og-image.png` | Social preview for `udvasito.vercel.app` |
+| `app-assets/og-image.png` | `public/og-image.png` | Social preview for `udvasito.com` |
 | `svg/udvasito-symbol-red.svg`, `svg/udvasito-wordmark-color.svg` | `assets/logo/` | In-app header and About page (drawn with `react-native-svg`, which the `lucide-react-native` icons in `specs.md` §1.3 already need) |
 
 ## Licences
