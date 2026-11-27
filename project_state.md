@@ -140,3 +140,22 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   (3) PR #2 p0/part-2 → staging: code review DONE (5 findings) + fixes DONE 2026-11-27 (Worker serves the app to crawlers via ASSETS binding + `routeFor`, 404 for missing files, security headers on every Worker response, serve-dist uses the same rule + no crash on broken URLs; IP finding: Better Auth limiter is OFF on Convex — probe 401×5 — noted in worker comment + spikes S3). WAITING: developer says "merge"; (4) Workers Builds (ask before installing the Cloudflare GitHub app) + staging Worker + staging.udvasito.com;
   spike S3 (Better Auth baseURL, Google redirect URIs on udvasito.com); (5) Telegram bot, Gemini key, CONVEX_DEPLOY_KEY
   (staging) for CI; spikes S1, S2, S4; EAS build #1 (ask first). Never merge a PR before review + fixes.
+- P1 PROGRESS (branch `p1/walking-skeleton`, pushed; no PR yet — open one into staging when the loop works, then
+  review + fix before merge):
+  ✅ 6 rules (220845d) · ✅ completeOnboarding + consents.accept + legal header check (6ed94a0) · ✅ 1+3 welcome/consent,
+  About you, /privacy /terms, ?c= capture (45f1582, 9fefdd0) · ✅ 5 shells: tab bar (Home, More), More, Settings,
+  account-status, update-required, profiles.updateLanguage + LanguageSync (9a6079b) · ✅ 2 sign-in was done in P0.
+  ⏭ /download (SCR-P08) moved to the go-live slice: needs the APK release; settings has no size/date fields — decide
+  then (GitHub release API vs new settings keys → ask). Home sections join with their features.
+  NEXT: slice 4 verification (in person now: phoneVerification.startInPerson/lookupInPerson/confirmInPerson +
+  SCR-O04 + SCR-V06; Telegram when bots exist) → 7 donor setup → 8 request form → 9–15.
+- Legal files: NONE in the repo (DEP-02). Without them /welcome, /onboarding, /privacy, /terms are "not found" and the
+  gates skip consent/onboarding (availableRoutes({legalReady})). To check those screens locally: write 4 throwaway
+  files in src/content/legal/ with front matter (version 2026-11-28-pilot, effective 2026-11-28), run
+  content:build + build:web, then DELETE them and `git checkout src/content/generated/index.ts`.
+- Local checks without signing in: temporary re-export routes (e.g. app/zzpreview/…) + `npx tsx scripts/serve-dist.ts`
+  (8081). serve-dist forbids iframes; for a 390 px view use a frame-friendly server from the scratchpad. `pkill` does
+  NOT exist in Git Bash here — stop node servers with PowerShell Stop-Process (match the command line).
+- Typed routes: after adding a route file run `CI=1 npx expo start --web --port 8099` ~25 s to regenerate
+  .expo/types/router.d.ts, otherwise tsc rejects the new href.
+- Copy rule (developer, Q-014): specs English-only → write the plain Bangla translation; don't ask.
