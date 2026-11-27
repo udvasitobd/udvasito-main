@@ -102,7 +102,7 @@ A key is like a password, so **you** create it and paste it straight into GitHub
 3. Name: `EXPO_TOKEN` · Secret: paste (Ctrl + V) → **Add secret**.
 4. Tell Claude "step 5 done". Claude adds the non-secret project id itself.
 
-### Step 6 — Android notifications + the app's signing key (15 minutes, before the first app build)
+### Step 6 — Android notifications + the app's signing key (15 minutes) — ✅ done 27 Nov (Claude checked it on Expo)
 **Why:** Claude set up Firebase (Google's free phone-notification service) for **org.udvasito.app**. Three files are
 like passwords, so **you** move them: Firebase's settings file, Firebase's "push key", and the app's **signing key**
 (Expo creates it — it proves every future update really comes from us; Expo keeps it safe).
