@@ -70,7 +70,7 @@ straight into Convex. It never goes into the chat or the code.
 > To test with your own Gmail: Google Cloud → **Audience** → **Test users** → **+ Add users** → type it → **Save**.
 > Before the real launch Claude asks you to switch it to **In production**.
 
-### Step 3c — Give Convex the Cloudinary key (5 minutes, can wait a few days)
+### Step 3c — Give Convex the Cloudinary key (5 minutes) — ✅ done 27 Nov (Claude checked all three)
 **Why:** Cloudinary makes the picture people share on Facebook/WhatsApp when someone needs blood. Claude created the
 free account (cloud name **udvasito**). Its **API key + API secret** work like a password, so **you** copy them.
 1. Open https://console.cloudinary.com → sign in with Google (**udvasitobd@gmail.com**) → ⚙️ **Settings** (bottom
@@ -127,11 +127,11 @@ like passwords, so **you** move them: Firebase's settings file, Firebase's "push
      the suggested name → **Generate a new keystore**. (It says "Created keystore".)
    - Back in the menu: **Google Service Account** → **Manage your Google Service Account Key for Push Notifications
      (FCM V1)** → **Set up a Google Service Account Key for Push Notifications (FCM V1)** → **Upload a new service
-     account key** → when it asks for the path, type the full path of the file from step 4, for example
-     `C:\Users\User\Downloads\udvasito-516006-firebase-adminsdk-xxxxx.json` → Enter.
+     account key** → when it asks for the path, type the full path of the file from step 4 **without quotation
+     marks** (with quotes Expo says "file not found"), for example `E:\udvasito.json` → Enter.
    - **Exit**.
-7. Delete both files from Downloads (`udvasito-google-services.json` and the `…firebase-adminsdk….json` file) — Expo
-   has them now. Then empty the Recycle Bin.
+7. Delete both files (`udvasito-google-services.json` in Downloads and the push-key file, e.g. `E:\udvasito.json`) —
+   Expo has them now. Then empty the Recycle Bin.
 8. Tell Claude "step 6 done". Claude checks it on the Expo website (it shows only names, never the secrets).
 
 ---
