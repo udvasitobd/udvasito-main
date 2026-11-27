@@ -661,6 +661,27 @@ Four steps with a progress indicator "Step x of 4"; Back keeps entries; data sav
 | `donor.setup.consentHealth` | I agree that UDVASITO stores my blood group, donation dates and area to match me with requests, and shares my number only as described above. | আমি সম্মত যে উদ্ভাসিত আমার রক্তের গ্রুপ, রক্তদানের তারিখ ও এলাকা সংরক্ষণ করবে অনুরোধের সঙ্গে মেলাতে, এবং উপরে বর্ণিতভাবে শুধু আমার নম্বর শেয়ার করবে। |
 | `donor.setup.finish` | Start receiving requests | অনুরোধ পাওয়া শুরু করুন |
 | `donor.setup.done` | You're a donor now. Thank you! We'll alert you only when you can help. | আপনি এখন একজন রক্তদাতা। ধন্যবাদ! শুধু যখন সাহায্য করতে পারবেন, তখনই জানাব। |
+**Copy — labels the layout names in English only** (Q-018, 2026-11-27; member 1 reviews the Bangla):
+| Key | English | বাংলা |
+|---|---|---|
+| `donor.setup.dontKnowGroup` | I don't know my group | আমি আমার গ্রুপ জানি না |
+| `donor.setup.division` | Division | বিভাগ |
+| `donor.setup.district` | District | জেলা |
+| `donor.setup.upazila` | Thana / upazila | থানা / উপজেলা |
+| `donor.setup.area` | Area (optional) | এলাকা (ঐচ্ছিক) |
+| `donor.setup.locationFailed` | We couldn't find your area. Please choose it below. | আপনার এলাকা খুঁজে পাওয়া যায়নি। নিচে থেকে বেছে নিন। |
+| `donor.setup.gender` | Gender | লিঙ্গ |
+| `donor.setup.genderMale` | Male | পুরুষ |
+| `donor.setup.genderFemale` | Female | নারী |
+| `donor.setup.genderOther` | Other | অন্যান্য |
+| `donor.setup.genderUnspecified` | Prefer not to say | বলতে চাই না |
+| `donor.setup.lastDate` | Date of your last donation | শেষ রক্তদানের তারিখ |
+| `donor.setup.lastType` | Type of last donation | শেষ রক্তদানের ধরন |
+| `donor.availability` | Your status | আপনার অবস্থা |
+| `donor.edit` | Update my donor details | আমার রক্তদাতার তথ্য হালনাগাদ করুন |
+| `common.choose` | Choose | বেছে নিন |
+| `common.search` | Search | খুঁজুন |
+| `common.noMatches` | Nothing found. Try another spelling. | কিছু পাওয়া যায়নি। অন্য বানানে চেষ্টা করুন। |
 **States:** step validation errors (§4); server error banner; success → `donor.setup.done` + prompt to allow notifications (OS dialog now — first contextual moment) → `/donor/alert-guide` if denied.
 **Events:** `donor_profile_live`.
 

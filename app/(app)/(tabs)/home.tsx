@@ -1,21 +1,26 @@
 /**
  * SCR-M01 · Home. Sections appear only when their feature works (specs §1.9): the verify banner once a verification
- * method is on; the hero "Need blood?" with the request form, "Become a donor" with donor setup, and so on.
+ * method is on; "Become a donor" (non-donors) and the donor status card (donors) with donor setup; the hero
+ * "Need blood?" with the request form, and so on.
  */
 import { api } from '@convex/_generated/api';
 import { useQuery } from 'convex/react';
 import { router } from 'expo-router';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Banner, Button, LogoMark, Screen, Text } from '@/components';
+import { Banner, Button, ListGroup, ListRow, LogoMark, Screen, Text } from '@/components';
+import { ChevronRight, Droplet } from '@/components/icons';
+import { EligibilityLine } from '@/features/donor/DonorStatus';
 import { useAppConfig } from '@/lib/appConfig';
 import { canVerify } from '@/lib/verification';
+import { colors } from '@/theme/tokens';
 
 export default function Home() {
   const { t } = useTranslation();
   const config = useAppConfig();
   const me = useQuery(api.profiles.me);
+  const mine = useQuery(api.donors.getMine);
   const showVerify = me?.profile?.phoneVerified === false && canVerify(config);
 
   return (
@@ -25,7 +30,12 @@ export default function Home() {
           kind="warning"
           text={t('home.verifyBanner')}
           action={
-            <Button label={t('home.verifyCta')} variant="secondary" size="sm" onPress={() => router.push('/verify-phone')} />
+            <Button
+              label={t('home.verifyCta')}
+              variant="secondary"
+              size="sm"
+              onPress={() => router.push('/verify-phone')}
+            />
           }
         />
       ) : null}
@@ -40,6 +50,27 @@ export default function Home() {
           </Text>
         </View>
       </View>
+      {mine ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/donor')}
+          className="min-h-touch flex-row items-center gap-s3 rounded-md border border-line bg-app p-s4 active:bg-surface web:hover:bg-surface"
+        >
+          <Droplet size={24} color={colors.brand.primary} aria-hidden />
+          <View className="flex-1 gap-s1">
+            <Text variant="bodyStrong">
+              {mine.donor.availability === 'available' ? t('donor.available') : t('donor.unavailable')}
+            </Text>
+            <EligibilityLine eligibleFrom={mine.eligibleFrom} />
+          </View>
+          <ChevronRight size={22} color={colors.text.muted} aria-hidden />
+        </Pressable>
+      ) : null}
+      {mine === null ? (
+        <ListGroup>
+          <ListRow label={t('home.becomeDonor')} icon={Droplet} onPress={() => router.push('/donor/setup')} />
+        </ListGroup>
+      ) : null}
     </Screen>
   );
 }

@@ -30,3 +30,6 @@ export { default as Settings } from 'lucide-react-native/icons/settings';
 export { default as ShieldCheck } from 'lucide-react-native/icons/shield-check';
 export { default as Smartphone } from 'lucide-react-native/icons/smartphone';
 export { default as Send } from 'lucide-react-native/icons/send';
+export { default as Droplet } from 'lucide-react-native/icons/droplet';
+export { default as MapPin } from 'lucide-react-native/icons/map-pin';
+export { default as Pencil } from 'lucide-react-native/icons/pencil';

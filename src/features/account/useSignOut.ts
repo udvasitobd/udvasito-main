@@ -2,6 +2,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 
+import { forgetAllDrafts } from '@/features/donor/draft';
 import { authClient } from '@/lib/convex';
 
 export function useSignOut() {
@@ -14,6 +15,7 @@ export function useSignOut() {
     try {
       const result = await authClient.signOut();
       if (result.error) throw new Error(result.error.message);
+      await forgetAllDrafts();
       router.replace('/sign-in');
     } catch {
       setFailed(true);

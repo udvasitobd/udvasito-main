@@ -1,5 +1,5 @@
 /**
- * Tabs of the signed-in area (specs §1.4.1). Home and More for now; Donate, Requests, Volunteer and Admin join as
+ * Tabs of the signed-in area (specs §1.4.1). Home, Donate and More for now; Requests, Volunteer and Admin join as
  * their screens are built — never before (specs §1.9). The gate wraps this whole navigator (app/(app)/_layout.tsx).
  */
 import { Tabs } from 'expo-router/tabs';
@@ -22,6 +22,7 @@ export default function TabsLayout() {
       tabBar={(props) => <TabBar {...props} sidebar={sidebar} />}
     >
       <Tabs.Screen name="home" options={{ title: t('tabs.home') }} />
+      <Tabs.Screen name="donor" options={{ title: t('tabs.donate') }} />
       <Tabs.Screen name="more" options={{ title: t('tabs.more') }} />
     </Tabs>
   );

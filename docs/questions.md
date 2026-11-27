@@ -284,3 +284,17 @@ happens when the shared contact is odd. The Telegram flow is built as follows (s
 number, not used elsewhere), and the new English lines are short enough for member 1 to review with the Bangla.
 **Applied:** as above (standing instruction "do the recommendations"); member 1 to review the three new bot lines.
 Status: 🟦 applied, waiting for review
+
+### Q-018 · 2026-11-27 · P1 · Words for donor setup and the Donate tab that specs names in English only
+SCR-D02 names the gender options, the place pickers, "I don't know my group" and the last-donation fields in English
+only, with no keys; SCR-D01 needs a label for the availability control and a way back into setup (to add the blood
+group later, as `donor.setup.unknownGroup` promises). Following the standing rule (Q-014: "use the default Bangla
+translation"), specs SCR-D02 now has a copy table with 18 keys (`donor.setup.dontKnowGroup` … `common.noMatches`).
+Also decided while building (no copy involved):
+- The health-data consent version is the current legal version (`settings.consentVersion`); a new version makes the
+  donor not live until they accept it again (`donor.notLive.consent`), like the main consent (X08).
+- "Paused until" is hidden in P1 (roadmap: availability pause is out of scope); Available / Not available work.
+
+**Recommendation:** keep as built; member 1 reviews the 18 Bangla lines.
+**Applied:** as above (standing instruction "do the recommendations").
+Status: 🟦 applied, waiting for review

@@ -7,12 +7,12 @@ import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text } from '@/components';
-import { House, Menu, type LucideIcon } from '@/components/icons';
+import { Droplet, House, Menu, type LucideIcon } from '@/components/icons';
 import { cn } from '@/lib/cn';
 import { colors } from '@/theme/tokens';
 
 /** Route name → icon (specs §1.4.1 icon column). */
-const ICONS: Record<string, LucideIcon> = { home: House, more: Menu };
+const ICONS: Record<string, LucideIcon> = { home: House, donor: Droplet, more: Menu };
 
 export function TabBar({ state, descriptors, navigation, sidebar }: BottomTabBarProps & { sidebar: boolean }) {
   const insets = useSafeAreaInsets();
