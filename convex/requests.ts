@@ -373,8 +373,15 @@ export const listMine = memberQuery({
   },
 });
 
-/** Donors still deciding, or on standby, are told it is no longer needed (NTF-09). */
+/**
+ * Who hears NTF-09 when a request closes: donors still deciding or on standby; with "No longer needed" also confirmed
+ * donors, who may already be on the way and (in "I'll call them" mode) cannot be called off by the family (Q-023).
+ */
 const STILL_WAITING = ['notified', 'opened', 'standby'] as const;
+const TOLD_ON_CLOSE = {
+  fulfilled: STILL_WAITING,
+  not_needed: [...STILL_WAITING, 'confirmed'],
+} as const;
 
 /**
  * `requests.close` (F-501, SCR-M03) — "All bags arranged" or "No longer needed". Matching jobs re-check the status
@@ -404,7 +411,7 @@ export const close = memberMutation({
     if (request.bloodGroup !== 'not_sure') {
       const group = request.bloodGroup;
       const names = await requestPlaceNames(ctx, request);
-      for (const state of STILL_WAITING) {
+      for (const state of TOLD_ON_CLOSE[reason]) {
         const waiting = await ctx.db
           .query('responses')
           .withIndex('by_request_state', (q) => q.eq('requestId', request._id).eq('state', state))
@@ -417,7 +424,7 @@ export const close = memberMutation({
             recipientId: donor._id,
             template: 'NTF-09',
             requestId: request._id,
-            ...noLongerNeededText(group, place, donor.language),
+            ...noLongerNeededText(group, place, reason, donor.language),
             url: `/alerts/${request._id}`,
             androidChannel: 'updates',
             isDemo: request.isDemo,

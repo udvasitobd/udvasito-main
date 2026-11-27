@@ -66,10 +66,20 @@ describe('alert words (specs §6.8)', () => {
   });
 
   it('NTF-09 names the group and the place, in the donor’s language', () => {
-    expect(noLongerNeededText('AB-', 'Chattogram Medical College Hospital', 'en')).toEqual({
+    expect(noLongerNeededText('AB-', 'Chattogram Medical College Hospital', 'fulfilled', 'en')).toEqual({
       title: 'No longer needed — thank you',
       body: 'The AB− request at Chattogram Medical College Hospital has been arranged.',
     });
-    expect(noLongerNeededText('B+', 'চমেক', 'bn').body).toBe('চমেক-এর B+ অনুরোধটির ব্যবস্থা হয়ে গেছে।');
+    expect(noLongerNeededText('B+', 'চমেক', 'fulfilled', 'bn').body).toBe('চমেক-এর B+ অনুরোধটির ব্যবস্থা হয়ে গেছে।');
+  });
+
+  it('NTF-09 after "No longer needed" does not say it was arranged (Q-023)', () => {
+    expect(noLongerNeededText('O+', 'Parkview Hospital', 'not_needed', 'en')).toEqual({
+      title: 'No longer needed — thank you',
+      body: 'The O+ request at Parkview Hospital is no longer needed. Thank you for being ready.',
+    });
+    expect(noLongerNeededText('O+', 'চমেক', 'not_needed', 'bn').body).toBe(
+      'চমেক-এর O+ অনুরোধটির আর প্রয়োজন নেই। প্রস্তুত থাকার জন্য ধন্যবাদ।',
+    );
   });
 });

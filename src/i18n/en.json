@@ -281,6 +281,7 @@
   "notifications.NTF-08.body": "Tap to answer — the family is waiting.",
   "notifications.NTF-08.title": "Still coming to {{hospital}}?",
   "notifications.NTF-09.body": "The {{group}} request at {{hospital}} has been arranged.",
+  "notifications.NTF-09.body.notNeeded": "The {{group}} request at {{hospital}} is no longer needed. Thank you for being ready.",
   "notifications.NTF-09.title": "No longer needed — thank you",
   "notifications.NTF-10.body": "One tap helps us count real donations.",
   "notifications.NTF-10.title": "Did the donation happen?",

@@ -281,6 +281,7 @@
   "notifications.NTF-08.body": "উত্তর দিতে ট্যাপ করুন — পরিবারটি অপেক্ষা করছে।",
   "notifications.NTF-08.title": "আপনি কি {{hospital}}-এ আসছেন?",
   "notifications.NTF-09.body": "{{hospital}}-এর {{group}} অনুরোধটির ব্যবস্থা হয়ে গেছে।",
+  "notifications.NTF-09.body.notNeeded": "{{hospital}}-এর {{group}} অনুরোধটির আর প্রয়োজন নেই। প্রস্তুত থাকার জন্য ধন্যবাদ।",
   "notifications.NTF-09.title": "আর প্রয়োজন নেই — ধন্যবাদ",
   "notifications.NTF-10.body": "এক ট্যাপে আমরা আসল রক্তদান গুনতে পারি।",
   "notifications.NTF-10.title": "রক্তদান কি হয়েছে?",
