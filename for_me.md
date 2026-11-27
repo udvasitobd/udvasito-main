@@ -23,13 +23,14 @@ _Last updated: Fri 27 Nov 2026._
 
 ## 👉 Do now
 
-### 👉 1. Say "merge" for pull request #2
-**Why:** it holds today's work (Cloudflare website setup + fixes). The automatic code review found 5 problems; Claude
-fixed all of them and every test passes. Just write **merge** in the chat (or ask Claude anything about it first).
+### 👉 1. Say "yes" to connecting Cloudflare to GitHub
+**Why:** then the test website **staging.udvasito.com** builds itself from the code. Claude opens the page in Chrome;
+you only click **Install & Authorize** (it lets Cloudflare read the code and show build results on GitHub; Claude shows
+you the exact permissions on the page before you click). Write **yes** in the chat.
 
-### 👉 2. Tell Claude your test phones
-**Why:** we test Bangla voice input and lock-screen alerts on real phones (one cheap 2 GB phone, ideally also one
-Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version** for each phone.
+### 👉 2. Pass on the team jobs below 👥
+Most urgent: **member 4's privacy notice + terms draft** (English + Bangla). Without it the app cannot show its
+consent screen to real people (Q-009). Then the hospital list, two more test phones, and member 1's missing texts.
 
 ---
 
@@ -56,6 +57,10 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 | ✅ | **Namecheap contact email verified** (the domain can't be suspended for that any more) | 27 Nov |
 | ✅ | **Checked the promo videos:** they show **www.udvasito.com** — fine: Claude set Cloudflare to forward www.udvasito.com to udvasito.com and tested it | 27 Nov |
 | ✅ | Cloudflare confirmed: **"Your domain is now protected by Cloudflare"** (udvasito.com is active there) | 27 Nov |
+| ✅ | Said **merge** for pull request #2 after its review + fixes (Claude merged it once GitHub's checks passed) | 27 Nov |
+| ✅ | Told Claude your test phone: **iQOO Z10 Turbo Pro** | 27 Nov |
+| ✅ | Said **"do the recommendations"** → questions Q-004, Q-006, Q-007, Q-008, Q-009 settled | 27 Nov |
+| ✅ | Said **start the next phase** → P1 (the first real version) has started | 27 Nov |
 
 > 💡 Namecheap **auto-renew is off** — the domain is paid until **26 Nov 2027**. Turning it on is your choice (it uses
 > the card saved at Namecheap — the project's one yearly payment). Claude will remind you in October 2027.
@@ -63,11 +68,10 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 ---
 
 ## ⏳ Later (Claude will tell you when)
-- ⏳ **Connect Cloudflare to GitHub (1 click):** Claude opens the page; you click **Install & Authorize** so Cloudflare
-  can build the website from the repository. Then the test website appears at **staging.udvasito.com**.
 - ⏳ **One key for the real website:** you copy a "deploy key" from Convex and paste it into Cloudflare (Claude shows
   you exactly where). Before the real website **udvasito.com** goes live, Claude asks you first.
-- ⏳ **Telegram bot:** needs your phone's Telegram app for 2 minutes (talking to @BotFather).
+- ⏳ **Telegram bots (2 of them: real + test):** needs your phone's Telegram app for ~5 minutes (talking to
+  @BotFather). Needed for phone-number checks in P1 — Claude will give you the exact taps.
 - ⏳ **Gemini AI key:** you create it in Google AI Studio and paste it into Convex (Claude shows where).
 - ⏳ **Install the first test app (APK)** on your phones: Claude sends a link; open it on the phone → **Download** →
   **Install** (Android may ask "Allow from this source?" → allow). Claude asks before using a build (15 a month).
@@ -76,6 +80,13 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 ---
 
 ## 👥 Jobs for the team (pass these on)
+- 👥 **Member 4 — privacy notice + terms draft (DEP-02), MOST URGENT:** English + Bangla, four files:
+  `src/content/legal/privacy.en.md`, `privacy.bn.md`, `terms.en.md`, `terms.bn.md`. Each starts with
+  `version: 2026-11-28-pilot` and `effective: 2026-11-28` (format in `docs/roadmap.md` §5.4). A law teacher reads it
+  for 30 minutes before real people use the app. Send the text to the developer if editing files is hard.
+- 👥 **Anyone — two more Android test phones (DEP-14):** the first real test needs 3 phones (one asks for blood, two
+  answer). Best: one cheap phone with 2 GB memory and one Xiaomi/Redmi. Tell Claude brand + model.
+- 👥 **Member 5 — final app icon (DEP-11)** before the first app for real people.
 - 👥 **Member 2 — hospital list (DEP-01):** fill `data/hospitals.csv` (the first line already has the column names; the
   rules are in `docs/roadmap.md` §5.1). Blood-bank numbers: **only the hospital's public number, never a person's.**
   Then run `npm run import:hospitals -- --check-only` — it lists every row that needs fixing, by line number.
@@ -86,9 +97,9 @@ Xiaomi/Redmi). Just write in the chat: **phone brand + model + Android version**
 - 👥 **Member 1 — missing text:** `docs/questions.md` Q-005 lists 4 small texts that need English + Bangla wording.
 
 ## ❓ Questions waiting for you / the team
-See `docs/questions.md` — Claude writes each question with a recommended answer. You only reply "OK" or pick another
-option. Waiting now: **Q-004, Q-005, Q-006** and the small confirm in **Q-007** (all already built the recommended
-way — a short "OK" is enough).
+See `docs/questions.md` — Claude writes each question with a recommended answer. You said "do the recommendations",
+so Claude follows them unless you say otherwise. Still waiting on people: **Q-005** (member 1's texts), **Q-009**
+(member 4's legal draft), **Q-010** (two more phones).
 
 ---
 

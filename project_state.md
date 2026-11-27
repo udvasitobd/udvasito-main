@@ -3,7 +3,7 @@
 > Read this FIRST in every new context window, after CLAUDE.md. Keep it short and current.
 > Update it at the end of every slice. The human guide is `for_me.md`.
 
-Last updated: 2026-11-27 (Fri) — branch `p0/foundations`
+Last updated: 2026-11-27 (Fri) — branch `p1/walking-skeleton`
 
 ## 1. Where things are
 - Repo root: `E:\ROUGH CODING\Udvasito new` → GitHub `udvasitobd/udvasito-main` (PUBLIC). Push works via the developer's
@@ -125,7 +125,18 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   udvasito.com **ACTIVE** 2026-11-27 ("Your domain is now protected by Cloudflare").
 - for_me.md is a LIVE CHECKLIST (developer's wish): top = "👉 Do now", then "✅ Done" (move items there the moment
   the developer says done / I verify), then "⏳ Later". Keep it current in every commit.
-- NEXT: (1)+(2) DONE (nameservers switched by me after the developer's sign-in, DNSSEC off; step 5 done).
+- 2026-11-27: PR #2 MERGED (squash 3b95976) after review + fixes + CI green (developer: "merge it once the checks pass").
+  Test phone: iQOO Z10 Turbo Pro (Vivo family). Developer: "do the recommendations" for open questions → Q-004 A,
+  Q-006 keep all, Q-007 offline file confirmed, Q-005 2/4/7 stay (member 1 writes 1/3/5/6); new Q-008 (P1 on staging
+  alongside P0 leftovers), Q-009 (no legal drafts → content:build refuses without them; consent tested by tests only),
+  Q-010 (need 2 more phones). Developer: "start working on next phase" → **P1 started, branch `p1/walking-skeleton`**.
+- P1 PLAN (build-prompts §2 order, vertical slices, commit `P1: …`, PRs into staging, review + fix before merge):
+  rules first (6: eligibility/compatibility/limits, pure + 100 % tests) → 2 sign-in/helpline → 3 onboarding 18+ + ?c=
+  → 5 shells (M01/M10/M06/O05/O06/P08/P09) → 1 consent + legal renderer (content waits for DEP-02) → 4 verification
+  (in-person now; Telegram when the bots exist) → 7 donor setup/tab → 8 request form + place picker → 9 matching v1 +
+  Expo push → 10 inbox → 11 accept/decline → 12 contact exchange → 13 status/close/my requests → 14 30-s helpline →
+  15 rate limits. Human: Cloudflare GitHub app (asked in for_me), Telegram bots (RB-5), EAS build (ask), phones, DEP-01/02.
+- OLD NEXT (P0 leftovers): (1)+(2) DONE (nameservers switched by me after the developer's sign-in, DNSSEC off; step 5 done).
   (3) PR #2 p0/part-2 → staging: code review DONE (5 findings) + fixes DONE 2026-11-27 (Worker serves the app to crawlers via ASSETS binding + `routeFor`, 404 for missing files, security headers on every Worker response, serve-dist uses the same rule + no crash on broken URLs; IP finding: Better Auth limiter is OFF on Convex — probe 401×5 — noted in worker comment + spikes S3). WAITING: developer says "merge"; (4) Workers Builds (ask before installing the Cloudflare GitHub app) + staging Worker + staging.udvasito.com;
   spike S3 (Better Auth baseURL, Google redirect URIs on udvasito.com); (5) Telegram bot, Gemini key, CONVEX_DEPLOY_KEY
   (staging) for CI; spikes S1, S2, S4; EAS build #1 (ask first). Never merge a PR before review + fixes.

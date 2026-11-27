@@ -56,7 +56,8 @@ The P0 Definition of Done says Google sign-in creates "a `profiles` row". The sc
 created and `profiles.me` returns needs-onboarding" in P0 and "a `profiles` row" in P1.
 Also decided with it: `minimumAppVersion` / `latestAppVersion` are seeded as **0.1.0** (the default 1.0.0 would block
 the pilot APK v0.1.0); `fallbackContactPhone` is seeded empty until the super-admin sets it through `internal.admin.ops`.
-Status: ⏳ built as A — please confirm
+**Answer (2026-11-27, developer): "do the recommendations"** → A confirmed.
+Status: ✅ answered
 
 ### Q-005 · 2026-11-27 · P0 · Copy missing from specs (not invented — waiting for text)
 These strings are needed but specs has no exact English + Bangla text. Until they arrive the code uses only existing keys:
@@ -75,7 +76,8 @@ These strings are needed but specs has no exact English + Bangla text. Until the
 
 **Recommendation:** member 1 (content) writes 1, 3, 5 and the no-count variant of 6 in both languages; 2 and 4 stay as
 they are; 7 stays as it is unless the team wants keys. Then `npm run copy:extract` picks them up from specs.
-Status: ⏳ waiting for copy
+**Answer (2026-11-27, developer): "do the recommendations"** → 2, 4 and 7 stay as they are; member 1 writes 1, 3, 5 and the no-count variant of 6 (team job in for_me.md).
+Status: ⏳ waiting for member 1's copy (1, 3, 5, 6)
 
 ### Q-006 · 2026-11-27 · P0 · Small additions made to the specs contracts (please confirm)
 1. `public.appConfig` (specs §6.1) also returns **`helplineAvailable: boolean`** (true when `fallbackContactPhone` is
@@ -90,7 +92,8 @@ Status: ⏳ waiting for copy
    (staging is the prod deployment of `udvasito-staging`, so the flag cannot tell them apart). Unknown → it stops.
 
 **Recommendation:** keep all four.
-Status: ⏳ built — please confirm
+**Answer (2026-11-27, developer): "do the recommendations"** → all four kept.
+Status: ✅ answered
 
 ### Q-007 · 2026-11-27 · P0 · Places dataset: which files, and permission to download them
 ADR-013 candidates checked (licence first):
@@ -117,4 +120,37 @@ phone numbers or addresses (`hospitals.bloodBanksNear` is member-only).
 **Answer (2026-11-27, developer): "yes"** → files downloaded at pinned commits into `data/sources/places/`, built with
 `scripts/build-places.ts`; licences in `docs/data-licences.md`. Akbar Shah thana has no centre in any source and is left out
 until member 2 adds one. The code-keyed offline file still needs the team's confirmation.
-Status: ✅ answered (offline-file design: ⏳ confirm)
+Status: ✅ answered (offline-file design confirmed 2026-11-27: "do the recommendations")
+
+### Q-008 · 2026-11-27 · P1 · P0 is not finished and the P1 go-live date (Sat 28 Nov 14:00) has passed
+Still open in P0: Android development build #1, Google sign-in on Android and on production, a push to a locked phone,
+Lighthouse ≤ 3 s, spikes S1–S4. They wait on human steps (Cloudflare ↔ GitHub, Telegram bot, Gemini key, phones,
+an EAS build).
+- **A.** Build P1 now on staging; finish the P0 items alongside as the human steps arrive; go live on production only
+  when the P1 Definition of Done passes and DEP-01/DEP-02 exist. Claude asks before every production deploy.
+- **B.** Stop P1 until P0 is fully done.
+
+**Recommendation: A** (follows Q-001 "just keep working").
+**Answer (2026-11-27, developer): "do the recommendations"** → A.
+Status: ✅ answered
+
+### Q-009 · 2026-11-27 · P1 · The privacy notice and terms (DEP-02) do not exist yet
+The consent screen (SCR-O01, gate G3) links to `/privacy` and `/terms`, rendered from `src/content/legal/*.md` (roadmap
+§5.4). Claude may not write legal text, and a placeholder page or a dead link is not allowed (specs §1.9).
+- **A.** Build the consent screen, `consents.accept`, G3 and the legal-page renderer now. `npm run content:build` refuses
+  to build without all four legal files, so nothing ships without the real draft. Until member 4 delivers it, the flow
+  is tested with automated tests only; real people (and the team on staging) see the consent screen once the draft is in.
+- **B.** Ship the consent screen without links until the draft arrives (consent without the notice — not valid).
+
+**Recommendation: A**; member 4's draft (EN + BN) is the most urgent team job.
+**Answer (2026-11-27, developer): "do the recommendations"** → A.
+Status: ✅ answered (waiting for DEP-02)
+
+### Q-010 · 2026-11-27 · P1 · Test phones: one named so far
+Named: **iQOO Z10 Turbo Pro** (Vivo family; Android version not given). P0 needs a cheap 2 GB phone (Bangla rendering)
+and a Xiaomi/Redmi (spike S2); the P1 Definition of Done needs **three phones** (requester + two donors).
+**Recommendation:** the team lends two more Android phones — ideally one cheap 2 GB phone and one Xiaomi/Redmi. The iQOO
+covers the Vivo battery-settings guide (SCR-M08 "Vivo").
+**Answer (2026-11-27, developer): "do the recommendations"** → borrow two phones (team job in for_me.md).
+Status: ⏳ waiting for two more phones
+

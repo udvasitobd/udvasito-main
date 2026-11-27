@@ -195,7 +195,7 @@ Status column (update as you go): ⬜ not started · 🟦 in progress · ✅ don
 
 ---
 
-### P1 — Walking skeleton · Day 3–5 · Thu 26 – Sat 28 Nov · ⬜
+### P1 — Walking skeleton · Day 3–5 · Thu 26 – Sat 28 Nov · 🟦 (started 2026-11-27, alongside the P0 leftovers — Q-008)
 **Goal:** a real person can consent, sign in, become a donor and verify by Telegram or in person with an admin; a requester can post a form request that alerts matching donors, who accept and see each other's numbers. Thin, but real, safe, logged and isolated from practice data.
 
 **Day plan**
