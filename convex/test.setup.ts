@@ -35,7 +35,8 @@ export type T = ReturnType<typeof makeT>;
 const DAY = 24 * 60 * 60 * 1000;
 
 /** Creates a Better Auth user + live session and returns a client acting as that user. */
-export async function signIn(t: T, email: string) {
+/** A Better Auth user and session; `ipAddress` is the network the session was opened from (S-25 tests). */
+export async function signIn(t: T, email: string, opened: { ipAddress?: string } = {}) {
   const now = Date.now();
   const { userId, sessionId } = await t.run(async (ctx) => {
     const user = (await ctx.runMutation(components.betterAuth.adapter.create, {
@@ -47,7 +48,14 @@ export async function signIn(t: T, email: string) {
     const session = (await ctx.runMutation(components.betterAuth.adapter.create, {
       input: {
         model: 'session',
-        data: { userId: user._id, token: `token-${email}`, expiresAt: now + DAY, createdAt: now, updatedAt: now },
+        data: {
+          userId: user._id,
+          token: `token-${email}`,
+          expiresAt: now + DAY,
+          createdAt: now,
+          updatedAt: now,
+          ...opened,
+        },
       },
     })) as { _id: string };
     return { userId: String(user._id), sessionId: String(session._id) };

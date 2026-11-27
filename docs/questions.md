@@ -423,3 +423,19 @@ Status: ⬜ waiting for the developer
 
 Also: a practice request lists practice blood banks only, so nobody practising calls a real blood bank.
 **Recommendation:** keep as built. Status: 🟦 applied, waiting for review
+
+### Q-025 · 2026-11-28 · P1 · Sign-up limit S-25: how "network" is measured, and a risk at blood drives
+Built (slice 15): `profiles.completeOnboarding` allows `signupsPerDevicePerHour` (S-25, default 5) new profiles per
+network per hour, then `ERR_RATE_LIMITED {minutes}`, with the helpline button under the message (D-R3).
+1. **How the network is known.** A Convex mutation cannot see the caller's address, so the key is the address
+   Better Auth stored on the person's session at sign-in (same Cloudflare header as `GET /public/helpline`), hashed.
+   A session without an address is not limited — one shared bucket would lock out everyone at once.
+2. **Risk.** Mobile operators often put many customers behind one shared public address, and a blood drive puts a
+   whole hall on one Wi-Fi. At 5 an hour, real people at a drive could be told to wait.
+   - **Option A (recommended):** keep 5 as specified; operations raise S-25 (allowed up to 50) with
+     `internal.admin.ops.setSetting` before a drive, and lower it again after.
+   - **Option B:** raise the default now (e.g. to 20).
+3. **"Posting rate limit" (roadmap F-802).** No number is written for it anywhere, so nothing new was invented:
+   posting is bounded by S-22 (1 / 2 open requests, 5 a month), already enforced in `requests.create`.
+
+**Recommendation:** A. Status: 🟦 applied, waiting for review

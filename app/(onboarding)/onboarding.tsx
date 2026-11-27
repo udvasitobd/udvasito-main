@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Banner, Button, DateField, Input, Screen, Text, useLanguage } from '@/components';
+import { Banner, Button, DateField, HelplineButton, Input, Screen, Text, useLanguage } from '@/components';
 import { NotFound } from '@/components/NotFound';
 import { LoadingScreen } from '@/features/account/Gate';
 import { Underage } from '@/features/account/Underage';
@@ -43,6 +43,8 @@ export default function Onboarding() {
   const [phone, setPhone] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [banner, setBanner] = useState<string | null>(null);
+  // S-25 hit: the helpline goes under the message (D-R3 "limit errors"), so nobody in an emergency is stuck here.
+  const [limited, setLimited] = useState(false);
   const [busy, setBusy] = useState(false);
   const [underage, setUnderage] = useState(false);
 
@@ -75,6 +77,7 @@ export default function Onboarding() {
 
   const submit = async () => {
     setBanner(null);
+    setLimited(false);
     const found = validate();
     setErrors(found);
     if (Object.keys(found).length > 0) return;
@@ -107,10 +110,14 @@ export default function Onboarding() {
       const field = (error as { data?: { field?: string } }).data?.field;
       if (message.code === 'ERR_CONSENT_REQUIRED') {
         router.replace(WELCOME_THEN_ONBOARDING as Href);
-      } else if (message.code === 'ERR_VALIDATION' && (field === 'name' || field === 'dateOfBirth' || field === 'phone')) {
+      } else if (
+        message.code === 'ERR_VALIDATION' &&
+        (field === 'name' || field === 'dateOfBirth' || field === 'phone')
+      ) {
         setErrors({ [field]: t(message.key, message.params ?? {}) });
       } else {
         setBanner(t(message.key, message.params ?? {}));
+        setLimited(message.code === 'ERR_RATE_LIMITED');
       }
     } finally {
       setBusy(false);
@@ -127,6 +134,7 @@ export default function Onboarding() {
       </View>
 
       {banner ? <Banner kind="error" text={banner} /> : null}
+      {limited ? <HelplineButton labelKey="signin.helpline" /> : null}
 
       <Input
         label={t('onboarding.name')}

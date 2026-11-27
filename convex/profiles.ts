@@ -8,6 +8,7 @@ import { memberMutationWith, signedInMutation, signedInQuery } from './_lib/auth
 import { writeAudit } from './_lib/audit';
 import { appError, validationError } from './_lib/errors';
 import { logEvent } from './_lib/events';
+import { checkSignupLimit } from './_lib/rateLimits';
 import { getSettings } from './_lib/settings';
 import { ownPhone } from './_lib/visibility';
 import { DAY_MS, dhakaDate } from './rules/time';
@@ -95,6 +96,7 @@ const CAMPAIGN_CODE = /^[A-Za-z0-9_-]{1,32}$/;
  * - Under 18 → `status: "underage_blocked"`. Only the date of birth is kept, as the reason for the block; the name and
  *   number of a child are not stored and no consent is recorded (a minor cannot give it) — Q-013.
  * - The campaign code is kept only when it names an active campaign.
+ * - S-25: a network creates at most `signupsPerDevicePerHour` profiles an hour → `ERR_RATE_LIMITED {minutes}`.
  */
 export const completeOnboarding = signedInMutation({
   args: {
@@ -117,6 +119,7 @@ export const completeOnboarding = signedInMutation({
     if (!dob.ok) throw validationError(dob.error);
 
     if (dob.value.underage) {
+      await checkSignupLimit(ctx, settings.signupsPerDevicePerHour);
       await ctx.db.insert('profiles', {
         authUserId,
         name: '',
@@ -151,6 +154,9 @@ export const completeOnboarding = signedInMutation({
         .unique();
       if (campaign?.active) campaignCode = campaign.code;
     }
+
+    // S-25 last: a form error never uses up one of the network's sign-ups.
+    await checkSignupLimit(ctx, settings.signupsPerDevicePerHour);
 
     const profileId = await ctx.db.insert('profiles', {
       authUserId,
