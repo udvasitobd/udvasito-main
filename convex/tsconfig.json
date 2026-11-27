@@ -1,0 +1,21 @@
+{
+  "//": "Used by `npx convex dev` to type-check Convex functions. Mirrors the root settings.",
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "lib": ["ES2023", "dom"],
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["./**/*", "../src/lib/phone.ts"],
+  "exclude": ["./_generated", "./**/*.test.ts"]
+}

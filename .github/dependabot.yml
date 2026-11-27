@@ -1,0 +1,36 @@
+# Dependabot (specs §7.4). Pull requests go to `staging` and are reviewed like any other change — never auto-merged.
+# Expo SDK packages move together (`npx expo install --fix`), so SDK-level jumps are left to a planned upgrade:
+# major versions are ignored everywhere, and React / React Native minors (which are SDK changes) too.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: staging
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Asia/Dhaka
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-native'
+        update-types: ['version-update:semver-minor']
+      - dependency-name: 'react'
+        update-types: ['version-update:semver-minor']
+      - dependency-name: 'react-dom'
+        update-types: ['version-update:semver-minor']
+    groups:
+      expo-sdk:
+        patterns: ['expo', 'expo-*', '@expo/*', 'react-native', 'react-native-*', '@react-native/*', 'react', 'react-dom']
+      development:
+        dependency-type: development
+      production:
+        dependency-type: production
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: staging
+    schedule:
+      interval: monthly

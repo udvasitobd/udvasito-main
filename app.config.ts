@@ -6,10 +6,11 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
  *
  * Environment (set per EAS profile in eas.json, and in Vercel for web — names only, never values here):
  *   EXPO_PUBLIC_CONVEX_URL, EXPO_PUBLIC_CONVEX_SITE_URL, EXPO_PUBLIC_SENTRY_DSN, EXPO_PUBLIC_APP_ENV
- *   EAS_PROJECT_ID (set once `eas init` has created the project), GOOGLE_SERVICES_JSON (EAS file secret path)
+ *   GOOGLE_SERVICES_JSON (EAS file secret path)
  */
 const APP_VERSION = '0.1.0';
-const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID;
+/** EAS project "udvasito" of the udvasitos-team account (created 2026-11-27). Public identifier, not a secret. */
+const EAS_PROJECT_ID = '3e11ddf3-c86f-4d08-8d22-433104d9a7b2';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -23,12 +24,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: 'light',
   icon: './assets/icon.png',
   runtimeVersion: { policy: 'fingerprint' },
-  ...(EAS_PROJECT_ID
-    ? {
-        updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}`, checkAutomatically: 'ON_LOAD', fallbackToCacheTimeout: 0 },
-        extra: { eas: { projectId: EAS_PROJECT_ID } },
-      }
-    : {}),
+  updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}`, checkAutomatically: 'ON_LOAD', fallbackToCacheTimeout: 0 },
+  extra: { ...config.extra, eas: { projectId: EAS_PROJECT_ID } },
   android: {
     package: 'org.udvasito.app',
     adaptiveIcon: {

@@ -6,6 +6,9 @@ const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   presets: [require('nativewind/preset')],
+  // Light theme only in v1 (specs §1.3). 'class' (never set) instead of the default 'media': NativeWind's web
+  // runtime throws "Cannot manually set color scheme, as dark mode is type 'media'" otherwise.
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {

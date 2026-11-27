@@ -1,0 +1,16 @@
+code,nameEn,nameBn,bbsV03,bdGeocodeId,lat,lng,note
+BD20150041,Kotwali,কোতয়ালী,BD20150041,566,,,
+BD20150057,Panchlaish,পাঁচলাইশ,BD20150057,569,,,
+BD20150010,Bakalia,বাকলিয়া,BD20150010,558,,,
+BD20150019,Chandgaon,চান্দগাঁও,BD20150019,560,,,
+BD20150006,Bayejid Bostami,বায়েজীদ বস্তামি,BD20150006,557,,,
+BD20150043,Khulshi,খুলশী,BD20150043,567,,,
+BD20150055,Pahartali,পাহাড়তলী,BD20150055,568,,,
+BD20150028,Double Mooring,ডবলমুরিং,BD20150028,562,,,
+BD20150035,Halishahar,হালিশহর,BD20150035,564,,,
+BD20150020,Chittagong Port,বন্দর,BD20150020,559,,,"Bandar thana. Bangla corrected from the source spelling ""বান্দার"" — member 2 to confirm."
+BD20150065,Patenga,পতেঙ্গা,BD20150065,570,,,
+X-CTG-SADARGHAT,Sadarghat,সদরঘাট,,571,,,"Not in BBS admin-3; English spelling normalised from ""Shodhorgat"" — member 2 to confirm."
+X-CTG-CHAWKBAZAR,Chawkbazar,চকবাজার,,561,,,"Not in BBS admin-3; English spelling normalised from ""Chokbazar"" — member 2 to confirm."
+X-CTG-EPZ,EPZ,ইপিজেড,,563,,,Not in BBS admin-3 — member 2 to confirm.
+X-CTG-AKBARSHAH,Akbar Shah,আকবর শাহ,,556,,,"Not in BBS admin-3 and the source has no centre: left out until member 2 adds lat,lng (Google Maps → right-click → copy coordinates)."

@@ -1,0 +1,77 @@
+# "Android local build" (roadmap §2.4 fallback, build-prompts P0 item 11): run by hand from the Actions tab when the
+# EAS free queue is slower than 60 minutes or the monthly quota is used up. Builds the APK on GitHub's Ubuntu runner
+# with `eas build --local` (free for public repositories), uploads it as a workflow artifact and, for preview and
+# production, attaches it to a DRAFT release (a person reviews and publishes it).
+#
+# Needs: repository secret EXPO_TOKEN (Expo access token). App secrets
+# (google-services.json, keys) are not here — EAS pulls them from the profile's EAS environment.
+name: Android local build
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: EAS build profile (eas.json)
+        type: choice
+        options: [preview, production, development]
+        default: preview
+
+permissions:
+  contents: write # only for the draft release
+
+concurrency:
+  group: android-local-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build APK (${{ inputs.profile }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PROFILE: ${{ inputs.profile }}
+      APK: udvasito-${{ inputs.profile }}-${{ github.run_number }}.apk
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install
+        run: npm ci
+
+      - name: Build (eas build --local)
+        run: eas build --local --non-interactive --platform android --profile "$PROFILE" --output "$APK"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APK }}
+          path: ${{ env.APK }}
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Attach to a draft release
+        if: inputs.profile != 'development'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "android-$PROFILE-${{ github.run_number }}" "$APK" \
+            --draft \
+            --target "${{ github.sha }}" \
+            --title "Android $PROFILE build ${{ github.run_number }}" \
+            --notes "Built locally on GitHub Actions from ${{ github.sha }} (profile: $PROFILE). Draft: check it on a phone before publishing."

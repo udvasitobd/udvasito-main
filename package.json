@@ -27,6 +27,7 @@
     "expo-linking": "~57.0.14",
     "expo-localization": "~57.0.2",
     "expo-location": "~57.0.24",
+    "expo-network": "~57.0.3",
     "expo-notifications": "~57.0.26",
     "expo-router": "~57.0.32",
     "expo-secure-store": "~57.0.4",
@@ -61,6 +62,7 @@
     "@axe-core/playwright": "^4.14.1",
     "@edge-runtime/vm": "^5.0.0",
     "@playwright/test": "^1.65.1",
+    "@types/node": "^22.20.7",
     "@types/react": "~19.2.2",
     "convex-test": "^0.0.75",
     "eslint": "^9.39.5",
@@ -70,6 +72,27 @@
     "typescript": "~6.0.3",
     "vitest": "^4.1.12"
   },
-  "scripts": {},
-  "private": true
+  "scripts": {
+    "dev": "expo start",
+    "convex": "convex dev",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts && tsc --noEmit -p convex",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm run lint && npm run copy:check && npm test",
+    "copy:extract": "tsx scripts/extract-copy.ts",
+    "copy:check": "tsx scripts/extract-copy.ts --check",
+    "seed:settings": "tsx scripts/seed-settings.ts",
+    "seed:places": "tsx scripts/seed-places.ts",
+    "import:hospitals": "tsx scripts/import-hospitals.ts",
+    "seed:staging": "tsx scripts/seed-staging.ts",
+    "places:build": "tsx scripts/build-places.ts",
+    "build:web": "expo export --platform web",
+    "content:build": "tsx scripts/build-content.ts",
+    "bundle:check": "tsx scripts/check-bundle.ts"
+  },
+  "private": true,
+  "overrides": {
+    "decode-uri-component": "0.5.1"
+  }
 }
