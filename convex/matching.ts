@@ -3,11 +3,13 @@
  * wave 1: the nearest eligible donors of the exact group in the request's district (`rules/ranking.ts`), each with a
  * `responses` row (`notified`) and an NTF-01 alert. All jobs re-check state first, so a retry does nothing twice.
  *
- * Later: waves 2–3, compatible groups and escalation (P2); on-duty volunteers, NTF-03 (P3); the 30-second helpline
- * `volunteerHotline` (P1 slice 14).
+ * `volunteerHotline` runs S-13 seconds after publish: if no donor has said yes, the requester's screen shows the
+ * helpline (`fallbackShown`). On-duty volunteers in that step, NTF-03/05/06 (P3); waves 2–3, compatible groups and
+ * escalation (P2).
  */
 import { v } from 'convex/values';
 
+import { internal } from './_generated/api';
 import type { Doc } from './_generated/dataModel';
 import { internalMutation, type MutationCtx } from './_generated/server';
 import { donorAlertText } from './_lib/alertText';
@@ -165,6 +167,29 @@ export const startRequest = internalMutation({
     const { eligible } = await runWave(ctx, request, 1, settings, Date.now());
     if (eligible === 0 && !request.zeroEligibleAtPublish)
       await ctx.db.patch(requestId, { zeroEligibleAtPublish: true });
+    await ctx.scheduler.runAfter(settings.volunteerHotlineDelaySec * 1000, internal.matching.volunteerHotline, {
+      requestId,
+    });
+    return null;
+  },
+});
+
+/**
+ * S-13 after publish (specs §6.6): no donor has said yes and the request is still live → the requester sees a way to
+ * reach a person now. Nobody can be on duty before volunteers exist (P3, F-702), so in P1 this is always the helpline
+ * (`fallbackShown`); the number itself is fetched only when tapped (D-R3).
+ */
+export const volunteerHotline = internalMutation({
+  args: { requestId: v.id('requests') },
+  handler: async (ctx, { requestId }) => {
+    const request = await ctx.db.get(requestId);
+    if (!request || request.status !== 'live' || request.fallbackShown) return null;
+    const responses = await ctx.db
+      .query('responses')
+      .withIndex('by_request_state', (q) => q.eq('requestId', requestId))
+      .collect();
+    if (responses.some((r) => r.acceptedAt !== undefined)) return null;
+    await ctx.db.patch(requestId, { fallbackShown: true });
     return null;
   },
 });

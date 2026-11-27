@@ -407,3 +407,19 @@ Status: ⬜ waiting for the developer
 
 **Built for now:** option B, exactly as specified (copy and rules are the team's call — CLAUDE.md §3).
 Status: ⬜ waiting for the developer
+
+### Q-024 · 2026-11-28 · P1 · 30-second helpline and "no donors yet": three small readings of the specs (please confirm)
+1. **`requests.getForOwner` returns `fallbackShown: boolean`, not `fallbackPhone`.** specs §6.2 lists an optional
+   `fallbackPhone`; roadmap P1 (F-504) and D-R3 say the helpline goes through `useHelpline()` and is fetched only on
+   tap. Built the D-R3 way: SCR-M03 shows the "Call the UDVASITO helpline" button, and the number arrives when it is
+   tapped. Like every helpline button, it stays hidden until `fallbackContactPhone` is set (Q-006).
+2. **"Volunteer contact in 0:21" countdown is not shown in P1.** Its copy (`request.volunteerIn`) promises *a
+   volunteer's number*, but no volunteers exist until P3, so the helpline simply appears at S-13. The countdown
+   arrives with volunteers.
+3. **"No donors yet" step 2 ("Share your request on Facebook and WhatsApp") is hidden** until the share card exists
+   (if-time, SCR-M05): advice to share with no share button would be a dead end (specs §1.9). Steps are numbered in
+   the order shown, and each appears only when it can be done (helpline once a number is set; blood banks when the
+   district has any with a public number).
+
+Also: a practice request lists practice blood banks only, so nobody practising calls a real blood bank.
+**Recommendation:** keep as built. Status: 🟦 applied, waiting for review

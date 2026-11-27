@@ -12,6 +12,7 @@ import type { Doc, Id } from './_generated/dataModel';
 import type { MutationCtx, QueryCtx } from './_generated/server';
 import { noLongerNeededText, roundKm } from './_lib/alertText';
 import { assertSameArea, memberMutation, memberQuery } from './_lib/auth';
+import { bloodBanksNear } from './_lib/bloodBanks';
 import { appError, validationError } from './_lib/errors';
 import { logEvent } from './_lib/events';
 import { checkPlaceChain } from './_lib/places';
@@ -256,7 +257,8 @@ function progressOf(responses: Doc<'responses'>[]) {
 /**
  * `requests.getForOwner` 📞 (SCR-M03) — live status for the requester: progress counts and one card per confirmed
  * donor. A donor's number comes only through `confirmedDonorPhoneFor` (a live reveal; none for "I'll call them").
- * Volunteers (P3), the helpline and "no donors yet" (slice 14) join this answer with their features.
+ * After S-13 without a "yes" it flags the helpline (`fallbackShown`; the number is fetched on tap, D-R3, so it is not
+ * in this answer); when no donor matched at publish it adds the district's blood banks (F-504). Volunteers come in P3.
  */
 export const getForOwner = memberQuery({
   args: { requestId: v.id('requests') },
@@ -294,6 +296,9 @@ export const getForOwner = memberQuery({
         callMode: response.callMode,
       });
     }
+    const live = request.status === 'live';
+    // F-504: told at once when no donor matches at all, with the helpline and the district's blood banks.
+    const noDonors = live && request.zeroEligibleAtPublish;
     return {
       request: {
         requestId: request._id,
@@ -318,6 +323,9 @@ export const getForOwner = memberQuery({
       wave: request.wave,
       nextWaveAt: request.nextWaveAt ?? null,
       confirmedDonors,
+      /** No donor said yes within S-13 → the helpline button (fetched on tap, D-R3). Volunteers join this in P3. */
+      fallbackShown: live && request.fallbackShown,
+      noDonors: { show: noDonors, bloodBanks: noDonors ? await bloodBanksNear(ctx, request) : [] },
       revealsFrozen: request.revealsFrozen,
       /** Shows CMP-PracticeBadge (specs §1.9). */
       practice: request.isDemo,
