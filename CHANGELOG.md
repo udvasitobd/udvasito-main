@@ -3,6 +3,7 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-28 · P1 · Code-review fixes for PR #3: donors with an out-of-date health consent are no longer alerted or confirmed, sign-out stops push alerts in every account state, practice accounts see practice hospitals (Q-026), removed requests leave the donor inbox, a typed place name is dropped when a hospital is chosen, pushed alerts are marked sent; web shell back to 556 KB gzip (zod and the full date-fns were in the app) (84c4f7f…6373faa).
 - 2026-11-28 · P1 · Sign-up limit S-25: at most 5 new profiles per network per hour (from settings), counted only when a profile is created; the helpline button appears under the "wait" message (f14ed09).
 - 2026-11-28 · P1 · 30-second path: no "yes" within S-13 → the requester's screen shows the helpline (number fetched on tap); no matching donor at all → "No donors yet" at once, with the district's blood banks and a Call button each (4743b1c, b0d12c5).
 - 2026-11-28 · P1 · My request (SCR-M03) and My requests tab (SCR-M04): live counts, a contact card per confirmed donor with the safety card, close as fulfilled or no longer needed (waiting donors are told), Home request cards, 15-second refresh when the live connection drops; headers keep the title readable on small phones (406203b, fdea762, 6f32aea).

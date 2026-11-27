@@ -183,8 +183,13 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   S-25 key = Better Auth session.ipAddress (auth.ts advanced.ipAddress reads cf-connecting-ip first), hashed via
   _lib/network.addressKey; session without an address → not limited. Q-022…Q-025 wait for the developer.
   SCR-M03 body lives in src/features/requests/MyRequestView.tsx (pure, takes `view` + `now`) so previews can render it.
-  NEXT: PR p1/walking-skeleton → staging, code review + fixes, merge only after that; then the team doc's Bangla tab
-  (Q-020, Q-021, Q-023 lines); human steps: helpline number (setSetting fallbackContactPhone), Telegram bot, phones.
+  PR #3 p1/walking-skeleton → staging OPENED 2026-11-28. Code review (high) → 6 findings, ALL FIXED (2b44f89 stale
+  health consent → _lib/donors.isLiveNow in matching + accept; 257890f push.unregister in every state; 1ea789c
+  hospitals.search by caller area, Q-026; bf92eeb inbox drops hiddenByModerator; ceb89b4 placeText dropped with a
+  hospital; e5edd27 pushed alerts 'sent'). Review comment posted on the PR. CI bundle check had failed (671 KB):
+  fixed 84c4f7f (556 KB). WAITING: CI green + developer's OK to merge. Team doc Bangla tab: 15 rows added (rev 2).
+  for_me 👉 4 = helpline number (developer types own number via dashboard → admin/ops:setSetting).
+  NEXT after merge: staging deploy (Workers Builds still needs the developer's yes), 3-phone DoD run, EAS build (ask).
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
   b498ce34-9880-4845-8fc5-54431dd450cb; tab "To-do" 1e0a4b77-629a (body 8e30bb71-e1ec), tab "Bangla to check"
   fc1b86ea-accf (body 054015cc-eff6, table mnm1hfaezn3.358: Screen | English | Claude's Bangla | Your fix | Key;
@@ -210,6 +215,11 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   (8081). serve-dist forbids iframes; for a 390 px view use a frame-friendly server from the scratchpad. `pkill` does
   NOT exist in Git Bash here — stop node servers with PowerShell Stop-Process (match the command line).
 - Unit tests (vitest "unit" project) resolve @/ and @convex/ aliases (vitest.config.mts).
+- BUNDLE: Metro does NOT tree-shake. A bare `zod` import ships all locales (~100 KB gzip), bare `date-fns` ships all
+  ~300 functions. Lint now forbids zod in convex/rules (except settings.ts) and bare 'date-fns' in app code. To see
+  what is in the shell: `npx expo export --platform web --source-maps --output-dir <scratch>` then decode the map
+  (per-source byte count script was in the scratchpad as sizes.py — VLQ decode of `mappings`). bundle:check fails
+  locally when app/zz-preview.tsx has a sample +880 number: move it aside before checking.
 - House style = prettier --single-quote --print-width 120 (no config file); run it on new files before the check.
 - Chrome screenshots can time out when the window is hidden: use read_page / javascript_tool to check the DOM.
 - Previews: app/zz* and src/content/legal/ are in .git/info/exclude (can never be committed). The Chrome window is
