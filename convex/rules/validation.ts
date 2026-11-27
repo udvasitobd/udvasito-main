@@ -109,6 +109,55 @@ export function checkVerificationCode(input: string): Checked<string> {
   return ok(code);
 }
 
+/** VAL-14d (and the donor's blood group, travel range): one of the offered options must be chosen. */
+export function checkChoice<T extends string>(
+  value: T | null | undefined,
+  options: readonly T[],
+  field: string,
+): Checked<T> {
+  if (value === null || value === undefined || !options.includes(value)) return fail(field, 'validation.VAL-14d.invalid');
+  return ok(value);
+}
+
+/** VAL-14b Last donation: a real date from 1970 to today, unless "I have never donated". */
+export function checkLastDonation(
+  neverDonated: boolean,
+  input: string | undefined,
+  today: string,
+): Checked<string | undefined> {
+  if (neverDonated) return ok(undefined);
+  const value = (input ?? '').trim();
+  if (!isRealDate(value) || value < '1970-01-01') return fail('lastDonationDate', 'validation.VAL-14b.missing');
+  if (value > today) return fail('lastDonationDate', 'validation.VAL-14b.future');
+  return ok(value);
+}
+
+/** VAL-14c The three self-checks must all be ticked. */
+export function checkDonorChecklist(checklist: { weight: boolean; health: boolean; screening: boolean }): Checked<true> {
+  if (!checklist.weight || !checklist.health || !checklist.screening) {
+    return fail('checklist', 'validation.VAL-14c.invalid');
+  }
+  return ok(true);
+}
+
+/** VAL-15 A consent checkbox must be ticked. */
+export function checkTicked(ticked: boolean, field = 'consent'): Checked<true> {
+  return ticked ? ok(true) : fail(field, 'validation.VAL-15.invalid');
+}
+
+/** VAL-22 / VAL-23 limit (specs §4). */
+export const SHORT_TEXT_MAX_LENGTH = 80;
+
+/** VAL-22 Institution / VAL-23 Area text: optional, trimmed, at most 80 characters; empty → undefined. */
+export function checkShortText(input: string | undefined, field: 'institution' | 'areaText'): Checked<string | undefined> {
+  const value = (input ?? '').trim().replace(/\s+/g, ' ');
+  if (value === '') return ok(undefined);
+  if ([...value].length > SHORT_TEXT_MAX_LENGTH) {
+    return fail(field, field === 'institution' ? 'validation.VAL-22.invalid' : 'validation.VAL-23.invalid');
+  }
+  return ok(value);
+}
+
 /** Zod helpers for forms (react-hook-form resolvers) built on the same checks. */
 export const zPhone = z.string().transform((value, ctx) => {
   const r = checkPhone(value);

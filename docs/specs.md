@@ -1032,6 +1032,7 @@ export default defineSchema({
     selfCheckAt: v.number(),                      // checklist confirmed
     healthConsentVersion: v.string(),
     noShowAt: v.array(v.number()),                // timestamps (last 90 days kept)
+    firstLiveAt: v.optional(v.number()),          // set once, when `donor_profile_live` fires (specs §6.3)
     isDemo: v.boolean(),
   }).index("by_profile", ["profileId"])
     .index("by_match", ["isDemo", "live", "bloodGroup", "districtId"])
@@ -1402,7 +1403,7 @@ reports *─1 moderationItems            notifications *─1 profiles, *─0..1 
 | Function | Type | Args | Returns | Who | Errors | Side effects |
 |---|---|---|---|---|---|---|
 | `places.bundleVersion` | query | — | `{version}` | public | — | App refreshes its bundled list if newer |
-| `places.list` | query | `{level, parentId?}` | `[{_id, nameEn, nameBn, lat, lng}]` | public | — | — |
+| `places.list` | query | `{level, parentId?}` | `[{_id, nameEn, nameBn, lat, lng, parentId}]` | public | — | `parentId` lets the app resolve "use my location" on the device |
 | `hospitals.search` | query | `{text, districtId?}` | top 10 `[{_id, nameEn, nameBn, upazila, lat, lng}]` — matches names **and aliases** (`search_all`) | public | — | — |
 | `hospitals.bloodBanksNear` | query | `{districtId, upazilaId}` | `[{nameEn, nameBn, phone, distanceKm}]` (institutional numbers) | member | — | — |
 | `intake.parse` | action | `{text, lang, source: "voice"\|"text"\|"paste"}` | `{fields: Partial<RequestFields>, hospitalCandidates: [...], missing: string[], aiUsed: bool, aiError?: "disabled"\|"quota"\|"unavailable", extractedPhone?: string}` | member | `ERR_VALIDATION` (VAL-13), `ERR_RATE_LIMITED` (10/h) | Rules parser → redaction (PRD §6.2) → AI only if required fields missing and allowed (S-29, quota, feature switch) → JSON validated → hospital names matched; `aiCalls` row (redacted); event `ai_call` |

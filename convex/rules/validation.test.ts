@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ageOn,
+  checkChoice,
   checkDateOfBirth,
   checkDeleteWord,
+  checkDonorChecklist,
+  checkLastDonation,
   checkName,
   checkPhone,
   checkReason,
+  checkShortText,
+  checkTicked,
   checkVerificationCode,
   firstNameOf,
   zPhone,
@@ -89,5 +94,74 @@ describe('VAL-18 reason, VAL-25 delete word, VAL-26 code', () => {
     expect(checkVerificationCode('AB0DQ9').ok).toBe(false);
     expect(checkVerificationCode('ABIDQ9').ok).toBe(false);
     expect(checkVerificationCode('AB3DQ').ok).toBe(false);
+  });
+});
+
+describe('VAL-14d choices', () => {
+  const options = ['male', 'female'] as const;
+  it('accepts an offered option only', () => {
+    expect(checkChoice('male', options, 'gender')).toEqual({ ok: true, value: 'male' });
+    for (const value of [undefined, null, 'x' as 'male']) {
+      expect(checkChoice(value, options, 'gender')).toEqual({
+        ok: false,
+        error: { field: 'gender', messageKey: 'validation.VAL-14d.invalid' },
+      });
+    }
+  });
+});
+
+describe('VAL-14b last donation', () => {
+  const today = '2026-11-27';
+  it('"never donated" needs no date', () => {
+    expect(checkLastDonation(true, '2030-01-01', today)).toEqual({ ok: true, value: undefined });
+  });
+  it('needs a real date from 1970 to today', () => {
+    expect(checkLastDonation(false, ' 2026-11-27 ', today)).toEqual({ ok: true, value: '2026-11-27' });
+    expect(checkLastDonation(false, '1970-01-01', today)).toEqual({ ok: true, value: '1970-01-01' });
+    for (const input of [undefined, '', '2026-02-30', '1969-12-31', '27/11/2026']) {
+      expect(checkLastDonation(false, input, today)).toMatchObject({
+        ok: false,
+        error: { field: 'lastDonationDate', messageKey: 'validation.VAL-14b.missing' },
+      });
+    }
+    expect(checkLastDonation(false, '2026-11-28', today)).toMatchObject({
+      ok: false,
+      error: { messageKey: 'validation.VAL-14b.future' },
+    });
+  });
+});
+
+describe('VAL-14c checklist and VAL-15 consent', () => {
+  it('all three self-checks', () => {
+    expect(checkDonorChecklist({ weight: true, health: true, screening: true }).ok).toBe(true);
+    expect(checkDonorChecklist({ weight: true, health: false, screening: true })).toEqual({
+      ok: false,
+      error: { field: 'checklist', messageKey: 'validation.VAL-14c.invalid' },
+    });
+  });
+  it('a ticked box', () => {
+    expect(checkTicked(true).ok).toBe(true);
+    expect(checkTicked(false, 'healthConsent')).toEqual({
+      ok: false,
+      error: { field: 'healthConsent', messageKey: 'validation.VAL-15.invalid' },
+    });
+  });
+});
+
+describe('VAL-22 / VAL-23 short text', () => {
+  it('is optional, trimmed and at most 80 characters', () => {
+    expect(checkShortText(undefined, 'institution')).toEqual({ ok: true, value: undefined });
+    expect(checkShortText('   ', 'areaText')).toEqual({ ok: true, value: undefined });
+    expect(checkShortText('  University  of   Chittagong ', 'institution')).toEqual({
+      ok: true,
+      value: 'University of Chittagong',
+    });
+    expect(checkShortText('আ'.repeat(80), 'areaText').ok).toBe(true);
+    expect(checkShortText('a'.repeat(81), 'institution')).toMatchObject({
+      error: { field: 'institution', messageKey: 'validation.VAL-22.invalid' },
+    });
+    expect(checkShortText('a'.repeat(81), 'areaText')).toMatchObject({
+      error: { field: 'areaText', messageKey: 'validation.VAL-23.invalid' },
+    });
   });
 });

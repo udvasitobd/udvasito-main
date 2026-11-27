@@ -67,6 +67,7 @@ export default defineSchema({
     selfCheckAt: v.number(),                      // checklist confirmed
     healthConsentVersion: v.string(),
     noShowAt: v.array(v.number()),                // timestamps (last 90 days kept)
+    firstLiveAt: v.optional(v.number()),          // set once, when `donor_profile_live` fires (specs §6.3)
     isDemo: v.boolean(),
   }).index("by_profile", ["profileId"])
     .index("by_match", ["isDemo", "live", "bloodGroup", "districtId"])

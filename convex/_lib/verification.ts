@@ -5,6 +5,7 @@
  */
 import type { Doc, Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
+import { refreshDonorLive } from './donors';
 import { appError } from './errors';
 import { phoneVerifiedElsewhere } from './visibility';
 
@@ -30,5 +31,5 @@ export async function markPhoneVerified(
     // Only in-person verification has a verifier; `undefined` clears an earlier one.
     phoneVerifiedBy: via === 'in_person' ? verifierId : undefined,
   });
-  // Donor profiles arrive with donor setup (P1 slice 7); their `live` flag is recomputed here from then on.
+  await refreshDonorLive(ctx, profile._id);
 }
