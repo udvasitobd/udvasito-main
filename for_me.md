@@ -11,7 +11,7 @@ finished and what to do next.
 | ⏳ | Later — Claude will tell you when |
 | 👥 | A job for another team member |
 
-_Last updated: Fri 27 Nov 2026._
+_Last updated: Sat 28 Nov 2026._
 
 > 🔒 **Golden rules**
 > 1. **Never enter a credit/debit card** on any website for this project. If a site asks for a card, stop and tell Claude.
@@ -53,6 +53,22 @@ only needs its own bot. This one is for the test website (staging) — the real 
    - **Value:** paste (Ctrl + V) → **Save**.
 8. Write in the chat: **"test bot done, it is @…"** with the username from step 5 (the username is not secret).
    Claude does the rest (a second secret, connecting the bot, switching the button on).
+
+### 👉 4. Put the helpline number in (about 3 minutes)
+**Why:** when nobody says "yes" to a blood request within 30 seconds, or no donor matches at all, the app shows a
+**"Call the UDVASITO helpline"** button. The plan says this is the super-admin's phone (yours), on loud at night. The
+button stays hidden until a number is set. The number is never in the website's code: the app asks for it only when
+someone taps the button. You type it yourself because it is your personal number.
+1. Open **https://dashboard.convex.dev** → project **udvasito-staging** → deployment menu at the top → **Production**
+   (`outstanding-grasshopper-711`, the **test website's** database).
+2. Click **Functions** (left) → open **admin/ops** → click **setSetting**.
+3. Click **Run function** (top right). In the box that opens, replace everything with this, putting your number
+   after `+880` (11 digits starting with 01 → drop the first 0, e.g. 01712345678 → `+8801712345678`):
+   ```
+   {"key": "fallbackContactPhone", "value": "+8801XXXXXXXXX", "reason": "helpline for the test website"}
+   ```
+4. Click **Run**. It answers `null` = done. An error saying "wrong format" means a digit is missing: check the number.
+5. Write in the chat: **"helpline done"** (don't write the number).
 
 ---
 
@@ -122,6 +138,12 @@ so Claude follows them unless you say otherwise. Still waiting on people: **Q-00
   form words; the health-data consent follows the main consent version) and **Q-019** (request form words; a request
   shows "verified" only when its contact number is your own verified number) — Claude used the
   recommendation; just read them and say if you want something different.
+- 🟦 **Q-020, Q-021, Q-024, Q-025** — words and small rules Claude chose for push alerts, answering a request, the
+  30-second helpline and the sign-up limit. Claude used the recommendation; read them if you like.
+- ❓ **Q-022** — the "copy number" button on Android needs one small Expo add-on (and a new app build). Claude
+  suggests yes (option A); for now Android users long-press the number to copy it.
+- ❓ **Q-023** — when a family taps "No longer needed", should donors who already said yes also get a message, with
+  new words ("…is no longer needed. Thank you for being ready.")? Claude suggests yes (option A).
 - ❓ **Q-016** — when a volunteer says "It doesn't match", should the person see a short message? Claude suggests yes
   (option A, the text is in the file). Until you answer, the screen simply shows the button again.
 

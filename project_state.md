@@ -187,7 +187,8 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   (Q-020, Q-021, Q-023 lines); human steps: helpline number (setSetting fallbackContactPhone), Telegram bot, phones.
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
   b498ce34-9880-4845-8fc5-54431dd450cb; tab "To-do" 1e0a4b77-629a (body 8e30bb71-e1ec), tab "Bangla to check"
-  fc1b86ea-accf (body 054015cc-eff6, 66 rows: Screen | English | Claude's Bangla | Your fix | Key). Edit it ONLY via the
+  fc1b86ea-accf (body 054015cc-eff6, table mnm1hfaezn3.358: Screen | English | Claude's Bangla | Your fix | Key;
+  81 rows after 2026-11-28 — Q-020/Q-021 lines, date-fns wording, proposed Q-023 line; bookmark rev 2). Edit it ONLY via the
   Claude Docs connector (load the docs skill, then read with sinceRev before writing — the team edits it). When a job is
   handed over, tick it there + Status dropdown in the "Before the first campus drive" table. Read "Your fix" cells
   and copy fixes into specs/en/bn (then copy:extract). TEAM NUMBERS: member 1 = developer; 2 recruitment; 3 Bangla/FAQ/QA
