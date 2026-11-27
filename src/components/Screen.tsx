@@ -50,10 +50,22 @@ type Props = {
   contentClassName?: string;
 };
 
-export function Screen({ title, root = false, practice = false, children, footer, scroll = true, contentClassName }: Props) {
+const NARROW_HEADER = 420;
+
+export function Screen({
+  title,
+  root = false,
+  practice = false,
+  children,
+  footer,
+  scroll = true,
+  contentClassName,
+}: Props) {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const pad = width >= breakpoints.md ? 'px-s6' : 'px-s4';
+  // Below this width the practice pill would squeeze the title to nothing, so it gets its own row under the header.
+  const narrow = width < NARROW_HEADER;
 
   const back = () => (router.canGoBack() ? router.back() : router.replace('/home'));
 
@@ -89,10 +101,15 @@ export function Screen({ title, root = false, practice = false, children, footer
             ) : null}
           </>
         )}
-        <View className="flex-1" />
-        {practice ? <PracticeBadge /> : null}
+        {root || !title ? <View className="flex-1" /> : null}
+        {practice && !narrow ? <PracticeBadge /> : null}
         <LanguageToggle />
       </View>
+      {practice && narrow ? (
+        <View className={cn('items-center border-b border-line bg-app py-s1', pad)}>
+          <PracticeBadge />
+        </View>
+      ) : null}
       {scroll ? (
         <ScrollView className="flex-1 bg-app" contentContainerClassName="grow" keyboardShouldPersistTaps="handled">
           {body}
@@ -100,7 +117,11 @@ export function Screen({ title, root = false, practice = false, children, footer
       ) : (
         <View className="flex-1">{body}</View>
       )}
-      {footer ? <SafeAreaView edges={['bottom']} className={cn('border-t border-line bg-app py-s3', pad)}>{footer}</SafeAreaView> : null}
+      {footer ? (
+        <SafeAreaView edges={['bottom']} className={cn('border-t border-line bg-app py-s3', pad)}>
+          {footer}
+        </SafeAreaView>
+      ) : null}
     </SafeAreaView>
   );
 }
