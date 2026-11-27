@@ -42,6 +42,25 @@ Just write in the chat: phone brand + model + Android version for each phone.
 
 ---
 
+### Step 3b — Give Convex the Google sign-in secret (5 minutes)
+**Why:** Claude created the Google sign-in client ("UDVASITO staging"). It has a **secret** (like a password), so
+**you** copy it from Google straight into Convex. It never goes into the chat or the code.
+Two Chrome tabs are already open for this (if not, use the links).
+1. Tab **Google Cloud** — https://console.cloud.google.com/auth/clients?project=udvasito-516006 → click
+   **UDVASITO staging (dev + staging)**. On the right, under **Client secrets**, click **+ Add secret**.
+   A new secret appears with a **copy** button (two small squares) → click it.
+2. Tab **Convex** — https://dashboard.convex.dev/d/wry-tern-774/settings/environment-variables → click **+ Add** →
+   Name: `GOOGLE_CLIENT_SECRET` → Value: **Ctrl + V** → **Save**.
+3. Back on Google Cloud: the **older** secret (it ends in **LH4C** — nobody has ever seen it) → click **Disable**, then
+   **Delete**. Keep the new one.
+4. Tell Claude "step 3b done" — Claude then tests "Continue with Google" on the web app.
+
+> While the app is in Google's **Testing** mode only listed test accounts can sign in (now: udvasitobd@gmail.com).
+> To test with your own Gmail: Google Cloud → **Audience** → **Test users** → **+ Add users** → type it → **Save**.
+> Before the real launch Claude asks you to switch it to **In production**.
+
+---
+
 ## 🟡 Tomorrow (Sat 28 Nov)
 
 ### Step 4 — Create the Vercel account (website hosting, free)

@@ -22,11 +22,12 @@ Last updated: 2026-11-27 (Fri) — branch `p0/foundations`
 | GitHub repo udvasitobd/udvasito-main | public; `main` + `staging` pushed (0273b96) |
 | Convex team `udvasitobd` | project **udvasito-staging** created, EU (Ireland); dev deployment `wry-tern-774` (used by `npx convex dev`). Team default region = EU. **udvasito-prod not created yet.** Staging "prod" deployment of udvasito-staging not created yet. |
 | Convex CLI | named account `udvasito` selected for this folder only (`~/.convex/config.json` directories map); developer's personal login kept as default account `personal` — never overwrite it |
-| Convex dev env vars set | BETTER_AUTH_SECRET (random), SITE_URL=http://localhost:8081, APP_ENV=staging, PASSWORD_SIGNIN=true. Missing: GOOGLE_CLIENT_ID/SECRET |
+| Convex dev env vars set | BETTER_AUTH_SECRET (random), SITE_URL=http://localhost:8081, APP_ENV=staging, PASSWORD_SIGNIN=true, GOOGLE_CLIENT_ID. Missing: GOOGLE_CLIENT_SECRET (user step 3b) |
 | Expo | account `udvasitos-team` exists; need `eas init` → EAS_PROJECT_ID |
 | Vercel | developer creates it on 2026-11-28 (Sat) |
 | Domain udvasito.com | Namecheap (only paid item). ADR-023: used everywhere; staging = staging.udvasito.com |
-| Google Cloud OAuth, Firebase FCM, Telegram bots, Gemini, Cloudinary, Sentry | not yet |
+| Google Cloud | project **UDVASITO** id `udvasito-516006` (no billing, no trial; ToS accepted with user OK 2026-11-27, also OK for Firebase + AI Studio ToS). Auth Platform: External, **Testing**, test user = team Gmail. Client **"UDVASITO staging (dev + staging)"** Web, id `436072889616-ab3hftd03esdskdkbtkaq1rv4qm347qo.apps.googleusercontent.com` (public) → set as GOOGLE_CLIENT_ID on dev. Redirect URI: `https://wry-tern-774.eu-west-1.convex.site/api/auth/callback/google` (EU site URLs carry `.eu-west-1.`!). Secret: user adds a new one → Convex dashboard (for_me step 3b); first secret ****LH4C unseen → user deletes. TODO: staging redirect URI when the staging prod deployment exists; separate production client; Branding home/privacy/terms links once those pages exist; publish to production before pilot (ask user). |
+| Firebase FCM, Telegram bots, Gemini, Cloudinary, Sentry | not yet |
 
 Convex region note: dashboard shows "30% regional surcharge" for EU; pricing page says included amounts are shared
 across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin). Region can't be changed later.
@@ -96,7 +97,7 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
 - Lessons: `convex run` JSON args must stay < ~20 K chars (Windows); `expo serve` has no SPA fallback; Playwright uses
   installed Chrome (no browser download); stop the old dev server before e2e (port 8081).
 - Questions open: Q-004, Q-005 (copy), Q-006, Q-007 offline-file design. Akbar Shah thana needs a centre (member 2).
-- NEXT: accounts via Chrome (Google OAuth client on team Gmail → GOOGLE_CLIENT_ID/SECRET into Convex env without showing
-  them; Convex udvasito-prod project; eas init → EAS_PROJECT_ID repo variable; Firebase FCM; Telegram bot; Gemini key;
+- Google OAuth client DONE (see §2) except the secret (user). docs/spikes.md written (all 4 wait on accounts/phones).
+- NEXT: after step 3b test "Continue with Google" on localhost:8081 (dev) end-to-end; Convex udvasito-prod project; eas init → EAS_PROJECT_ID repo variable; Firebase FCM; Telegram bot; Gemini key;
   Cloudinary; Sentry), spikes S1–S4 in docs/spikes.md, then PR p0/foundations → staging + code review + fixes (NEVER merge
   before review). User steps pending: Vercel account (Sat), EXPO_TOKEN secret (for_me.md step 5), test phones.
