@@ -63,6 +63,7 @@ const newestFirst = (a: InboxItem, b: InboxItem) => b.notifiedAt - a.notifiedAt;
 /**
  * `responses.inbox` — Needs your answer (notified / opened), You said yes (accepted / confirmed / standby), Earlier
  * (any of those on a request that is no longer needed); newest first. A member who is not a donor gets empty lists.
+ * A request a moderator removed is left out: it cannot be opened any more (`visibleRequest`).
  */
 export const inbox = memberQuery({
   args: {},
@@ -86,7 +87,7 @@ export const inbox = memberQuery({
     for (const response of rows) {
       if (response.isDemo !== me.isDemo) continue;
       const request = await ctx.db.get(response.requestId);
-      if (!request || request.isDemo !== me.isDemo) continue;
+      if (!request || request.isDemo !== me.isDemo || request.hiddenByModerator) continue;
       const { place, area } = await requestPlaceNames(ctx, request);
       const item: InboxItem = {
         requestId: request._id,
@@ -100,7 +101,7 @@ export const inbox = memberQuery({
         km: home ? roundKm(distanceKm(home, { lat: request.approxLat, lng: request.approxLng })) : null,
         neededBy: request.neededBy,
         verified: request.verifiedBadge,
-        closed: request.status === 'closed' || request.hiddenByModerator,
+        closed: request.status === 'closed',
       };
       if (item.closed) earlier.push(item);
       else if (item.state === 'notified' || item.state === 'opened') needsAnswer.push(item);

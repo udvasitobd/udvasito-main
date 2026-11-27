@@ -159,6 +159,18 @@ describe('responses.inbox (SCR-D03)', () => {
     expect(inbox.earlier).toEqual([]);
   });
 
+  it('leaves out a request a moderator removed (it cannot be opened any more)', async () => {
+    const { t, where } = await setupMatching();
+    const me = await signedInDonor(t, where);
+    const removed = await alerted(t, where);
+    const kept = await alerted(t, where);
+    await t.run((ctx) => ctx.db.patch(removed, { hiddenByModerator: true }));
+    const inbox = await me.as.query(api.responses.inbox, {});
+    expect(inbox.needsAnswer.map((i) => i.requestId)).toEqual([kept]);
+    expect(inbox.earlier).toEqual([]);
+    expect(await codeOf(me.as.query(api.responses.getForDonor, { requestId: removed }))).toBe('ERR_NOT_FOUND');
+  });
+
   it('never mixes practice and real rows', async () => {
     const { t, where } = await setupMatching();
     const me = await signedInDonor(t, where);
