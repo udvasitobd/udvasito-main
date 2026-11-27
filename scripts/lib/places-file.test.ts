@@ -86,6 +86,21 @@ describe('toMin', () => {
         { c: 'V1', l: 'v', en: 'Chattogram', bn: 'চট্টগ্রাম', lat: 22.3, lng: 91.8 },
         { c: 'U2', l: 'u', p: 'D1', en: 'Panchlaish', bn: 'পাঁচলাইশ', lat: 22.36219, lng: 91.83427, m: 1 },
       ],
+      hospitals: [],
     });
+  });
+
+  it('adds active hospitals only, without phone or address', () => {
+    const base = { nameBn: 'হাসপাতাল', type: 'hospital' as const, districtCode: 'D1', upazilaCode: 'U2', lat: 22.359501, lng: 91.8309 };
+    const min = toMin([], [
+      { ...base, nameEn: 'B Hospital', aliases: ['BH'], address: 'Road 1', bloodBankPhone: '031-123456', active: true },
+      { ...base, nameEn: 'A Blood Bank', aliases: [], type: 'blood_bank', active: true },
+      { ...base, nameEn: 'Closed Clinic', aliases: [], type: 'clinic', active: false },
+    ]);
+    expect(min.hospitals).toEqual([
+      { en: 'A Blood Bank', bn: 'হাসপাতাল', t: 'b', d: 'D1', u: 'U2', lat: 22.3595, lng: 91.8309 },
+      { en: 'B Hospital', bn: 'হাসপাতাল', a: ['BH'], t: 'h', d: 'D1', u: 'U2', lat: 22.3595, lng: 91.8309 },
+    ]);
+    expect(JSON.stringify(min)).not.toMatch(/031|Road/);
   });
 });

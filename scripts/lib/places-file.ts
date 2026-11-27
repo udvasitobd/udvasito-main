@@ -8,6 +8,7 @@
 import { z } from 'zod';
 
 import { countByLevel, sortForInsert, validatePlaces, type PlaceInput, type PlaceLevel } from '../../convex/rules/places';
+import type { HospitalRow } from './hospitals-csv';
 
 /** The pilot district (OQ-12). The dataset must contain it and its metropolitan thanas (roadmap §5.2). */
 export const PILOT_DISTRICT_EN = 'Chattogram';
@@ -88,13 +89,21 @@ export function insertBatches(places: readonly PlaceInput[], maxChars = 20_000):
 /** One compact place: code, level, parent code, names, centre (5 decimals ≈ 1 m), metro-thana flag. */
 export type MinPlace = { c: string; l: 'v' | 'd' | 'u'; p?: string; en: string; bn: string; lat: number; lng: number; m?: 1 };
 
-export type PlacesMin = { v: 1; places: MinPlace[] };
+/**
+ * One compact active hospital for the offline picker and search: names, aliases, type, district + upazila codes,
+ * point. Never the phone number or address (`hospitals.bloodBanksNear` is member-only, specs §6).
+ */
+export type MinHospital = { en: string; bn: string; a?: string[]; t: 'h' | 'b' | 'c'; d: string; u: string; lat: number; lng: number };
+
+export type PlacesMin = { v: 1; places: MinPlace[]; hospitals: MinHospital[] };
+
+const TYPE_CODE = { hospital: 'h', blood_bank: 'b', clinic: 'c' } as const;
 
 const LEVEL_CODE = { division: 'v', district: 'd', upazila: 'u' } as const;
 
 const round5 = (n: number) => Math.round(n * 1e5) / 1e5;
 
-export function toMin(places: readonly PlaceInput[]): PlacesMin {
+export function toMin(places: readonly PlaceInput[], hospitals: readonly HospitalRow[] = []): PlacesMin {
   return {
     v: 1,
     places: sortForInsert(places).map((p) => ({
@@ -107,5 +116,18 @@ export function toMin(places: readonly PlaceInput[]): PlacesMin {
       lng: round5(p.lng),
       ...(p.isMetroThana ? { m: 1 as const } : {}),
     })),
+    hospitals: hospitals
+      .filter((h) => h.active)
+      .map((h) => ({
+        en: h.nameEn,
+        bn: h.nameBn,
+        ...(h.aliases.length > 0 ? { a: h.aliases } : {}),
+        t: TYPE_CODE[h.type],
+        d: h.districtCode,
+        u: h.upazilaCode,
+        lat: round5(h.lat),
+        lng: round5(h.lng),
+      }))
+      .sort((x, y) => x.d.localeCompare(y.d) || x.en.localeCompare(y.en)),
   };
 }

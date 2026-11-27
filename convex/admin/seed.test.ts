@@ -66,3 +66,76 @@ describe('admin.seed places', () => {
     expect(await neighbours()).toEqual({ 'T-U1': ['T-U2', 'T-U3'], 'T-U2': ['T-U1', 'T-U3'], 'T-U3': ['T-U2', 'T-U1'] });
   });
 });
+
+describe('admin.seed hospitals', () => {
+  // Test-only row (roadmap §5.1 illustrative example, no phone number).
+  const row = {
+    nameEn: 'Test Medical College Hospital',
+    nameBn: 'পরীক্ষা মেডিকেল কলেজ হাসপাতাল',
+    aliases: ['TMCH', 'টমেক'],
+    type: 'hospital' as const,
+    districtCode: 'T-DIS',
+    upazilaCode: 'T-U2',
+    address: 'Test Road',
+    lat: 22.36,
+    lng: 91.83,
+    active: true,
+  };
+
+  async function loaded() {
+    const t = makeT();
+    await t.mutation(internal.admin.seed.upsertPlaces, { places });
+    return t;
+  }
+
+  it('inserts a real hospital with place ids and searchText, then is idempotent', async () => {
+    const t = await loaded();
+    expect(await t.mutation(internal.admin.seed.upsertHospitals, { rows: [row] })).toEqual({ inserted: 1, updated: 0, unchanged: 0 });
+    expect(await t.mutation(internal.admin.seed.upsertHospitals, { rows: [row] })).toEqual({ inserted: 0, updated: 0, unchanged: 1 });
+    const [h] = await t.run((ctx) => ctx.db.query('hospitals').collect());
+    const ids = await t.run(async (ctx) => {
+      const code = async (c: string) => (await ctx.db.query('places').withIndex('by_code', (q) => q.eq('code', c)).unique())?._id;
+      return { division: await code('T-DIV'), district: await code('T-DIS'), upazila: await code('T-U2') };
+    });
+    expect(h).toMatchObject({
+      isDemo: false,
+      searchText: 'test medical college hospital পরীক্ষা মেডিকেল কলেজ হাসপাতাল tmch টমেক',
+      divisionId: ids.division,
+      districtId: ids.district,
+      upazilaId: ids.upazila,
+    });
+  });
+
+  it('updates by name inside the district (any case), including switching it off and removing the address', async () => {
+    const t = await loaded();
+    await t.mutation(internal.admin.seed.upsertHospitals, { rows: [row] });
+    const { address: _dropped, ...withoutAddress } = row;
+    const changed = { ...withoutAddress, nameEn: 'TEST MEDICAL COLLEGE HOSPITAL', active: false };
+    expect(await t.mutation(internal.admin.seed.upsertHospitals, { rows: [changed] })).toEqual({ inserted: 0, updated: 1, unchanged: 0 });
+    const all = await t.run((ctx) => ctx.db.query('hospitals').collect());
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({ active: false, nameEn: 'TEST MEDICAL COLLEGE HOSPITAL' });
+    expect(all[0]?.address).toBeUndefined();
+    // Switched off, it is still found (and not duplicated) on the next run.
+    expect(await t.mutation(internal.admin.seed.upsertHospitals, { rows: [changed] })).toEqual({ inserted: 0, updated: 0, unchanged: 1 });
+  });
+
+  it('never matches a practice-area hospital with the same name', async () => {
+    const t = await loaded();
+    await t.mutation(internal.admin.seed.upsertHospitals, { rows: [row] });
+    await t.run(async (ctx) => {
+      const real = (await ctx.db.query('hospitals').collect())[0]!;
+      const { _id, _creationTime, ...copy } = real;
+      await ctx.db.insert('hospitals', { ...copy, isDemo: true, address: 'practice' });
+    });
+    expect(await t.mutation(internal.admin.seed.upsertHospitals, { rows: [row] })).toEqual({ inserted: 0, updated: 0, unchanged: 1 });
+    const practice = await t.run((ctx) => ctx.db.query('hospitals').collect());
+    expect(practice.find((h) => h.isDemo)?.address).toBe('practice');
+  });
+
+  it('refuses an upazila outside the district and an unknown district', async () => {
+    const t = await loaded();
+    await expect(t.mutation(internal.admin.seed.upsertHospitals, { rows: [{ ...row, upazilaCode: 'T-DIS' }] })).rejects.toThrow(/not in district/);
+    await expect(t.mutation(internal.admin.seed.upsertHospitals, { rows: [{ ...row, districtCode: 'NOPE' }] })).rejects.toThrow(/not loaded/);
+  });
+});

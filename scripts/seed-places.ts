@@ -8,12 +8,13 @@
  *
  * --file-only  only checks the dataset and writes src/data/places.min.json (no Convex deployment needed).
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { countByLevel } from '../convex/rules/places';
 import { parseTarget, runFunction } from './lib/convex-cli';
-import { datasetErrors, insertBatches, parseDataset, toMin } from './lib/places-file';
+import { readHospitals, writeOfflineFile } from './lib/offline-file';
+import { datasetErrors, insertBatches, parseDataset } from './lib/places-file';
 
 const argv = process.argv.slice(2);
 const target = parseTarget(argv);
@@ -21,7 +22,6 @@ const fileOnly = argv.includes('--file-only');
 
 const root = process.cwd();
 const datasetPath = path.join(root, 'data', 'places.json');
-const minPath = path.join(root, 'src', 'data', 'places.min.json');
 
 const dataset = parseDataset(JSON.parse(readFileSync(datasetPath, 'utf8')));
 const errors = datasetErrors(dataset.places);
@@ -36,8 +36,9 @@ const counts = countByLevel(dataset.places);
 const metro = dataset.places.filter((p) => p.isMetroThana).length;
 console.log(`dataset: ${counts.division} divisions, ${counts.district} districts, ${counts.upazila} upazilas/thanas (${metro} metropolitan)`);
 
-writeFileSync(minPath, `${JSON.stringify(toMin(dataset.places))}\n`, 'utf8');
-console.log(`wrote src/data/places.min.json`);
+const hospitals = readHospitals(root, dataset.places);
+writeOfflineFile(root, dataset.places, hospitals);
+console.log(`wrote src/data/places.min.json (with ${hospitals.rows.length} checked hospital rows; npm run import:hospitals prints their report)`);
 
 if (!fileOnly) {
   const totals = { inserted: 0, updated: 0, unchanged: 0 };

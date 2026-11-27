@@ -5,10 +5,11 @@
  */
 import { v } from 'convex/values';
 
-import type { Id } from '../_generated/dataModel';
+import type { Doc, Id } from '../_generated/dataModel';
 import { internalMutation, type MutationCtx } from '../_generated/server';
 import { getSetting } from '../_lib/settings';
-import { neighbourCodes, placeErrors } from '../rules/places';
+import { hospitalSearchText } from '../rules/hospitals';
+import { insideBangladesh, neighbourCodes, placeErrors } from '../rules/places';
 import { SETTING_KEYS, seedValues } from '../rules/settings';
 
 /** OQ-12: the pilot starts in Chattogram district. */
@@ -140,3 +141,79 @@ export const computeNeighbours = internalMutation({
   },
 });
 
+// ── Hospitals (npm run import:hospitals — scripts/import-hospitals.ts, roadmap §5.1) ───────────────────────────
+
+const hospitalValidator = v.object({
+  nameEn: v.string(),
+  nameBn: v.string(),
+  aliases: v.array(v.string()),
+  type: v.union(v.literal('hospital'), v.literal('blood_bank'), v.literal('clinic')),
+  districtCode: v.string(),
+  upazilaCode: v.string(),
+  address: v.optional(v.string()),
+  bloodBankPhone: v.optional(v.string()),
+  lat: v.number(),
+  lng: v.number(),
+  active: v.boolean(),
+});
+
+/**
+ * Real (not practice-area) hospitals, matched by English name inside their district, so running the import again
+ * updates rows instead of adding copies. Rows missing from the file are left as they are (set active=false to hide one).
+ * The script has already checked each row; this re-checks what the database depends on.
+ */
+export const upsertHospitals = internalMutation({
+  args: { rows: v.array(hospitalValidator) },
+  handler: async (ctx, { rows }) => {
+    let inserted = 0;
+    let updated = 0;
+    let unchanged = 0;
+    for (const r of rows) {
+      const where = `hospital "${r.nameEn}"`;
+      if (!r.nameEn.trim() || !r.nameBn.trim()) throw new Error(`${where}: names are required`);
+      if (!insideBangladesh(r.lat, r.lng)) throw new Error(`${where}: lat/lng outside Bangladesh`);
+      const district = await placeByCode(ctx, r.districtCode);
+      const upazila = await placeByCode(ctx, r.upazilaCode);
+      if (!district || district.level !== 'district' || !district.parentId) throw new Error(`${where}: district ${r.districtCode} not loaded`);
+      if (!upazila || upazila.level !== 'upazila' || upazila.parentId !== district._id) {
+        throw new Error(`${where}: upazila ${r.upazilaCode} is not in district ${r.districtCode}`);
+      }
+      const fields = {
+        nameEn: r.nameEn,
+        nameBn: r.nameBn,
+        aliases: r.aliases,
+        searchText: hospitalSearchText(r.nameEn, r.nameBn, r.aliases),
+        type: r.type,
+        divisionId: district.parentId,
+        districtId: district._id,
+        upazilaId: upazila._id,
+        address: r.address,
+        bloodBankPhone: r.bloodBankPhone,
+        lat: r.lat,
+        lng: r.lng,
+        active: r.active,
+      };
+      const name = r.nameEn.trim().toLowerCase();
+      let existing: Doc<'hospitals'> | undefined;
+      for (const active of [true, false]) {
+        const inDistrict = await ctx.db
+          .query('hospitals')
+          .withIndex('by_district', (q) => q.eq('isDemo', false).eq('active', active).eq('districtId', district._id))
+          .collect();
+        existing ??= inDistrict.find((h) => h.nameEn.trim().toLowerCase() === name);
+      }
+      if (!existing) {
+        await ctx.db.insert('hospitals', { ...fields, isDemo: false });
+        inserted++;
+      } else if (
+        (Object.keys(fields) as (keyof typeof fields)[]).some((k) => JSON.stringify(existing[k]) !== JSON.stringify(fields[k]))
+      ) {
+        await ctx.db.patch(existing._id, fields);
+        updated++;
+      } else {
+        unchanged++;
+      }
+    }
+    return { inserted, updated, unchanged };
+  },
+});
