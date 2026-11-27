@@ -1,7 +1,7 @@
 /**
  * SCR-M01 · Home. Sections appear only when their feature works (specs §1.9): the verify banner once a verification
  * method is on; "Become a donor" (non-donors) and the donor status card (donors) with donor setup; the hero
- * "Need blood?" with the request form, and so on.
+ * "Need blood?" with the request form (P1 slice 8), and so on.
  */
 import { api } from '@convex/_generated/api';
 import { useQuery } from 'convex/react';
@@ -9,7 +9,7 @@ import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Banner, Button, ListGroup, ListRow, LogoMark, Screen, Text } from '@/components';
+import { Banner, Button, ListGroup, ListRow, Screen, Text } from '@/components';
 import { ChevronRight, Droplet } from '@/components/icons';
 import { EligibilityLine } from '@/features/donor/DonorStatus';
 import { useAppConfig } from '@/lib/appConfig';
@@ -39,16 +39,27 @@ export default function Home() {
           }
         />
       ) : null}
-      <View className="flex-1 items-center justify-center gap-s6 py-s8">
-        <LogoMark size={88} />
-        <View className="items-center gap-s2">
-          <Text variant="title" tone="brand" className="text-center">
-            {t('common.appName')}
+      <View className="gap-s4 rounded-md bg-brand-primary p-s6">
+        <Text variant="display" tone="inverse" accessibilityRole="header">
+          {t('home.needBlood')}
+        </Text>
+        <Button
+          label={t('home.needBloodCta')}
+          variant="inverse"
+          block
+          icon={Droplet}
+          onPress={() => router.push('/request/new')}
+        />
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push('/request/new?dengue=1')}
+          className="min-h-touch justify-center self-start"
+          hitSlop={4}
+        >
+          <Text tone="inverse" className="underline">
+            {t('home.dengueCta')}
           </Text>
-          <Text tone="muted" className="text-center">
-            {t('common.tagline')}
-          </Text>
-        </View>
+        </Pressable>
       </View>
       {mine ? (
         <Pressable

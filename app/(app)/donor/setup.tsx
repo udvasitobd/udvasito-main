@@ -47,7 +47,7 @@ import {
   type StepErrors,
   type StepField,
 } from '@/features/donor/setupForm';
-import { useLocateArea } from '@/features/donor/useLocateArea';
+import { useLocateArea } from '@/features/places/useLocateArea';
 import { useAppConfig } from '@/lib/appConfig';
 import { todayInDhaka } from '@/lib/dates';
 import { errorMessage } from '@/lib/errors';
@@ -212,7 +212,8 @@ function SetupSteps({
       setLocationFailed(true);
       return;
     }
-    update(area, ['upazilaId']);
+    // Only the place ids: the location reading itself is never kept (not even in the draft).
+    update({ divisionId: area.divisionId, districtId: area.districtId, upazilaId: area.upazilaId }, ['upazilaId']);
   };
 
   const verifyNow = async () => {

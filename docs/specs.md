@@ -519,6 +519,21 @@ Template per screen: **Purpose · Layout (top → bottom) · Copy · States · B
 | `request.duplicate.body` | A {{group}} request at {{hospital}} was posted {{time}}. Is it the same patient? | {{hospital}}-এ {{group}} গ্রুপের একটি অনুরোধ {{time}} পোস্ট হয়েছে। এটি কি একই রোগী? |
 | `request.duplicate.join` | Yes, open that request | হ্যাঁ, সেই অনুরোধটি খুলুন |
 | `request.duplicate.postAnyway` | No, post mine | না, আমারটি পাঠান |
+**Copy — labels the layout names in English only, or not at all** (Q-019, 2026-11-27; member 1 reviews the Bangla):
+| Key | English | বাংলা |
+|---|---|---|
+| `request.unitsIncrease` | Increase bags | ব্যাগ বাড়ান |
+| `request.unitsDecrease` | Decrease bags | ব্যাগ কমান |
+| `request.unitsCount_one` | {{count}} bag | {{count}} ব্যাগ |
+| `request.unitsCount_other` | {{count}} bags | {{count}} ব্যাগ |
+| `request.placeText` | Hospital, clinic or area name | হাসপাতাল, ক্লিনিক বা এলাকার নাম |
+| `request.distance` | {{km}} km away | {{km}} কিমি দূরে |
+| `request.noHospitalsNear` | We couldn't find a listed hospital near you. Please choose your area below. | আপনার কাছে তালিকাভুক্ত কোনো হাসপাতাল পাওয়া যায়নি। অনুগ্রহ করে নিচে আপনার এলাকা বেছে নিন। |
+| `request.pickDate` | Date | তারিখ |
+| `request.pickTime` | Time | সময় |
+| `request.neededByAt` | Needed by {{when}} | {{when}}-এর মধ্যে লাগবে |
+| `request.monthlyLimit` | You've reached this month's request limit. | এ মাসের অনুরোধের সীমা শেষ। |
+| `validation.VAL-08.empty` | Please choose when blood is needed. | কখন রক্ত লাগবে তা বেছে নিন। |
 **States:**
 - *Loading:* form renders immediately (no network needed); places/hospitals come from the bundled list.
 - *AI working:* "Fill the form for me" shows spinner; form remains editable; timeout 8 s → `request.aiUnavailable`.

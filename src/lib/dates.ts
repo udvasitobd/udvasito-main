@@ -59,3 +59,32 @@ export function addYears(ymd: string, years: number): string {
   if (date.getMonth() !== month) date.setDate(0);
   return ymdFromDate(date);
 }
+
+const HM = /^(\d{1,2}):(\d{2})$/;
+/** Asia/Dhaka is UTC+6 all year (no daylight saving since 2009). */
+const DHAKA_OFFSET_MS = 6 * 60 * 60 * 1000;
+
+function localized(text: string, language: Language): string {
+  return language === 'bn' ? toBanglaDigits(text) : text;
+}
+
+/** "14:05" → "2:05 PM" in the app language (Bangla digits and day period in Bangla) (specs §1.6: `h:mm a`). Empty if not a time. */
+export function formatClockTime(hm: string, language: Language): string {
+  const m = HM.exec(hm);
+  if (!m || Number(m[1]) > 23 || Number(m[2]) > 59) return '';
+  const date = new Date(2000, 0, 1, Number(m[1]), Number(m[2]));
+  return localized(format(date, 'h:mm a', { locale: language === 'bn' ? bn : enGB }), language);
+}
+
+/** A timestamp as Dhaka wall-clock time, "27 Nov 2026, 2:05 PM", whatever the device's time zone. */
+export function formatDhakaDateTime(timestamp: number, language: Language): string {
+  const d = new Date(timestamp + DHAKA_OFFSET_MS);
+  const wall = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes());
+  return localized(format(wall, 'd MMM yyyy, h:mm a', { locale: language === 'bn' ? bn : enGB }), language);
+}
+
+/** A Date's local clock time as "HH:MM" (what the phone's time picker returns). */
+export function hmFromDate(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}

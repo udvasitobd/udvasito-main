@@ -298,3 +298,28 @@ Also decided while building (no copy involved):
 **Recommendation:** keep as built; member 1 reviews the 18 Bangla lines.
 **Applied:** as above (standing instruction "do the recommendations").
 Status: 🟦 applied, waiting for review
+
+### Q-019 · 2026-11-27 · P1 · Request form (SCR-M02 form path): words and rules specs leaves open
+SCR-M02 names the units stepper buttons in English only and has no words for the place-name field, distances, the
+"Pick date & time" fields, an empty "needed by", or the monthly-limit banner (whose `{{phone}}` is fetched only on
+tap, D-R3). Following the standing rule (Q-014), specs SCR-M02 now has a copy table with 13 keys
+(`request.unitsIncrease` … `validation.VAL-08.empty`). Also decided while building:
+- **Numbers kept as constants, not settings:** "Now" = within 2 h, "Tomorrow" = 12:00, 1–10 bags, 5 minutes of grace
+  and 30 days ahead (VAL-08), and the text lengths. They are definitions written in specs §4 / SCR-M02 and are not
+  in the settings list (§5.2). Each sits in one place (`convex/rules/request.ts`).
+- **Contact "verified":** `contactPhoneVerified` is true only when the contact number is the requester's own verified
+  number. Any other number is posted but shows "phone not yet verified".
+- **Place lists come from the server** (`places.list`, `hospitals.search`), not the bundled file: posting needs a
+  network anyway, and the offline outbox is out of P1 scope. "My place isn't in the list" asks district → thana
+  (the division follows from the district) → place name.
+- **Location:** the reading stays on the phone (it sorts nearby hospitals or picks the thana). The server stores the
+  hospital's point or the thana's centre, rounded to 3 decimals, never the reading.
+- **The form starts with no "needed by" choice**, so urgency is never assumed.
+- **Monthly limit:** banner `request.monthlyLimit` plus the "Get help" helpline button, which fetches the number.
+- **After posting:** SCR-M03 (`/request/[id]`) comes in slice 13. Until then, the app goes to Home with the "Sent" toast.
+- **Not in this slice:** the money-word flag (the automatic-flags step; specs has no word list, and none is invented)
+  and a per-minute rate limit on posting (slice 15).
+
+**Recommendation:** keep as built; member 1 reviews the 13 Bangla lines.
+**Applied:** as above (standing instruction "do the recommendations").
+Status: 🟦 applied, waiting for review

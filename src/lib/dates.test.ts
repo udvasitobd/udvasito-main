@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { addYears, dateFromYmd, formatCalendarDate, formatDhakaDate, toBanglaDigits, todayInDhaka, ymdFromDate } from './dates';
+import {
+  addYears,
+  dateFromYmd,
+  formatCalendarDate,
+  formatClockTime,
+  formatDhakaDate,
+  formatDhakaDateTime,
+  hmFromDate,
+  toBanglaDigits,
+  todayInDhaka,
+  ymdFromDate,
+} from './dates';
 
 describe('dates (specs §1.6 rule 3)', () => {
   it('formats a calendar date as d MMM yyyy, with Bangla digits in Bangla', () => {
@@ -20,6 +31,14 @@ describe('dates (specs §1.6 rule 3)', () => {
   it('uses the Dhaka day for timestamps', () => {
     expect(todayInDhaka(Date.UTC(2026, 10, 27, 18, 30))).toBe('2026-11-28'); // 00:30 in Dhaka
     expect(formatDhakaDate(Date.UTC(2026, 10, 27, 18, 30), 'en')).toBe('28 Nov 2026');
+  });
+
+  it('shows clock times and Dhaka date-times (h:mm a)', () => {
+    expect(formatClockTime('14:05', 'en')).toBe('2:05 PM');
+    expect(formatClockTime('09:30', 'bn')).toMatch(/^৯:৩০ /);
+    expect(formatClockTime('25:00', 'en')).toBe('');
+    expect(formatDhakaDateTime(Date.UTC(2026, 10, 27, 17, 59), 'en')).toBe('27 Nov 2026, 11:59 PM');
+    expect(hmFromDate(new Date(2026, 0, 1, 7, 5))).toBe('07:05');
   });
 
   it('moves by whole years, keeping 29 February valid', () => {
