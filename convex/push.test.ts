@@ -48,4 +48,24 @@ describe('push device registration', () => {
     await as.mutation(api.push.unregister, { token: TOKEN });
     expect((await statusOf(t, profileId)).hasToken).toBe(false);
   });
+
+  it('signing out stops alerts in every account state, also before the new terms are accepted', async () => {
+    const t = makeT();
+    let n = 0;
+    for (const change of [
+      { status: 'frozen' as const },
+      { status: 'suspended' as const },
+      { status: 'banned' as const },
+      { status: 'deletion_pending' as const },
+      { consentVersion: 'an-older-notice' },
+    ]) {
+      n += 1;
+      const { as, userId } = await signIn(t, `leaving${n}@example.com`);
+      const profileId = await insertProfile(t, userId);
+      await as.mutation(api.push.registerExpoToken, { token: TOKEN });
+      await t.run((ctx) => ctx.db.patch(profileId, change));
+      expect(await codeOf(as.mutation(api.push.unregister, {}))).toBeNull();
+      expect((await statusOf(t, profileId)).hasToken).toBe(false);
+    }
+  });
 });

@@ -4,7 +4,7 @@
  */
 import { v } from 'convex/values';
 
-import { memberMutation } from './_lib/auth';
+import { memberMutation, memberMutationWith } from './_lib/auth';
 import { appError } from './_lib/errors';
 import { pushNotifications } from './_lib/push';
 
@@ -20,8 +20,15 @@ export const registerExpoToken = memberMutation({
   },
 });
 
-/** On sign-out: this device stops receiving alerts for the account. */
-export const unregister = memberMutation({
+/**
+ * On sign-out: this device stops receiving alerts for the account. Allowed in every account state and with an older
+ * consent — a frozen account, or one that has not seen the new terms yet, must still be able to stop alerts reaching
+ * a phone it is leaving (a failure here never stops the sign-out).
+ */
+export const unregister = memberMutationWith({
+  statuses: ['active', 'frozen', 'suspended', 'banned', 'deletion_pending', 'underage_blocked'],
+  allowStaleConsent: true,
+})({
   args: { token: v.optional(v.string()), endpoint: v.optional(v.string()) },
   handler: async (ctx) => {
     await pushNotifications.removeToken(ctx, { userId: ctx.caller.profile._id });
