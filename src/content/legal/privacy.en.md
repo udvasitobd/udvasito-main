@@ -24,7 +24,7 @@ UDVASITO is not a blood bank, a hospital or a medical service. It does not sell 
 
 ## Who can use UDVASITO
 
-You must be **18 or older**. If you give a date of birth under 18, we stop the sign-up and keep only that date of birth, so the sign-up cannot simply be repeated. We do not keep anything else about you.
+You must be **18 or older**. If you give a date of birth under 18, we stop the sign-up. We keep that date of birth and your Google sign-in (name and email address), so the same account cannot simply sign up again. We do not keep your phone number or anything else you typed.
 
 ## What we collect and why
 
@@ -65,7 +65,7 @@ Donor details are health-related, so we ask for your agreement separately before
 - **Blood group, whole blood or platelets, number of bags, hospital or area, the time it is needed by, and urgency** — the basic request that donors see.
 - **Contact number** — your own number, shown to confirmed donors.
 - **Optional details:** patient name, ward or bed and a note — shown only to confirmed donors. Ask the patient or their family before you enter these.
-- **Optional hospital slip photo** — used only by a volunteer to check the request by hand. It is deleted when the request closes.
+- **Optional hospital slip photo** — seen only by our volunteers and admins, to check the request by hand. It is deleted when the request closes.
 - **Location:** if you tap "Use my current location", your phone or browser uses your position to find nearby hospitals. We store only the hospital you choose, or your area and an approximate point for that area, never your exact position.
 
 ### When you answer or take part
@@ -92,7 +92,7 @@ We process your data on the basis of **your consent**, which you give on the fir
 - **Donors who receive an alert:** the same basics and the requester's track record (member since, number of requests, confirmed donations).
 - **Confirmed donors:** also the patient name, ward or bed and the requester's phone number.
 - **The requester:** the first name, blood group and area of each confirmed donor, and that donor's phone number, unless the donor chose "I'll call them". Also the first name and phone number of up to two volunteers helping while the request is open.
-- **Volunteers:** request details, and donor search results (first name, blood group, area). They see a donor's phone number only if that donor agreed to be called by volunteers, and they must give a reason each time.
+- **Volunteers:** the request details — including the patient name, ward or bed, the requester's phone number and the slip photo — and donor search results (first name, blood group, area). They see a donor's phone number only if that donor agreed to be called by volunteers, and they must give a reason each time.
 - **Admins:** what they need to keep the service safe. A donor's phone number stays hidden until an admin chooses to reveal it and gives a reason, which is recorded.
 - **Nobody:** your exact location (it is never stored), and the audit log and consent records (admins only).
 

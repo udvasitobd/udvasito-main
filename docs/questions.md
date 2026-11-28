@@ -458,3 +458,17 @@ looser: real and practice rows still never meet. Until a practice hospital exist
 isn't in the list".
 
 **Recommendation:** keep. **Decision 2026-11-28 (developer): keep.** Status: ✅ decided
+
+### Q-027 · 2026-11-28 · P1 · How long are daily backups kept? (needed for the privacy notice)
+NFR-03 asks for a daily backup export (specs §6 cron, `exports.kind = "daily_backup"`), but PRD §5.9 gives no keep
+time for it. A backup holds personal data, so the privacy notice must say how long. A deleted account also stays in
+the backups taken before it was removed, until those backups expire. Backups are not built yet, so the draft notice
+(2026-11-28-pilot) does not mention them.
+- **A.** Keep each daily backup **7 days**, then delete it (a new admin-editable setting next to S-26/S-27). The notice
+  gets one line: "Backup copies are kept for 7 days, so deleted data also leaves them at most 7 days after deletion."
+- **B.** Keep backups **30 days**. Deleted data can then stay in a backup up to 30 days after the deletion.
+- **C.** Other.
+
+**Recommendation: A**: it keeps the least personal data (minimisation, PDPO 2025) and still allows a week to notice and
+undo a mistake. The line goes into the notice when the backup job is built; the law teacher reads it in DEP-02b.
+Status: ❓ open (not blocking: no backups exist yet)
