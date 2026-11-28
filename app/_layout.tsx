@@ -1,6 +1,7 @@
 /**
  * Root layout — specs §1.2 / §1.5: providers (Convex + Better Auth, i18n, fonts, safe area, toasts), the G2 splash
- * (fonts + i18n, at most 2 s, then system fonts). Gates G1, G3–G7 run in the group layouts (src/features/account/Gate).
+ * (fonts + i18n, at most 2 s, then system fonts) and the update checks (CMP-UpdateBanner). Gates G1, G3–G7 run in
+ * the group layouts (src/features/account/Gate).
  */
 import '../global.css';
 
@@ -19,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-import { ErrorState, FontsLoadedContext, ToastProvider } from '@/components';
+import { ErrorState, FontsLoadedContext, ToastProvider, UpdateWatcher } from '@/components';
 import { AppRoot } from '@/components/AppRoot';
 import { LanguageSync } from '@/features/account/LanguageSync';
 import { useCampaignCapture } from '@/lib/campaign';
@@ -70,6 +71,7 @@ export default function RootLayout() {
               <ToastProvider>
                 <StatusBar style="dark" />
                 <LanguageSync />
+                <UpdateWatcher />
                 <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg.app } }} />
               </ToastProvider>
             </SafeAreaProvider>

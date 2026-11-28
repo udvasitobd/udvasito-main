@@ -1,0 +1,18 @@
+{
+  "releases": [
+    {
+      "id": 1,
+      "date": "2026-11-28",
+      "en": [
+        "When a new version of UDVASITO is ready, a bar at the top of the screen now tells you. Tap “Update now” to get it, or “What's new” to see what changed.",
+        "The privacy notice and the terms of use are now in the app, in English and Bangla.",
+        "The “Try again” button on the error screen is centred again."
+      ],
+      "bn": [
+        "উদ্ভাসিতের নতুন সংস্করণ এলে এখন স্ক্রিনের ওপরে একটি বার আপনাকে জানায়। নতুন সংস্করণ পেতে “এখনই আপডেট করুন” চাপুন, আর কী বদলেছে দেখতে “নতুন কী আছে” চাপুন।",
+        "গোপনীয়তা নীতি ও ব্যবহারের শর্তাবলি এখন অ্যাপেই আছে, ইংরেজি ও বাংলায়।",
+        "ত্রুটির স্ক্রিনে “আবার চেষ্টা করুন” বোতামটি আবার মাঝখানে দেখা যায়।"
+      ]
+    }
+  ]
+}

@@ -472,3 +472,20 @@ the backups taken before it was removed, until those backups expire. Backups are
 **Recommendation: A**: it keeps the least personal data (minimisation, PDPO 2025) and still allows a week to notice and
 undo a mistake. The line goes into the notice when the backup job is built; the law teacher reads it in DEP-02b.
 Status: ❓ open (not blocking: no backups exist yet)
+
+### Q-028 · 2026-11-28 · P1 · "New version available" bar with what's new (developer request)
+The developer asked: whenever a new update is pushed, the older version should show a top bar saying a new version is
+available, please update, together with the changes. Nothing in specs covered it (only the hard block, gate G1 /
+SCR-O05, for an app that is too old), so it was added to specs §1.3.5 as `CMP-UpdateBanner`, with new copy in
+English and standard Bangla (`update.available.*`, `update.whatsNew.title`):
+- **Android app:** expo-updates checks when the app opens and each time it comes back to the screen; **Update now**
+  downloads the update if needed and restarts the app into it. A newer APK (`settings.latestAppVersion` + `apkUrl`,
+  ADR-007) shows the same bar with **Download update**.
+- **Web:** the page compares its own release with the live `/whats-new.json` when it opens and each time the tab comes
+  back into view; **Update now** reloads the page.
+- **What's new:** the notes come from `public/whats-new.json` (one entry per release, English + Bangla, written at each
+  release). The website always serves the newest copy, so an older app can show what a newer one brings.
+- Checks happen only on open / return to the app — never on a timer — so no new rule number was needed. No new
+  service, library or personal data: the app reads one small file from its own website.
+
+**Decision 2026-11-28 (developer): build it.** Status: ✅ decided

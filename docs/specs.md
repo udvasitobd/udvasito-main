@@ -146,6 +146,7 @@ Spacing scale 4/8/12/16/24/32/48 px. Screen padding 16 (mobile) / 24 (≥ 768 px
 | `CMP-ContactCard` | Name, role chip, area/distance, phone, **Call** and **WhatsApp** buttons (`tel:` and `https://wa.me/<number>`), copy-number button. |
 | `CMP-Banner` | `info` / `warning` / `success` / `error` with icon + text + optional action. |
 | `CMP-OfflineBanner` | Sticky top banner when offline; shows pending outbox count. |
+| `CMP-UpdateBanner` | Top bar on every screen (under `CMP-OfflineBanner`) when a newer version exists — rules and copy below the table (Q-028). |
 | `CMP-Skeleton` | Grey blocks matching the final layout. |
 | `CMP-EmptyState` | Icon + title + body + optional action. |
 | `CMP-ErrorState` | Icon + `errors.generic.title` + message from the error code + **Try again** + **Get help** (opens the helpline through `useHelpline()`, D-R3). |
@@ -156,6 +157,14 @@ Spacing scale 4/8/12/16/24/32/48 px. Screen padding 16 (mobile) / 24 (≥ 768 px
 | `CMP-CountdownChip` | "Volunteer contact in 0:21" / "Next search in 3:40" — updates every second, announced only on change of minute. |
 | `CMP-ReportSheet` | Reasons + details + Block toggle (see SCR-C01). |
 | `CMP-Markdown` | Renders team-written content pages (legal, learn, dengue) from `src/content/generated/*.json`. Supports only: `##`/`###` headings, paragraphs, bullet and numbered lists, **bold**, *italic*, links (external links open in the browser). No raw HTML. The JSON is produced at build time by `scripts/build-content.ts` using the `marked` lexer (MIT), so content changes ship with EAS Update. |
+
+**`CMP-UpdateBanner`** (developer decision 2026-11-28, Q-028). Navy bar with a sparkle icon, a title, one line, **Update now**, **What's new** (only when there are notes) and a close button (Later).
+- **Android app:** an EAS Update was found — when the app opens (`checkAutomatically: ON_LOAD`, downloads in the background) or each time it comes back to the screen. Update now downloads it if needed and restarts the app into it. Otherwise, when `settings.latestAppVersion` is newer than the app and `apkUrl` is set, the button is `update.download` and opens `apkUrl` (ADR-007; the hard block stays gate G1).
+- **Web:** the live `/whats-new.json` lists a newer release than the page was built with — checked when the page opens and each time the tab comes back into view, never on a timer. Update now reloads the page.
+- **What's new** (`CMP-Dialog`): the releases newer than the running version, newest first — date, then one line per change, in the chosen language. The notes live in `public/whats-new.json` (every release: a whole-number id one higher than the last, the date, the same lines in English and Bangla; never a name or phone number). Each version bundles the file and the website serves it, so an older version can show what a newer one brings. The app reads it only from its own website and sends nothing about the person.
+- **Later** hides that offer until the app restarts or a newer one appears. Never shown on `/update-required`. A failed update keeps the bar and shows `update.available.failed`.
+
+**Copy:** `update.available.title` "New version available" / "নতুন সংস্করণ এসেছে"; `update.available.body` "Please update to the latest version." / "অনুগ্রহ করে সর্বশেষ সংস্করণে আপডেট করুন।"; `update.available.now` "Update now" / "এখনই আপডেট করুন"; `update.available.whatsNew` "What's new" / "নতুন কী আছে"; `update.available.later` "Later" / "পরে"; `update.available.failed` "Could not update. Check your internet connection and try again." / "আপডেট করা যায়নি। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।"; dialog title `update.whatsNew.title` "What's new" / "নতুন কী আছে".
 
 ### 1.4 Navigation and layout
 
@@ -1726,7 +1735,7 @@ Implements PRD §3.3 (visibility), §5.9 (retention), consent versioning (NFR-10
 | Share sheet | ✅ native | ✅ Web Share | ✅ Web Share | ⚠ Copy link fallback |
 | Slip photo | ✅ camera/gallery | ✅ file/camera | ✅ | ✅ file |
 | Install | APK (`/download`) | PWA install | Add to Home Screen | PWA install |
-| App update | EAS Update (JS) + `minimumAppVersion` gate | Automatic | Automatic | Automatic |
+| App update | EAS Update (JS) + `minimumAppVersion` gate + `CMP-UpdateBanner` | `CMP-UpdateBanner` (reload) | `CMP-UpdateBanner` (reload) | `CMP-UpdateBanner` (reload) |
 
 ### 7.9 QA checklist per build (NFR-06 — run by member 3, results posted in the PR)
 1. Fresh install on the 2 GB test phone → welcome in Bangla (phone set to Bangla) → consent → sign in → onboarding → post a request **by voice** in Bangla. Two timings: first-timer end-to-end ≤ 2 min (US-X01); the request form itself — from tapping **Need blood** to **Post**, already signed in — ≤ 60 s (G4).

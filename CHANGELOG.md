@@ -3,6 +3,7 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-28 · P1 · "New version available" bar on every screen (CMP-UpdateBanner, Q-028): Update now restarts the Android app into a downloaded EAS Update (or opens a newer APK) and reloads the website; What's new lists the newer releases from `public/whats-new.json` (English + Bangla), which every version bundles and the website serves. Web shell 579 KB gzip.
 - 2026-11-28 · P1 · Draft privacy notice and terms of use in English and Bangla (`src/content/legal/`, version `2026-11-28-pilot`): the welcome/consent screen, profile setup and the `/privacy` and `/terms` pages now exist; a law teacher reads them before production (Q-009 update). The error screen now uses the app fonts, so "Try again" is centred on phones with a maker font.
 - 2026-11-28 · P1 · First Android test app (EAS preview APK 0.1.0, runtime d48c5a7…): Sentry upload off for test builds (#7), fingerprint skips the EAS-only Firebase file (#8).
 - 2026-11-28 · P0 · **staging.udvasito.com is live**: Cloudflare Workers Builds deploys the `staging` branch (Worker `udvasito-web-staging`); request logging off in `wrangler.jsonc` (#5).

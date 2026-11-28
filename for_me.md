@@ -30,7 +30,8 @@ real, and real people should not use it yet).
 
 ### 👉 6. Get the new screens on your phone (about 3 minutes) — after Claude writes "update sent"
 The app on your phone stopped at **"Please review and accept the updated terms"** because the privacy notice and terms
-did not exist yet. Claude has now written them, so the app gets a small update (no new install needed).
+did not exist yet. Claude has now written them, so the app gets a small update (no new install needed). This update
+also adds the **"New version available" bar**, so this is the **last time** you have to do the close-and-open trick.
 1. When Claude writes **"update sent"**: on the phone, close UDVASITO completely — open the recent-apps view (swipe up
    from the bottom and hold) and swipe UDVASITO away.
 2. Open UDVASITO again, wait 10 seconds, then close it and open it **once more** (the first opening downloads the
@@ -39,6 +40,11 @@ did not exist yet. Claude has now written them, so the app gets a small update (
    of birth and phone number.
 4. Write in the chat what you saw — **"profile done"**, or a screenshot of anything that looks wrong (cover the phone
    number).
+
+**From the next update on** you don't need any trick: a dark-blue bar appears at the top of the screen saying
+**"New version available"**. Tap **What's new** to read what changed, then **Update now** — the app restarts by itself
+in a few seconds with the new version. Tap **✕** if you are busy; the bar comes back the next time you open the app.
+The website (staging.udvasito.com) shows the same bar; there **Update now** simply reloads the page.
 
 ### ✅ 5. Test app installed on your iQOO phone (28 Nov) — Google sign-in worked
 The first phone version of UDVASITO is ready (a test copy: it talks to the test server, not the real one).
