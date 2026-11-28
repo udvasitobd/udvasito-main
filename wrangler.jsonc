@@ -17,6 +17,9 @@
     // These paths always run worker/index.ts first; real files and navigations are free static-asset requests.
     "run_worker_first": ["/api/*"],
   },
+  // Workers Logs / traces OFF: sign-in URLs (one-time tokens) pass through this Worker, and request logs would keep
+  // visitor addresses — personal data we never store (CLAUDE.md rule 3). Set here so every deploy enforces it.
+  "observability": { "enabled": false },
   "workers_dev": false,
   "preview_urls": false,
   // www.udvasito.com (on the promo videos) never reaches this Worker: a proxied placeholder DNS record + the zone
@@ -25,6 +28,7 @@
   "vars": { "CONVEX_SITE_URL": "https://striped-starling-176.eu-west-1.convex.site" },
   "env": {
     "staging": {
+      "observability": { "enabled": false },
       "workers_dev": true,
       "preview_urls": true,
       "routes": [{ "pattern": "staging.udvasito.com", "custom_domain": true }],
