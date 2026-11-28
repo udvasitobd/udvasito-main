@@ -2,9 +2,12 @@
  * Edge Worker for udvasito.com and staging.udvasito.com (ADR-024).
  *
  * Cloudflare serves the web export (`dist/`) as static assets with `public/_headers` without running this code. The
- * Worker runs for `/api/*` (wrangler.jsonc `run_worker_first`) and for any request that matches no file and is not a
- * browser navigation — crawlers, link-preview bots and older browsers send no `Sec-Fetch-Mode: navigate`, so
- * Cloudflare's own single-page-app fallback does not answer them (review of PR #2). `routeFor` decides:
+ * Worker runs for `/api/*` (wrangler.jsonc `run_worker_first`). Measured on staging.udvasito.com 2026-11-28:
+ * Cloudflare's single-page-app fallback answers EVERY other request that matches no file with `index.html` (200), with
+ * or without `Sec-Fetch-Mode: navigate` — crawlers and link previews get the app, and a missing file such as
+ * `/robots.txt` also gets the app page instead of a 404. Sending those paths through the Worker would make every
+ * asset request a Worker invocation (100,000/day free), so this is accepted. `routeFor` still decides for any request
+ * that does reach the Worker, and for scripts/serve-dist.ts (local smoke tests):
  * - `/api/auth/*` is passed through to this environment's Convex site, so Google's sign-in screen can show our own
  *   address (spike S3). A static `_redirects` rule cannot proxy to another host, hence this Worker.
  * - an app address such as `/learn/dengue` or `/r/<slug>` gets the app (`index.html`), as a navigation would;
