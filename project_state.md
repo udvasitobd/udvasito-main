@@ -193,12 +193,18 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   NTF-09 to confirmed donors on not_needed (body key notifications.NTF-09.body.notNeeded) MERGED (62bdf61; review
   inline, no findings — background review agent died on usage limit); PR #5 wrangler observability off + worker
   comment MERGED (ec71b0f). staging.udvasito.com LIVE, sign-in page renders, no console errors. EAS preview env:
-  EXPO_PUBLIC_CONVEX_URL/SITE_URL = staging, SENTRY_DSN, GOOGLE_SERVICES_JSON, + EXPO_PUBLIC_APP_ENV=staging (added).
+  EXPO_PUBLIC_CONVEX_URL/SITE_URL = staging, SENTRY_DSN, GOOGLE_SERVICES_JSON (APP_ENV comes from eas.json).
   Donor live rule needs phoneVerified → 3-phone run needs the Telegram test bot (for_me 👉 3).
   for_me 👉 4 = helpline number (developer types own number via dashboard → admin/ops:setSetting).
   eas.json development + preview: SENTRY_DISABLE_AUTO_UPLOAD=true (no SENTRY_AUTH_TOKEN; the Gradle source-map upload
   would fail the build). Production profile still uploads → needs SENTRY_AUTH_TOKEN (EAS secret, developer pastes) or
   the same switch before build #3. Developer said "yes build" 2026-11-28 for build #1.
+  EAS build #1 (preview, 2d32bf24) ERRORED at "Configure expo-updates": runtime version mismatch — the fingerprint
+  hashed the GOOGLE_SERVICES_JSON file secret (../eas-environment-secrets/<hash>), which exists only on EAS. Fix:
+  fingerprint.config.js ignorePaths ['../eas-environment-secrets/**'] (proved locally: file present + skip = same hash
+  d48c5a7… as no file). Retry = budget row 2 "Reserve — fix a native config mistake from build 1" (roadmap §2.4).
+  Removed my duplicate EAS preview var EXPO_PUBLIC_APP_ENV (eas.json profile env already sets it).
+  Lesson: decompress EAS log files (gzip) before reading; Node needs C:/ paths, not /c/.
   NEXT (was): ask the developer for EAS build #1 (preview APK, 1 of 15/month); Telegram bot wiring when the token is in;
   then the 3-phone DoD run; Sentry DSN as a Cloudflare build var (public value) when the dashboard tab works.
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
