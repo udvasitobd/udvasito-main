@@ -22,3 +22,9 @@ Legal pages, Learn articles and the dengue guide are written here in Markdown, i
 
 Anything else (pictures, tables, code, HTML, `http://` links) stops the build with a message that says which
 file and what to change, so nothing silently disappears from a legal page.
+
+## What's new (release notes)
+
+The "What's new" list in the update bar comes from `public/whats-new.json` (not Markdown). Claude adds one entry
+for every release people will notice: the next id, the date, and the same lines in English and Bangla — plain words,
+never a name or a phone number. `npm test` checks the file.

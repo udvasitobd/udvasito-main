@@ -209,8 +209,15 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   runtime d48c5a7b… (= local), channel preview. Builds used this month: 2 of 15 (quota reset date still unknown →
   check expo.dev billing page). Developer installed it on the iQOO Z10 Turbo Pro (2026-11-28): native Google sign-in
   WORKS (spike S3 sign-in ✅ on Android). It then hit ERR_CONSENT_REQUIRED on the root error screen (no legal files →
-  no /welcome) → fixed by the legal draft (branch p1/legal-draft) + EAS Update to channel `preview` (JS only, same
-  runtime d48c5a7…). Push on the phone still untested. The phone screenshot `issue 1.jpg` sits untracked in the repo
+  no /welcome) → fixed by PR #10 (merged b208995, legal draft + ErrorBoundary fonts, self-review fixed 3 wrong claims)
+  + EAS Update group 099926ee-a438-42ab-bd9f-383523efc89f on branch/channel `preview` (android, runtime d48c5a7…,
+  checked: bundle has outstanding-grasshopper-711, no dev/prod URL, no sample number). EAS UPDATE RECIPE: (0) add the
+  release's entry to public/whats-new.json and merge to staging FIRST (Cloudflare serves the notes), then move
+  app/zz-preview.tsx AND .env.local (dev Convex URL) to the scratchpad hold, then
+  `EXPO_PUBLIC_APP_ENV=staging npx eas-cli@latest update --channel preview --environment preview --platform android
+  --message "…" --non-interactive`, move both back (eas.json profile env is NOT applied to updates). Waiting: developer
+  reopens the app twice → welcome → profile (for_me 👉 6). Team doc To-do tab bookmark rev 13 (member 4 job = book the
+  law teacher's first read; 5 points to check). Q-027 (backup keep time) open. Push on the phone still untested. The phone screenshot `issue 1.jpg` sits untracked in the repo
   root — never commit it.
   NEXT (was): ask the developer for EAS build #1 (preview APK, 1 of 15/month); Telegram bot wiring when the token is in;
   then the 3-phone DoD run; Sentry DSN as a Cloudflare build var (public value) when the dashboard tab works.
@@ -243,6 +250,17 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   Legal text adds ~18 KB gzip to the web shell (574/600 KB on 2026-11-28) → lazy-load it if the budget gets tight.
 - Root ErrorBoundary renders OUTSIDE RootLayout's providers → it now reads font state itself (src/lib/fonts.ts
   appFontsLoaded via expo-font isLoaded). Without it the iQOO system font mis-measured bold text ("Try again" off-centre).
+- UPDATE BAR (CMP-UpdateBanner, specs §1.3.5, Q-028, 2026-11-28): every release people will notice ADDS an entry to
+  public/whats-new.json (id = previous + 1, date, en + bn with the same number of lines; whatsNew.test.ts checks it).
+  Web: bar when the live /whats-new.json id > the bundled id (checked on open + visibilitychange + focus; Update now =
+  reload). Android: bar when expo-updates finds an update (ON_LOAD at start + AppState 'active'; Update now = fetch if
+  needed + reloadAsync with a white reload screen) or latestAppVersion > app version with apkUrl set (opens apkUrl).
+  Android reads notes from SITE_URL/whats-new.json (src/lib/links.ts: staging.udvasito.com unless APP_ENV=production)
+  only once an offer exists. Forgot the entry → Android bar without "What's new", web no bar. Files: src/lib/whatsNew.ts
+  (pure), updateStore.ts (useSyncExternalStore — no zustand/zod in the web shell), updates.ts (web) /
+  updates.native.ts, components/UpdateBanner.tsx (rendered by Screen under OfflineBanner; UpdateWatcher in the root
+  layout). Checked in Chrome on a local build (bar, What's new EN/BN, Later). The Android bar can only show from the
+  update AFTER the one that brings it.
 - Local checks without signing in: temporary re-export routes (e.g. app/zzpreview/…) + `npx tsx scripts/serve-dist.ts`
   (8081). serve-dist forbids iframes; for a 390 px view use a frame-friendly server from the scratchpad. `pkill` does
   NOT exist in Git Bash here — stop node servers with PowerShell Stop-Process (match the command line).

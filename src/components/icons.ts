@@ -48,3 +48,5 @@ export { default as ShieldAlert } from 'lucide-react-native/icons/shield-alert';
 export { default as HeartHandshake } from 'lucide-react-native/icons/heart-handshake';
 export { default as ClipboardList } from 'lucide-react-native/icons/clipboard-list';
 export { default as ChevronUp } from 'lucide-react-native/icons/chevron-up';
+export { default as RefreshCw } from 'lucide-react-native/icons/refresh-cw';
+export { default as Sparkles } from 'lucide-react-native/icons/sparkles';

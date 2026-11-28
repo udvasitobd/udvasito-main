@@ -1,6 +1,7 @@
 /**
  * Screen frame — specs §1.4.2 header (back button when not a root · title · CMP-LanguageToggle · CMP-PracticeBadge)
- * + CMP-OfflineBanner + scrollable content (16 px padding on phones, 24 px from 768 px, max width 720).
+ * + CMP-OfflineBanner + CMP-UpdateBanner + scrollable content (16 px padding on phones, 24 px from 768 px, max width
+ * 720).
  */
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
@@ -17,6 +18,7 @@ import { LanguageToggle } from './LanguageToggle';
 import { OfflineBanner } from './OfflineBanner';
 import { PracticeBadge } from './PracticeBadge';
 import { Text } from './Text';
+import { UpdateBanner } from './UpdateBanner';
 
 /** The UDVASITO symbol (assets/logo/udvasito-symbol-red.svg) — a mark only, never behind text (§1.3.1). */
 export function LogoMark({ size = 32, color = colors.brand.logoRed }: { size?: number; color?: string }) {
@@ -76,6 +78,7 @@ export function Screen({
   return (
     <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-app">
       <OfflineBanner />
+      <UpdateBanner />
       <View className={cn('flex-row items-center gap-s2 border-b border-line bg-app py-s2', pad)}>
         {root ? (
           <View className="min-h-touch flex-row items-center gap-s2">
