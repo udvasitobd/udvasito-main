@@ -243,6 +243,7 @@ Status column (update as you go): ⬜ not started · 🟦 in progress · ✅ don
 - Every reveal has a `contactReveals` row and an audit entry.
 
 **Go-live steps (Sat 28 Nov, by 14:00)**
+0. The law teacher's first read of the draft privacy notice and terms is done (DEP-02a) and its notes are fixed in `src/content/legal/*.md` — **no production deploy before this** (Q-009 update).
 1. Merge to `main` → production web + Convex.
 2. `bootstrapSuperAdmin` on production; set `fallbackContactPhone`, `contactEmail`, `consentVersion` = `2026-11-28-pilot` (D-R5).
 3. `seed-places`, `seed-settings`, `import-hospitals` on production.
@@ -405,8 +406,8 @@ DEP-01 to DEP-07 are from `PRD.md` §10.1; DEP-02b onwards were added while plan
 | ID | Deliverable | Owner | Due | Needed by | Format |
 |---|---|---|---|---|---|
 | DEP-01 | Chattogram hospitals & blood banks (≥ 40 rows, with aliases) | Members 2 + 4 | **Day 3 (Thu 26 Nov)** | P1 place picker | `data/hospitals.csv` (§5.1) |
-| DEP-02 | Privacy notice, terms, consent text — EN/BN **draft** | Member 4 | **Day 4** | P1 consent | `src/content/legal/*.md` (§5.4) |
-| DEP-02a | 30-minute first read of the draft by the law-faculty teacher | Member 4 | Day 4 | P1 go-live (D-R5) | Notes → fixes in the draft |
+| DEP-02 | Privacy notice, terms, consent text — EN/BN **draft** | Claude (developer decision 2026-11-28, Q-009) ✅ | **Day 4** | P1 consent | `src/content/legal/*.md` (§5.4) |
+| DEP-02a | 30-minute first read of the draft by the law-faculty teacher — **required before production** | Member 4 arranges | Day 4 | P1 go-live (D-R5) | Notes → fixes in the draft; `reviewedBy` in the front matter |
 | DEP-02b | Full law review → final privacy/terms | Member 4 + law teacher | **Day 12** | P6 final consent version | Same files, new version |
 | DEP-02c | One-page breach-response plan (NFR-08) | Member 4 | Day 5 | Pilot | `docs/breach-plan.md` |
 | DEP-03 | FAQ ≥ 30 entries + dengue page EN/BN, medically reviewed | Member 3 + medical reviewer | **Day 8** | P7 #5, #6 | `data/faq.csv` (§5.3), `src/content/<lang>/dengue.md` |
