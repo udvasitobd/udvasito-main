@@ -227,6 +227,20 @@ describe('requests.close', () => {
   });
 });
 
+describe('requests.close — confirmed donors (Q-023)', () => {
+  it('no longer needed: confirmed donors are told too (they may be on the way); a donor who declined is not', async () => {
+    const { t, owner, requestId, nasrin, tanvir, sabbir, mitu } = await scene();
+    await nasrin.as.mutation(api.responses.accept, acceptArgs(requestId)); // confirmed
+    await tanvir.as.mutation(api.responses.accept, acceptArgs(requestId)); // confirmed
+    await sabbir.as.mutation(api.responses.accept, acceptArgs(requestId)); // standby
+    await mitu.as.mutation(api.responses.decline, { requestId }); // declined
+    await owner.mutation(api.requests.close, { requestId, reason: 'not_needed' });
+
+    const told = (await notificationsOf(t, requestId, 'NTF-09')).map((n) => n.recipientId);
+    expect(told.sort()).toEqual([nasrin.profileId, tanvir.profileId, sabbir.profileId].sort());
+  });
+});
+
 describe('requests.listMine', () => {
   it('active and closed apart, newest first; only the caller’s own requests', async () => {
     const { t, where, owner, requestId } = await scene();

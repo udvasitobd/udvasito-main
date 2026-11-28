@@ -23,10 +23,9 @@ _Last updated: Sat 28 Nov 2026._
 
 ## 👉 Do now
 
-### 👉 1. Say "yes" to connecting Cloudflare to GitHub
-**Why:** then the test website **staging.udvasito.com** builds itself from the code. Claude opens the page in Chrome;
-you only click **Install & Authorize** (it lets Cloudflare read the code and show build results on GitHub; Claude shows
-you the exact permissions on the page before you click). Write **yes** in the chat.
+### ✅ 1. Cloudflare connected to GitHub (28 Nov)
+You said yes and typed GitHub's email code. The test website **staging.udvasito.com** now builds itself every time the
+`staging` code changes (Worker `udvasito-web-staging`).
 
 ### 👉 2. Share the team to-do doc with members 2–5
 Open **https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v** → **Share** → add the four members (or copy the link and send it in your team group). The most
@@ -138,12 +137,10 @@ so Claude follows them unless you say otherwise. Still waiting on people: **Q-00
   form words; the health-data consent follows the main consent version) and **Q-019** (request form words; a request
   shows "verified" only when its contact number is your own verified number) — Claude used the
   recommendation; just read them and say if you want something different.
-- 🟦 **Q-020, Q-021, Q-024, Q-025** — words and small rules Claude chose for push alerts, answering a request, the
-  30-second helpline and the sign-up limit. Claude used the recommendation; read them if you like.
-- ❓ **Q-022** — the "copy number" button on Android needs one small Expo add-on (and a new app build). Claude
-  suggests yes (option A); for now Android users long-press the number to copy it.
-- ❓ **Q-023** — when a family taps "No longer needed", should donors who already said yes also get a message, with
-  new words ("…is no longer needed. Thank you for being ready.")? Claude suggests yes (option A).
+- 🟦 **Q-020, Q-021** — words Claude chose for push alerts and answering a request. Claude used the recommendation;
+  read them if you like.
+- ✅ **Q-022 … Q-026** — you said "your recommendation" (28 Nov): copy-number button on Android (arrives with the next
+  app build), "No longer needed" message to donors who already said yes, and Q-024/025/026 kept as built.
 - ❓ **Q-016** — when a volunteer says "It doesn't match", should the person see a short message? Claude suggests yes
   (option A, the text is in the file). Until you answer, the screen simply shows the button again.
 

@@ -391,7 +391,8 @@ named in the ADRs, so CLAUDE.md says to ask before adding one.
   text (long-press → Copy), Call and WhatsApp work as specified.
 
 **Built for now:** option B (nothing half-working: the button is hidden where it cannot work).
-Status: ⬜ waiting for the developer
+**Decision 2026-11-28 (developer): A.** `expo-clipboard ~57.0.2` added; the button shows on Android and web. Arrives on
+phones with the next EAS build. Status: ✅ decided
 
 ### Q-023 · 2026-11-28 · P1 · Closing a request: who is told, and with which words
 `requests.close` (specs §6.2) sends NTF-09 to donors who are notified, opened or on standby. Two gaps:
@@ -406,7 +407,8 @@ Status: ⬜ waiting for the developer
 - **Option B:** keep the spec as written (confirmed donors hear nothing until the donation-confirmation prompt, P2).
 
 **Built for now:** option B, exactly as specified (copy and rules are the team's call — CLAUDE.md §3).
-Status: ⬜ waiting for the developer
+**Decision 2026-11-28 (developer): A.** specs §6.2 `requests.close` and the NTF-09 row updated; new key
+`notifications.NTF-09.body.notNeeded` (Bangla for member 3 to check). Status: ✅ decided
 
 ### Q-024 · 2026-11-28 · P1 · 30-second helpline and "no donors yet": three small readings of the specs (please confirm)
 1. **`requests.getForOwner` returns `fallbackShown: boolean`, not `fallbackPhone`.** specs §6.2 lists an optional
@@ -422,7 +424,7 @@ Status: ⬜ waiting for the developer
    district has any with a public number).
 
 Also: a practice request lists practice blood banks only, so nobody practising calls a real blood bank.
-**Recommendation:** keep as built. Status: 🟦 applied, waiting for review
+**Recommendation:** keep as built. **Decision 2026-11-28 (developer): keep.** Status: ✅ decided
 
 ### Q-025 · 2026-11-28 · P1 · Sign-up limit S-25: how "network" is measured, and a risk at blood drives
 Built (slice 15): `profiles.completeOnboarding` allows `signupsPerDevicePerHour` (S-25, default 5) new profiles per
@@ -438,7 +440,7 @@ network per hour, then `ERR_RATE_LIMITED {minutes}`, with the helpline button un
 3. **"Posting rate limit" (roadmap F-802).** No number is written for it anywhere, so nothing new was invented:
    posting is bounded by S-22 (1 / 2 open requests, 5 a month), already enforced in `requests.create`.
 
-**Recommendation:** A. Status: 🟦 applied, waiting for review
+**Recommendation:** A. **Decision 2026-11-28 (developer): A.** Status: ✅ decided
 
 ### Q-026 · 2026-11-28 · P1 · Code review of PR #3: practice accounts and the hospital list (please confirm)
 The review found that a practice account (made with `internal.admin.ops.setDemo`, as in the go-live smoke test)
@@ -449,4 +451,4 @@ everyone else the real ones — the same rule as the "no donors yet" blood-bank 
 looser: real and practice rows still never meet. Until a practice hospital exists, a practice account uses "My place
 isn't in the list".
 
-**Recommendation:** keep. Status: 🟦 applied, waiting for review
+**Recommendation:** keep. **Decision 2026-11-28 (developer): keep.** Status: ✅ decided

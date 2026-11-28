@@ -79,15 +79,20 @@ export function donorConfirmedText(
   };
 }
 
-/** NTF-09 — to donors still deciding (or on standby) when the request is closed. */
+/**
+ * NTF-09 — when the request is closed: to donors still deciding (or on standby), and with "No longer needed" also to
+ * confirmed donors (Q-023). "Has been arranged" is only true for "All bags arranged".
+ */
 export function noLongerNeededText(
   bloodGroup: Exclude<RequestGroup, 'not_sure'>,
   place: string,
+  reason: 'fulfilled' | 'not_needed',
   language: Language,
 ): { title: string; body: string } {
+  const body = reason === 'not_needed' ? 'notifications.NTF-09.body.notNeeded' : 'notifications.NTF-09.body';
   return {
     title: copyText('notifications.NTF-09.title', language),
-    body: fill(copyText('notifications.NTF-09.body', language), {
+    body: fill(copyText(body, language), {
       group: groupText(bloodGroup, language),
       hospital: place,
     }),
