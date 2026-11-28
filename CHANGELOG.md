@@ -3,6 +3,8 @@
 All notable changes, newest first. One line per slice; phase prefix as in commit messages.
 
 ## Unreleased
+- 2026-11-28 · P0 · **staging.udvasito.com is live**: Cloudflare Workers Builds deploys the `staging` branch (Worker `udvasito-web-staging`); request logging off in `wrangler.jsonc` (#5).
+- 2026-11-28 · P1 · Decisions Q-022…Q-026: "No longer needed" also tells confirmed donors, with words that don't say it was arranged; copy-number button on Android (`expo-clipboard`) (#4).
 - 2026-11-28 · P1 · Code-review fixes for PR #3: donors with an out-of-date health consent are no longer alerted or confirmed, sign-out stops push alerts in every account state, practice accounts see practice hospitals (Q-026), removed requests leave the donor inbox, a typed place name is dropped when a hospital is chosen, pushed alerts are marked sent; web shell back to 556 KB gzip (zod and the full date-fns were in the app) (84c4f7f…6373faa).
 - 2026-11-28 · P1 · Sign-up limit S-25: at most 5 new profiles per network per hour (from settings), counted only when a profile is created; the helpline button appears under the "wait" message (f14ed09).
 - 2026-11-28 · P1 · 30-second path: no "yes" within S-13 → the requester's screen shows the helpline (number fetched on tap); no matching donor at all → "No donors yet" at once, with the district's blood banks and a Call button each (4743b1c, b0d12c5).

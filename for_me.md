@@ -23,9 +23,10 @@ _Last updated: Sat 28 Nov 2026._
 
 ## 👉 Do now
 
-### ✅ 1. Cloudflare connected to GitHub (28 Nov)
-You said yes and typed GitHub's email code. The test website **staging.udvasito.com** now builds itself every time the
-`staging` code changes (Worker `udvasito-web-staging`).
+### ✅ 1. Cloudflare connected to GitHub (28 Nov) — the test website is live
+You said yes and typed GitHub's email code. **https://staging.udvasito.com** now builds itself every time the
+`staging` code changes. You can open it and sign in with Google to look around (it is the test copy: nothing there is
+real, and real people should not use it yet).
 
 ### 👉 2. Share the team to-do doc with members 2–5
 Open **https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v** → **Share** → add the four members (or copy the link and send it in your team group). The most
@@ -98,6 +99,8 @@ someone taps the button. You type it yourself because it is your personal number
 | ✅ | Told Claude your test phone: **iQOO Z10 Turbo Pro** | 27 Nov |
 | ✅ | Said **"do the recommendations"** → questions Q-004, Q-006, Q-007, Q-008, Q-009 settled | 27 Nov |
 | ✅ | Said **start the next phase** → P1 (the first real version) has started | 27 Nov |
+| ✅ | Said **merge** for pull request #3 (P1, after its review + 6 fixes) and **yes** to Cloudflare ↔ GitHub; typed GitHub's email code | 28 Nov |
+| ✅ | Answered **Q-022 … Q-026** ("your recommendation") | 28 Nov |
 
 > 💡 Namecheap **auto-renew is off** — the domain is paid until **26 Nov 2027**. Turning it on is your choice (it uses
 > the card saved at Namecheap — the project's one yearly payment). Claude will remind you in October 2027.

@@ -187,9 +187,17 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   health consent → _lib/donors.isLiveNow in matching + accept; 257890f push.unregister in every state; 1ea789c
   hospitals.search by caller area, Q-026; bf92eeb inbox drops hiddenByModerator; ceb89b4 placeText dropped with a
   hospital; e5edd27 pushed alerts 'sent'). Review comment posted on the PR. CI bundle check had failed (671 KB):
-  fixed 84c4f7f (556 KB). WAITING: CI green + developer's OK to merge. Team doc Bangla tab: 15 rows added (rev 2).
+  fixed 84c4f7f (556 KB). Team doc Bangla tab: 15 rows added (rev 2).
+  2026-11-28 developer: "merge it and yes. Q-022-Q026, your recommendation" → PR #3 MERGED (707a767), Convex staging
+  deployed (+ index phoneVerifications.by_external); Workers Builds connected; PR #4 Q-022 expo-clipboard + Q-023
+  NTF-09 to confirmed donors on not_needed (body key notifications.NTF-09.body.notNeeded) MERGED (62bdf61; review
+  inline, no findings — background review agent died on usage limit); PR #5 wrangler observability off + worker
+  comment MERGED (ec71b0f). staging.udvasito.com LIVE, sign-in page renders, no console errors. EAS preview env:
+  EXPO_PUBLIC_CONVEX_URL/SITE_URL = staging, SENTRY_DSN, GOOGLE_SERVICES_JSON, + EXPO_PUBLIC_APP_ENV=staging (added).
+  Donor live rule needs phoneVerified → 3-phone run needs the Telegram test bot (for_me 👉 3).
   for_me 👉 4 = helpline number (developer types own number via dashboard → admin/ops:setSetting).
-  NEXT after merge: staging deploy (Workers Builds still needs the developer's yes), 3-phone DoD run, EAS build (ask).
+  NEXT: ask the developer for EAS build #1 (preview APK, 1 of 15/month); Telegram bot wiring when the token is in;
+  then the 3-phone DoD run; Sentry DSN as a Cloudflare build var (public value) when the dashboard tab works.
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
   b498ce34-9880-4845-8fc5-54431dd450cb; tab "To-do" 1e0a4b77-629a (body 8e30bb71-e1ec), tab "Bangla to check"
   fc1b86ea-accf (body 054015cc-eff6, table mnm1hfaezn3.358: Screen | English | Claude's Bangla | Your fix | Key;
