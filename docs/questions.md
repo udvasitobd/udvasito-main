@@ -147,7 +147,13 @@ The consent screen (SCR-O01, gate G3) links to `/privacy` and `/terms`, rendered
 **How it is built:** with **no** legal files the build works but `/welcome`, `/onboarding`, `/privacy` and `/terms`
 do not exist (gates never send anyone there, the addresses show "not found"); with **some but not all four**, or a
 wrong `version`/`effective` header, `npm run content:build` stops and leaves the legal pages out.
-Status: ✅ answered (waiting for DEP-02)
+**Update (2026-11-28, developer):** *"write the legal texts by yourselfs, a law teacher will review that before final
+publish"* → this replaces "Claude may not write legal text" for DEP-02. Claude wrote the **draft** privacy notice and
+terms in English and Bangla (`src/content/legal/{privacy,terms}.{en,bn}.md`, version `2026-11-28-pilot`). It is based
+only on what the app really collects and does (specs §5, PRD §3.3, §5.9, §6). Member 4 arranges the law teacher's first
+read (DEP-02a). That read and its fixes are required **before anything goes to production** (roadmap P1 go-live step 0).
+The full review (DEP-02b) then becomes the final version, a new `consentVersion`, and everyone re-consents once.
+Status: ✅ draft in (staging) · ⏳ law teacher's read (DEP-02a) before production
 
 ### Q-010 · 2026-11-27 · P1 · Test phones: one named so far
 Named: **iQOO Z10 Turbo Pro** (Vivo family; Android version not given). P0 needs a cheap 2 GB phone (Bangla rendering)
@@ -452,3 +458,17 @@ looser: real and practice rows still never meet. Until a practice hospital exist
 isn't in the list".
 
 **Recommendation:** keep. **Decision 2026-11-28 (developer): keep.** Status: ✅ decided
+
+### Q-027 · 2026-11-28 · P1 · How long are daily backups kept? (needed for the privacy notice)
+NFR-03 asks for a daily backup export (specs §6 cron, `exports.kind = "daily_backup"`), but PRD §5.9 gives no keep
+time for it. A backup holds personal data, so the privacy notice must say how long. A deleted account also stays in
+the backups taken before it was removed, until those backups expire. Backups are not built yet, so the draft notice
+(2026-11-28-pilot) does not mention them.
+- **A.** Keep each daily backup **7 days**, then delete it (a new admin-editable setting next to S-26/S-27). The notice
+  gets one line: "Backup copies are kept for 7 days, so deleted data also leaves them at most 7 days after deletion."
+- **B.** Keep backups **30 days**. Deleted data can then stay in a backup up to 30 days after the deletion.
+- **C.** Other.
+
+**Recommendation: A**: it keeps the least personal data (minimisation, PDPO 2025) and still allows a week to notice and
+undo a mistake. The line goes into the notice when the backup job is built; the law teacher reads it in DEP-02b.
+Status: ❓ open (not blocking: no backups exist yet)

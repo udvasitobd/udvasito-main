@@ -207,8 +207,11 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   Lesson: decompress EAS log files (gzip) before reading; Node needs C:/ paths, not /c/.
   EAS build #2 (preview, 2c7bb228-48f2-4e3e-a348-e2e6d675ec05, commit f7fce85) FINISHED in 23 min: 0.1.0, versionCode 1,
   runtime d48c5a7b… (= local), channel preview. Builds used this month: 2 of 15 (quota reset date still unknown →
-  check expo.dev billing page). for_me 👉 5 = install on the iQOO (developer). Native Google sign-in + push are
-  untested on a phone until the developer reports back (spike S3).
+  check expo.dev billing page). Developer installed it on the iQOO Z10 Turbo Pro (2026-11-28): native Google sign-in
+  WORKS (spike S3 sign-in ✅ on Android). It then hit ERR_CONSENT_REQUIRED on the root error screen (no legal files →
+  no /welcome) → fixed by the legal draft (branch p1/legal-draft) + EAS Update to channel `preview` (JS only, same
+  runtime d48c5a7…). Push on the phone still untested. The phone screenshot `issue 1.jpg` sits untracked in the repo
+  root — never commit it.
   NEXT (was): ask the developer for EAS build #1 (preview APK, 1 of 15/month); Telegram bot wiring when the token is in;
   then the 3-phone DoD run; Sentry DSN as a Cloudflare build var (public value) when the dashboard tab works.
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
@@ -228,10 +231,18 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   TELEGRAM_BOT_TOKEN in the Convex dashboard; I generate TELEGRAM_WEBHOOK_SECRET and pipe it in unprinted
   (node crypto → `npx convex env set` via stdin); then `npx convex run telegram:registerWebhook`; then set
   settings.verification {telegram: true, telegramBot: '<name>'} via internal.admin.ops.setSetting.
-- Legal files: NONE in the repo (DEP-02). Without them /welcome, /onboarding, /privacy, /terms are "not found" and the
-  gates skip consent/onboarding (availableRoutes({legalReady})). To check those screens locally: write 4 throwaway
-  files in src/content/legal/ with front matter (version 2026-11-28-pilot, effective 2026-11-28), run
-  content:build + build:web, then DELETE them and `git checkout src/content/generated/index.ts`.
+- Legal files: DRAFT IN THE REPO since 2026-11-28 (developer: "write the legal texts by yourselfs, a law teacher will
+  review that before final publish" → Q-009 update). src/content/legal/{privacy,terms}.{en,bn}.md, version
+  2026-11-28-pilot, effective 2026-11-28; written ONLY from what the code/specs really do (specs §5, PRD §3.3/§5.9/§6).
+  /src/content/legal/ is NO LONGER in .git/info/exclude. Production is blocked until the law teacher's read (DEP-02a,
+  roadmap go-live step 0) — then set `reviewedBy` in the front matter. Any change to what we collect/keep/show
+  (new field, retention, a provider) MUST update these 4 files in the same PR; a meaning change needs a new
+  version = settings.consentVersion (everyone re-consents). The notice PROMISES things not built yet: retention crons
+  (PRD §5.9: 30-day request scrub, slip photo 7 days, reveals/audit/consents 12 months, AI logs 30 days, push tokens 60
+  days) and F-603 data rights (copy/delete within 30 days) → must exist before the public launch (T0).
+  Legal text adds ~18 KB gzip to the web shell (574/600 KB on 2026-11-28) → lazy-load it if the budget gets tight.
+- Root ErrorBoundary renders OUTSIDE RootLayout's providers → it now reads font state itself (src/lib/fonts.ts
+  appFontsLoaded via expo-font isLoaded). Without it the iQOO system font mis-measured bold text ("Try again" off-centre).
 - Local checks without signing in: temporary re-export routes (e.g. app/zzpreview/…) + `npx tsx scripts/serve-dist.ts`
   (8081). serve-dist forbids iframes; for a 390 px view use a frame-friendly server from the scratchpad. `pkill` does
   NOT exist in Git Bash here — stop node servers with PowerShell Stop-Process (match the command line).

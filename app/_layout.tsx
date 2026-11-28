@@ -25,6 +25,7 @@ import { LanguageSync } from '@/features/account/LanguageSync';
 import { useCampaignCapture } from '@/lib/campaign';
 import { authClient, convex } from '@/lib/convex';
 import { i18n, initI18n } from '@/lib/i18n';
+import { appFontsLoaded } from '@/lib/fonts';
 import { initSentry, reportError } from '@/lib/sentry';
 import { colors } from '@/theme/tokens';
 
@@ -79,14 +80,19 @@ export default function RootLayout() {
   );
 }
 
-/** Any render error lands here: CMP-ErrorState with Try again (and the helpline when it is set). */
+/**
+ * Any render error lands here: CMP-ErrorState with Try again (and the helpline when it is set). It renders outside
+ * RootLayout's providers, so it reads the font state itself (src/lib/fonts.ts).
+ */
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   useEffect(() => reportError(error), [error]);
   return (
-    <SafeAreaProvider>
-      <SafeAreaView className="flex-1 items-center justify-center bg-app">
-        <ErrorState error={error} onRetry={() => void retry()} showHelp={false} />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <FontsLoadedContext.Provider value={appFontsLoaded()}>
+      <SafeAreaProvider>
+        <SafeAreaView className="flex-1 items-center justify-center bg-app">
+          <ErrorState error={error} onRetry={() => void retry()} showHelp={false} />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </FontsLoadedContext.Provider>
   );
 }

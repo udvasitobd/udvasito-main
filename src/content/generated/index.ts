@@ -2,4 +2,8 @@
 import type { ContentDoc } from '@/lib/content';
 
 export const content: Record<string, ContentDoc> = {
+  "legal/privacy.bn": require("./legal/privacy.bn.json") as ContentDoc,
+  "legal/privacy.en": require("./legal/privacy.en.json") as ContentDoc,
+  "legal/terms.bn": require("./legal/terms.bn.json") as ContentDoc,
+  "legal/terms.en": require("./legal/terms.en.json") as ContentDoc,
 };

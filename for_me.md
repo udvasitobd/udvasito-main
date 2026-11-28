@@ -28,7 +28,19 @@ You said yes and typed GitHub's email code. **https://staging.udvasito.com** now
 `staging` code changes. You can open it and sign in with Google to look around (it is the test copy: nothing there is
 real, and real people should not use it yet).
 
-### 👉 5. Put the test app on your iQOO phone (about 10 minutes) — do this first
+### 👉 6. Get the new screens on your phone (about 3 minutes) — after Claude writes "update sent"
+The app on your phone stopped at **"Please review and accept the updated terms"** because the privacy notice and terms
+did not exist yet. Claude has now written them, so the app gets a small update (no new install needed).
+1. When Claude writes **"update sent"**: on the phone, close UDVASITO completely — open the recent-apps view (swipe up
+   from the bottom and hold) and swipe UDVASITO away.
+2. Open UDVASITO again, wait 10 seconds, then close it and open it **once more** (the first opening downloads the
+   update, the second one uses it).
+3. You should now see **Welcome to UDVASITO**: tick the box "I'm 18 or older…" → **Continue** → fill in your name, date
+   of birth and phone number.
+4. Write in the chat what you saw — **"profile done"**, or a screenshot of anything that looks wrong (cover the phone
+   number).
+
+### ✅ 5. Test app installed on your iQOO phone (28 Nov) — Google sign-in worked
 The first phone version of UDVASITO is ready (a test copy: it talks to the test server, not the real one).
 1. On your **phone**, open **Chrome** and go to the build page:
    **https://expo.dev/accounts/udvasitos-team/projects/udvasito/builds/2c7bb228-48f2-4e3e-a348-e2e6d675ec05**
@@ -48,8 +60,8 @@ The first phone version of UDVASITO is ready (a test copy: it talks to the test 
 
 ### 👉 2. Share the team to-do doc with members 2–5
 Open **https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v** → **Share** → add the four members (or copy the link and send it in your team group). The most
-urgent jobs in it: **member 4's privacy notice + terms**, **the hospital list** (members 2 + 4) and **two more test
-phones** (anyone). Nobody else can open the link until you share it.
+urgent jobs in it: **member 4 books the law teacher** to read the privacy notice + terms Claude wrote, **the hospital
+list** (members 2 + 4) and **two more test phones** (anyone). Nobody else can open the link until you share it.
 
 ### 👉 3. Make the **test** Telegram bot (about 5 minutes)
 **Why:** people verify their phone number by tapping a button that opens this bot in Telegram. The code is ready; it
@@ -120,6 +132,8 @@ someone taps the button. You type it yourself because it is your personal number
 | ✅ | Said **merge** for pull request #3 (P1, after its review + 6 fixes) and **yes** to Cloudflare ↔ GitHub; typed GitHub's email code | 28 Nov |
 | ✅ | Answered **Q-022 … Q-026** ("your recommendation") | 28 Nov |
 | ✅ | Said **"yes build"** → the first phone app was built (the first try stopped on a setting; Claude fixed it and used the spare build) | 28 Nov |
+| ✅ | **Step 5** — installed the test app on the iQOO phone; Google sign-in worked; sent the screenshot of the "accept the terms" screen | 28 Nov |
+| ✅ | Decided: **Claude writes the privacy notice and terms** (English + Bangla); a law teacher reads them before the real website goes live | 28 Nov |
 
 > 💡 Namecheap **auto-renew is off** — the domain is paid until **26 Nov 2027**. Turning it on is your choice (it uses
 > the card saved at Namecheap — the project's one yearly payment). Claude will remind you in October 2027.
@@ -132,8 +146,9 @@ someone taps the button. You type it yourself because it is your personal number
 - ⏳ **The real Telegram bot** (same taps as 👉 3, name `UDVASITO`, username `udvasito_bot` or similar) — just
   before the real website goes live; its token goes into the **udvasito-prod** project instead.
 - ⏳ **Gemini AI key:** you create it in Google AI Studio and paste it into Convex (Claude shows where).
-- ⏳ **Install the first test app (APK)** on your phones: Claude sends a link; open it on the phone → **Download** →
-  **Install** (Android may ask "Allow from this source?" → allow). Claude asks before using a build (15 a month).
+- ⏳ **Law teacher's read** of the privacy notice and terms (member 4 arranges it): before the real website goes live,
+  the teacher reads them at **https://staging.udvasito.com/privacy** and **/terms** (both languages) and sends notes;
+  Claude puts the fixes in. Nothing goes to the real website before this.
 - ⏳ **Sign in once** on the app with **udvasitobd@gmail.com** → Claude makes that account the first super-admin.
 
 ---
@@ -153,7 +168,7 @@ Every job for members 2–5 is now in one shared doc: **UDVASITO team to-do** �
 ## ❓ Questions waiting for you / the team
 See `docs/questions.md` — Claude writes each question with a recommended answer. You said "do the recommendations",
 so Claude follows them unless you say otherwise. Still waiting on people: **Q-005** (member 3's texts), **Q-009**
-(member 4's legal draft), **Q-010** (two more phones).
+(the law teacher's read of the draft Claude wrote — member 4 arranges it), **Q-010** (two more phones).
 - ✅ Q-011, Q-012, Q-013, Q-014 — you answered (recommended options; "default Bangla translation everywhere").
 - 🟦 **Q-015** (one verified account per phone number), **Q-017** (what the Telegram bot says), **Q-018** (donor
   form words; the health-data consent follows the main consent version) and **Q-019** (request form words; a request
