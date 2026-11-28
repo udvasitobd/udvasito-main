@@ -196,7 +196,10 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   EXPO_PUBLIC_CONVEX_URL/SITE_URL = staging, SENTRY_DSN, GOOGLE_SERVICES_JSON, + EXPO_PUBLIC_APP_ENV=staging (added).
   Donor live rule needs phoneVerified → 3-phone run needs the Telegram test bot (for_me 👉 3).
   for_me 👉 4 = helpline number (developer types own number via dashboard → admin/ops:setSetting).
-  NEXT: ask the developer for EAS build #1 (preview APK, 1 of 15/month); Telegram bot wiring when the token is in;
+  eas.json development + preview: SENTRY_DISABLE_AUTO_UPLOAD=true (no SENTRY_AUTH_TOKEN; the Gradle source-map upload
+  would fail the build). Production profile still uploads → needs SENTRY_AUTH_TOKEN (EAS secret, developer pastes) or
+  the same switch before build #3. Developer said "yes build" 2026-11-28 for build #1.
+  NEXT (was): ask the developer for EAS build #1 (preview APK, 1 of 15/month); Telegram bot wiring when the token is in;
   then the 3-phone DoD run; Sentry DSN as a Cloudflare build var (public value) when the dashboard tab works.
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
   b498ce34-9880-4845-8fc5-54431dd450cb; tab "To-do" 1e0a4b77-629a (body 8e30bb71-e1ec), tab "Bangla to check"
