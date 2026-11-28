@@ -28,6 +28,24 @@ You said yes and typed GitHub's email code. **https://staging.udvasito.com** now
 `staging` code changes. You can open it and sign in with Google to look around (it is the test copy: nothing there is
 real, and real people should not use it yet).
 
+### 👉 5. Put the test app on your iQOO phone (about 10 minutes) — do this first
+The first phone version of UDVASITO is ready (a test copy: it talks to the test server, not the real one).
+1. On your **phone**, open **Chrome** and go to the build page:
+   **https://expo.dev/accounts/udvasitos-team/projects/udvasito/builds/2c7bb228-48f2-4e3e-a348-e2e6d675ec05**
+   If Expo asks you to log in, tap **Continue with Google** and pick the team Gmail.
+2. Tap **Install** (or the download button). Chrome downloads a file ending in **.apk**. If Chrome warns
+   "this type of file can harm your device", tap **Download anyway**: it is our own app.
+3. Open the downloaded file (tap the notification, or Chrome menu ⋮ → **Downloads**).
+4. Android asks to **allow Chrome to install unknown apps** → tap **Settings** → switch on **Allow from this source** →
+   press back.
+5. Tap **Install**. The iQOO phone may show a security check or say the app is "not from an app store": choose
+   **Continue installing** / **Install anyway**. If **Google Play Protect** says "unsafe app blocked", tap
+   **More details** → **Install anyway**. (This happens to every app that isn't in the Play Store yet.)
+6. Open **UDVASITO**. When it asks to **send notifications**, tap **Allow** — that is how blood requests reach you.
+7. Sign in with Google and pick the **team Gmail** (while we test, Google only lets that account in).
+8. Look around. Then write in the chat: **"app installed"** and anything that looked wrong or confusing. A screenshot
+   is fine — just cover any phone number on it.
+
 ### 👉 2. Share the team to-do doc with members 2–5
 Open **https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v** → **Share** → add the four members (or copy the link and send it in your team group). The most
 urgent jobs in it: **member 4's privacy notice + terms**, **the hospital list** (members 2 + 4) and **two more test
@@ -101,6 +119,7 @@ someone taps the button. You type it yourself because it is your personal number
 | ✅ | Said **start the next phase** → P1 (the first real version) has started | 27 Nov |
 | ✅ | Said **merge** for pull request #3 (P1, after its review + 6 fixes) and **yes** to Cloudflare ↔ GitHub; typed GitHub's email code | 28 Nov |
 | ✅ | Answered **Q-022 … Q-026** ("your recommendation") | 28 Nov |
+| ✅ | Said **"yes build"** → the first phone app was built (the first try stopped on a setting; Claude fixed it and used the spare build) | 28 Nov |
 
 > 💡 Namecheap **auto-renew is off** — the domain is paid until **26 Nov 2027**. Turning it on is your choice (it uses
 > the card saved at Namecheap — the project's one yearly payment). Claude will remind you in October 2027.
