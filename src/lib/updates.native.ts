@@ -36,14 +36,18 @@ export function useUpdateOffer(): UpdateOfferState {
   const updates = Updates.useUpdates();
   const config = useAppConfig();
   const { remote, dismissed } = useUpdateState();
+  // A check while the app was open can find an update newer than the one already downloaded at start: then it is
+  // not ready yet — "Update now" downloads the newest instead of restarting into the older one.
+  const found = updates.isUpdateAvailable ? updates.availableUpdate?.updateId : undefined;
+  const downloaded = updates.isUpdatePending ? updates.downloadedUpdate?.updateId : undefined;
   const offer = resolveOffer({
     native: true,
     currentId: CURRENT_RELEASE_ID,
     remote,
     ota: {
       available: updates.isUpdateAvailable,
-      pending: updates.isUpdatePending,
-      updateId: (updates.downloadedUpdate ?? updates.availableUpdate)?.updateId,
+      pending: updates.isUpdatePending && (found === undefined || found === downloaded),
+      updateId: found ?? downloaded,
     },
     appVersion: APP_VERSION,
     config,

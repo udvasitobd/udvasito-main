@@ -259,8 +259,11 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   only once an offer exists. Forgot the entry → Android bar without "What's new", web no bar. Files: src/lib/whatsNew.ts
   (pure), updateStore.ts (useSyncExternalStore — no zustand/zod in the web shell), updates.ts (web) /
   updates.native.ts, components/UpdateBanner.tsx (rendered by Screen under OfflineBanner; UpdateWatcher in the root
-  layout). Checked in Chrome on a local build (bar, What's new EN/BN, Later). The Android bar can only show from the
-  update AFTER the one that brings it.
+  layout). Checked in Chrome on a local build (bar, What's new EN/BN, Later) and by e2e (8 tests: bar + axe + Escape
+  + Later with a mocked newer /whats-new.json; no bar at the same version). The Android bar can only show from the
+  update AFTER the one that brings it. test:e2e is NOT in CI and runs against dist/ — rebuild (build:web) before it;
+  it now expects the consent gate (/ → /welcome) first. Known (not fixed): the web Dialog's focus trap focuses the
+  aria-hidden backdrop Pressable first (react-native-web focuses even tabindex=-1); Escape works once open.
 - Local checks without signing in: temporary re-export routes (e.g. app/zzpreview/…) + `npx tsx scripts/serve-dist.ts`
   (8081). serve-dist forbids iframes; for a 390 px view use a frame-friendly server from the scratchpad. `pkill` does
   NOT exist in Git Bash here — stop node servers with PowerShell Stop-Process (match the command line).
