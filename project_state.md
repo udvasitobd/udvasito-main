@@ -205,6 +205,10 @@ across regions and Free plan has no metered billing → kept ADR T-2 (EU-Dublin)
   d48c5a7… as no file). Retry = budget row 2 "Reserve — fix a native config mistake from build 1" (roadmap §2.4).
   Removed my duplicate EAS preview var EXPO_PUBLIC_APP_ENV (eas.json profile env already sets it).
   Lesson: decompress EAS log files (gzip) before reading; Node needs C:/ paths, not /c/.
+  EAS build #2 (preview, 2c7bb228-48f2-4e3e-a348-e2e6d675ec05, commit f7fce85) FINISHED in 23 min: 0.1.0, versionCode 1,
+  runtime d48c5a7b… (= local), channel preview. Builds used this month: 2 of 15 (quota reset date still unknown →
+  check expo.dev billing page). for_me 👉 5 = install on the iQOO (developer). Native Google sign-in + push are
+  untested on a phone until the developer reports back (spike S3).
   NEXT (was): ask the developer for EAS build #1 (preview APK, 1 of 15/month); Telegram bot wiring when the token is in;
   then the 3-phone DoD run; Sentry DSN as a Cloudflare build var (public value) when the dashboard tab works.
 - TEAM TO-DO DOC (Claude Docs, made 2026-11-27): https://claude.ai/artifact/PJT9GL12qaHMyQ63Tw2L6v — project
